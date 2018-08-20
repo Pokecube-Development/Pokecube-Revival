@@ -161,6 +161,7 @@ public class EditTrainerPage extends ListPage
         }
     }
 
+    @Override
     protected void onPageOpened()
     {
         int x = parent.width / 2;

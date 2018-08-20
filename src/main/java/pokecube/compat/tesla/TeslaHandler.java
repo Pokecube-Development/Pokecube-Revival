@@ -189,7 +189,7 @@ public class TeslaHandler
                 {
                     double dSq = Math.max(1, living.getDistanceSq(tile.getPos().getX() + 0.5,
                             tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5));
-                    long input = (long) (producer.takePower((long) (PokecubeAdv.conf.maxOutput / dSq), simulated));
+                    long input = (producer.takePower((long) (PokecubeAdv.conf.maxOutput / dSq), simulated));
                     ret += input;
                     if (ret >= power)
                     {

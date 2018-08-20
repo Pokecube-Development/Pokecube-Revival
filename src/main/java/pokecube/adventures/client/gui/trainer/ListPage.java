@@ -22,6 +22,7 @@ public abstract class ListPage extends Page
         initList();
     }
 
+    @Override
     protected abstract void initList();
 
     @Override

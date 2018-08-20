@@ -353,7 +353,7 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
         return 1;
     }
 
-    // 1.11
+    @Override
     public boolean isEmpty()
     {
         return true;

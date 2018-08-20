@@ -10,7 +10,6 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
@@ -308,7 +307,7 @@ public class PAEventsHandler
         IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(evt.getTarget());
         if (pokemobHolder != null && pokemobHolder.getTarget() == null)
         {
-            pokemobHolder.setTarget((EntityLivingBase) evt.getEntityLiving());
+            pokemobHolder.setTarget(evt.getEntityLiving());
         }
     }
 
@@ -396,7 +395,7 @@ public class PAEventsHandler
         {
             mob.getAI().addAITask(new AIFindTarget(npc, EntityPlayer.class).setPriority(10));
             mob.getAI()
-                    .addAITask(new AIMate(npc, (Class<? extends EntityAgeable>) ((EntityTrainerBase) npc).getClass()));
+                    .addAITask(new AIMate(npc, ((EntityTrainerBase) npc).getClass()));
         }
         // 5% chance of battling a random nearby pokemob if they see it.
         mob.getAI().addAITask(new AIFindTarget(npc, 0.05f, EntityPokemob.class).setPriority(20));

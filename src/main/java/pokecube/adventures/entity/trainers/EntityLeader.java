@@ -11,7 +11,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.DefaultPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards.Reward;
 import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
 import pokecube.adventures.items.ItemBadge;
@@ -26,7 +25,7 @@ public class EntityLeader extends EntityTrainer
         super(world);
         aiStates.setAIState(IHasNPCAIStates.STATIONARY, true);
         aiStates.setAIState(IHasNPCAIStates.TRADES, false);
-        ((DefaultPokemobs) pokemobsCap).resetTime = 0;
+        pokemobsCap.resetTime = 0;
     }
 
     public EntityLeader(World world, TypeTrainer type, int maxXp, Vector3 location)

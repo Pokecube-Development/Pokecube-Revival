@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.Loader;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.IHasPokemobs;
 import pokecube.core.PokecubeCore;
+import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.utils.Tools;
 import thut.core.client.render.model.IExtendedModelPart;
 import thut.core.client.render.x3d.X3dModel;
@@ -40,8 +41,8 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
     public TrainerBeltRenderer(RenderLivingBase<?> livingEntityRendererIn)
     {
         this.livingEntityRenderer = livingEntityRendererIn;
-        model = new X3dModel(new ResourceLocation(PokecubeCore.ID, "models/worn/belt.x3d"));
-        model2 = new X3dModel(new ResourceLocation(PokecubeCore.ID, "models/worn/belt.x3d"));
+        model = new X3dModel(new ResourceLocation(PokecubeMod.ID, "models/worn/belt.x3d"));
+        model2 = new X3dModel(new ResourceLocation(PokecubeMod.ID, "models/worn/belt.x3d"));
         wearables = Loader.isModLoaded("thut_wearables");
     }
 

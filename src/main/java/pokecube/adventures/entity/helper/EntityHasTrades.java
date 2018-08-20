@@ -188,11 +188,13 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
         checkTradeIntegrity();
     }
 
+    @Override
     public World getWorld()
     {
         return this.buyingPlayer.world;
     }
 
+    @Override
     public BlockPos getPos()
     {
         return new BlockPos(this.buyingPlayer);

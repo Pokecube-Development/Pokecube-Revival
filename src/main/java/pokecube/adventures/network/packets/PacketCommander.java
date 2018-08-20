@@ -63,7 +63,7 @@ public class PacketCommander implements IMessage, IMessageHandler<PacketCommande
             if (PokecubeMod.debug) PokecubeMod.log(Level.WARNING, "Invalid Commander Block use at " + tile.getPos(), e);
             tile.getWorld().playSound(null, tile.getPos(), SoundEvents.BLOCK_NOTE_BASEDRUM, SoundCategory.BLOCKS, 1, 1);
         }
-        PacketHandler.sendTileUpdate((TileEntity) tile);
+        PacketHandler.sendTileUpdate(tile);
     }
 
     @Override

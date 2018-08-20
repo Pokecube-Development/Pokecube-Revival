@@ -120,7 +120,7 @@ public class PokemobMoveCategory implements IRecipeCategory<PokemobMoveRecipeWra
 
         if (recipeWrapper instanceof ICraftingRecipeWrapper)
         {
-            ICraftingRecipeWrapper craftingRecipeWrapper = (ICraftingRecipeWrapper) recipeWrapper;
+            ICraftingRecipeWrapper craftingRecipeWrapper = recipeWrapper;
             ResourceLocation registryName = craftingRecipeWrapper.getRegistryName();
             if (registryName != null)
             {

@@ -517,6 +517,7 @@ public class EntityTrainer extends EntityTrainerBase
 
     /** This is called when Entity's growing age timer reaches 0 (negative
      * values are considered as a child, positive as an adult) */
+    @Override
     protected void onGrowingAdult()
     {
     }

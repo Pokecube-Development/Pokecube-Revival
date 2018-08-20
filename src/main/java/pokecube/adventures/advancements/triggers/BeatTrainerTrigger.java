@@ -68,7 +68,7 @@ public class BeatTrainerTrigger implements ICriterionTrigger<BeatTrainerTrigger.
 
             for (ICriterionTrigger.Listener<BeatTrainerTrigger.Instance> listener : this.listeners)
             {
-                if (((BeatTrainerTrigger.Instance) listener.getCriterionInstance()).test(player, defeated))
+                if (listener.getCriterionInstance().test(player, defeated))
                 {
                     if (list == null)
                     {

@@ -424,17 +424,20 @@ public class CapabilityHasPokemobs
                 pokecubes = NonNullList.<ItemStack> withSize(6, ItemStack.EMPTY);
         }
 
+        @Override
         public Set<ITargetWatcher> getTargetWatchers()
         {
             return watchers;
         }
 
+        @Override
         public void addTargetWatcher(ITargetWatcher watcher)
         {
             IHasPokemobs.super.addTargetWatcher(watcher);
             watchers.add(watcher);
         }
 
+        @Override
         public void removeTargetWatcher(ITargetWatcher watcher)
         {
             IHasPokemobs.super.removeTargetWatcher(watcher);

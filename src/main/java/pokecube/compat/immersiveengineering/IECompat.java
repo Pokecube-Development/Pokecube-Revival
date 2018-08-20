@@ -24,6 +24,7 @@ import blusunrize.immersiveengineering.api.crafting.SqueezerRecipe;
 import blusunrize.immersiveengineering.api.tool.BelljarHandler;
 import blusunrize.immersiveengineering.api.tool.BelljarHandler.DefaultPlantHandler;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
@@ -455,7 +456,7 @@ public class IECompat
                     float jarScale = 0.75f;
                     // Render growing stem
                     GlStateManager.rotate(-90, 0, 1, 0);
-                    IBlockState state = renderStates[0].withProperty(BlockBerryCrop.AGE,
+                    IBlockState state = renderStates[0].withProperty(BlockCrops.AGE,
                             (int) (growth >= .5 ? 7 : 2 * growth * 7));
                     IBakedModel model = blockRenderer.getModelForState(state);
                     GlStateManager.translate((1 - jarScale) / 2, 0, -(1 - jarScale) / 2);

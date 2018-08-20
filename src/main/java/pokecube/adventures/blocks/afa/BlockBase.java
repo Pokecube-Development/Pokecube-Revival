@@ -10,7 +10,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -59,7 +58,7 @@ public abstract class BlockBase extends Block implements ITileEntityProvider
                         new ItemStack(item.getItem(), item.getCount(), item.getItemDamage()));
                 if (item.hasTagCompound())
                 {
-                    entity_item.getItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
+                    entity_item.getItem().setTagCompound(item.getTagCompound().copy());
                 }
                 float factor = 0.005F;
                 entity_item.motionX = rand.nextGaussian() * factor;

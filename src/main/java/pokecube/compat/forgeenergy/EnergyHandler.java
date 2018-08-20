@@ -52,7 +52,7 @@ public class EnergyHandler
                 {
                     double dSq = Math.max(1, living.getDistanceSq(tile.getPos().getX() + 0.5,
                             tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5));
-                    int input = (int) (producer.extractEnergy((int) (PokecubeAdv.conf.maxOutput / dSq), simulated));
+                    int input = (producer.extractEnergy((int) (PokecubeAdv.conf.maxOutput / dSq), simulated));
                     ret += input;
                     if (ret >= power)
                     {
@@ -63,7 +63,7 @@ public class EnergyHandler
             }
         }
         ret = Math.min(ret, PokecubeAdv.conf.maxOutput);
-        if (!simulated) tile.currentOutput = (int) ret;
+        if (!simulated) tile.currentOutput = ret;
         return ret;
     }
 
@@ -72,7 +72,7 @@ public class EnergyHandler
     {
         Map<IEnergyStorage, Integer> tiles = Maps.newHashMap();
         Integer output = (int) getOutput(event.getTile(), PokecubeAdv.conf.maxOutput, true);
-        event.getTile().theoreticalOutput = (int) output;
+        event.getTile().theoreticalOutput = output;
         event.getTile().currentOutput = 0;
         IEnergyStorage producer = event.getTile().getCapability(CapabilityEnergy.ENERGY, null);
         Integer start = output;
@@ -335,7 +335,7 @@ public class EnergyHandler
                 }
             }
             dE = (maxEnergy);
-            dE = (int) Math.min(dE, power);
+            dE = Math.min(dE, power);
             if (!simulate)
             {
                 living.getEntityData().setLong("energyTime", energyTime);
