@@ -1,6 +1,6 @@
 package mcjty.lostcities.api;
 
-import mcjty.lostcities.varia.ChunkCoord;
+//import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 
@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 public interface ILostSphere {
 
     // Get the center chunk of this sphere
-    ChunkCoord getCenter();
+    //ChunkCoord getCenter();
 
     // Get the center position of this sphere
     BlockPos getCenterPos();
