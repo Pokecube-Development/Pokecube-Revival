@@ -1,0 +1,28 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"textures": {
+			"#None": "pokecube_adventures:blocks/extractor"
+		},
+		"model": "pokecube_adventures:extractor.obj"
+	},
+	"variants": {
+		"inventory": [{
+			"transform": "forge:default-block"
+		}],
+		"facing": {
+			"east": {
+				"y": 0
+			},
+			"west": {
+				"y": 180
+			},
+			"north": {
+				"y": 270
+			},
+			"south": {
+				"y": 90
+			}
+		}
+	}
+}

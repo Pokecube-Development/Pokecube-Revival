@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "pokecube_adventures:badge_rock",
+      "data": 6
+    },
+    "title": {
+      "translate": "achievement.achievement.pokeadv.get.badgerock"
+    },
+    "description": {
+      "translate": "achievement.achievement.pokeadv.get.badgerock.desc"
+    }
+  },
+  "criteria": {
+    "get_badge": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "pokecube_adventures:badge_rock"
+          }
+        ]
+      }
+    }
+  },
+  "parent": "pokecube_adventures:trainers/root"
+}
