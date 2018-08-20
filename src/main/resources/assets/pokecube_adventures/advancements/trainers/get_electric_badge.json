@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_electric",
-      "data": 13
+      "item": "pokecube_adventures:badge_electric"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgeelectric"

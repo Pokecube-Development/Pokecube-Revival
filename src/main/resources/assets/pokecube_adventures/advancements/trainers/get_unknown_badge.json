@@ -1,13 +1,13 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_fire"
+      "item": "pokecube_adventures:badge_unknown"
     },
     "title": {
-      "translate": "achievement.achievement.pokeadv.get.badgefire"
+      "translate": "achievement.achievement.pokeadv.get.badgeunknown"
     },
     "description": {
-      "translate": "achievement.achievement.pokeadv.get.badgefire.desc"
+      "translate": "achievement.achievement.pokeadv.get.badgeunknown.desc"
     }
   },
   "criteria": {
@@ -16,7 +16,7 @@
       "conditions": {
         "items": [
           {
-            "item": "pokecube_adventures:badge_fire"
+            "item": "pokecube_adventures:badge_unknown"
           }
         ]
       }

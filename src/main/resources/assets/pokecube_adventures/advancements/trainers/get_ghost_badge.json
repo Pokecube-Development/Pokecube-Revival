@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_ghost",
-      "data": 8
+      "item": "pokecube_adventures:badge_ghost"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgeghost"

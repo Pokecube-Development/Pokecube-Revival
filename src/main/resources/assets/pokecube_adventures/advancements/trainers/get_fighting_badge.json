@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_fighting",
-      "data": 2
+      "item": "pokecube_adventures:badge_fighting"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgefighting"

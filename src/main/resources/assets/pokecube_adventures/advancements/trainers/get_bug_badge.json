@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_bug",
-      "data": 7
+      "item": "pokecube_adventures:badge_bug"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgebug"

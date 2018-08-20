@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_steel",
-      "data": 9
+      "item": "pokecube_adventures:badge_steel"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgesteel"

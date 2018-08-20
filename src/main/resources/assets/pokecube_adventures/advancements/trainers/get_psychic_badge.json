@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_psychic",
-      "data": 14
+      "item": "pokecube_adventures:badge_psychic"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgepsychic"

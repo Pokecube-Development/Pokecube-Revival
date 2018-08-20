@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_dark",
-      "data": 17
+      "item": "pokecube_adventures:badge_dark"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgedark"

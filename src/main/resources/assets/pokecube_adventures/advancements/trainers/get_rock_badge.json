@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_rock",
-      "data": 6
+      "item": "pokecube_adventures:badge_rock"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgerock"

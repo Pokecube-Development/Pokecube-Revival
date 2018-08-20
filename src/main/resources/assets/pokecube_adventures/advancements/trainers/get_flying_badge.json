@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_flying",
-      "data": 3
+      "item": "pokecube_adventures:badge_flying"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgeflying"

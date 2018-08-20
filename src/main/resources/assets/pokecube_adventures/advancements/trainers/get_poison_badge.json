@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_poison",
-      "data": 4
+      "item": "pokecube_adventures:badge_poison"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgepoison"

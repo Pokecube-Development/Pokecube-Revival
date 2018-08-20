@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_dragon",
-      "data": 16
+      "item": "pokecube_adventures:badge_dragon"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgedragon"

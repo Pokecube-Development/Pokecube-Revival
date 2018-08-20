@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_fairy",
-      "data": 18
+      "item": "pokecube_adventures:badge_fairy"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgefairy"

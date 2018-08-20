@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_normal",
-      "data": 1
+      "item": "pokecube_adventures:badge_normal"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgenormal"

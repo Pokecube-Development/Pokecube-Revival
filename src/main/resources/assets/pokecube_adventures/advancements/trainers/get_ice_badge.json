@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_ice",
-      "data": 15
+      "item": "pokecube_adventures:badge_ice"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgeice"

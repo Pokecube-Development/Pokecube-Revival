@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_grass",
-      "data": 12
+      "item": "pokecube_adventures:badge_grass"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgegrass"

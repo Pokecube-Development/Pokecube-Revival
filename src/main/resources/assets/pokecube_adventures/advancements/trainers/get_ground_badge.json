@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_ground",
-      "data": 5
+      "item": "pokecube_adventures:badge_ground"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgeground"

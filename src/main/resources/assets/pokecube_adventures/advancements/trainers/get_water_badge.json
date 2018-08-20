@@ -1,8 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "pokecube_adventures:badge_water",
-      "data": 11
+      "item": "pokecube_adventures:badge_water"
     },
     "title": {
       "translate": "achievement.achievement.pokeadv.get.badgewater"
