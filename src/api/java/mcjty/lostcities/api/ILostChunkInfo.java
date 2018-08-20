@@ -1,8 +1,8 @@
 package mcjty.lostcities.api;
 
-import java.util.Collection;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 public interface ILostChunkInfo {
 
@@ -15,8 +15,8 @@ public interface ILostChunkInfo {
      * If this chunk hosts the center of a city then this will retrieve the city information
      * of that city.
      */
-//    @Nullable
-//    ILostCityInfo getCityInfo();
+    @Nullable
+    ILostCityInfo getCityInfo();
 
     /**
      * Return the name of the building if there is a building here (name from asset registry)
@@ -88,4 +88,10 @@ public interface ILostChunkInfo {
      * Return the maximum highway level at this chunk. Returns -1 if there is no highway here
      */
     int getMaxHighwayLevel();
+
+    /**
+     * Get a sphere that contains this chunk (if there is one)
+     */
+    @Nullable
+    ILostSphere getSphere();
 }
