@@ -30,7 +30,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 
-version = "${version_compile}"
+version = "${version_minecraft}-${version_compile}"
 group= ""
 archivesBaseName = "${compile_name}"
 
@@ -86,7 +86,7 @@ dependencies {
 	deobfProvided "net.darkhax.tesla:Tesla-${tesla_mcversion}:${tesla_version}"
     //JEI
 	deobfProvided "mezz.jei:jei_${jei_mcversion}:${jei_version}:api"
-	runtime "mezz.jei:jei_${jei_mcversion}:${jei_version}"
+	compile "mezz.jei:jei_${jei_mcversion}:${jei_version}"
     //JER
     deobfCompile "just-enough-resources-jer:JustEnoughResources:${version_minecraft}:${version_jer}"
     //Inventory tweaks
