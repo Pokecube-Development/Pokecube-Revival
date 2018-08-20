@@ -37,6 +37,7 @@ import pokecube.core.database.SpawnBiomeMatcher;
 import pokecube.core.database.SpawnBiomeMatcher.SpawnCheck;
 import pokecube.core.events.handlers.EventsHandler;
 import pokecube.core.events.handlers.SpawnHandler;
+import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.utils.ChunkCoordinate;
 import thut.api.maths.Vector3;
 
@@ -171,7 +172,7 @@ public class TrainerSpawnHandler
                 return;
             }
             double dt = (System.nanoTime() - time) / 1000000D;
-            if (dt > 20) System.err.println(FMLCommonHandler.instance().getEffectiveSide() + " Trainer "
+            if (dt > 20) PokecubeMod.log(FMLCommonHandler.instance().getEffectiveSide() + " Trainer "
                     + cap.getType().name + " " + dt + "ms ");
             v.offsetBy(EnumFacing.UP).moveEntity(t);
             if (t.pokemobsCap.countPokemon() > 0
@@ -194,8 +195,8 @@ public class TrainerSpawnHandler
             long time = System.nanoTime();
             tick(evt.world);
             double dt = (System.nanoTime() - time) / 1000000D;
-            if (dt > 50) System.err
-                    .println(FMLCommonHandler.instance().getEffectiveSide() + "Trainer Spawn Tick took " + dt + "ms");
+            if (dt > 50) PokecubeMod
+                    .log(FMLCommonHandler.instance().getEffectiveSide() + "Trainer Spawn Tick took " + dt + "ms");
         }
     }
 
