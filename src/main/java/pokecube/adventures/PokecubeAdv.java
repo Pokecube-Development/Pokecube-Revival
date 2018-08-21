@@ -25,7 +25,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import pokecube.adventures.advancements.Triggers;
 import pokecube.adventures.commands.BattleCommand;
 import pokecube.adventures.commands.Config;
+import pokecube.adventures.commands.CountCommand;
 import pokecube.adventures.commands.GeneralCommands;
+import pokecube.adventures.commands.KillCommand;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.DefaultPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.IHasPokemobs;
@@ -76,7 +78,8 @@ public class PokecubeAdv
     public static final String version            = "@VERSION";
     public final static String MCVERSIONS         = "@MCVERSION";
     public final static String MINVERSION         = "@MINVERSION";
-    // Add things here as compat modules are made for them, the only "required-after" should be pokecube.
+    // Add things here as compat modules are made for them, the only
+    // "required-after" should be pokecube.
     public final static String DEPSTRING          = "required-after:pokecube;" + "after:thut_wearables;"
             + "after:thutessentials;" + "after:waila;" + "after:advancedrocketry;" + "after:thut_bling;"
             + "after:theoneprobe;" + "after:tesla;" + "after:lostcities;" + "after:ruins;" + "after:ftbl;"
@@ -223,6 +226,8 @@ public class PokecubeAdv
     public void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new GeneralCommands());
+        event.registerServerCommand(new KillCommand());
+        event.registerServerCommand(new CountCommand());
         event.registerServerCommand(new BattleCommand());
         event.registerServerCommand(new CommandConfig("pokeadvsettings", Config.instance));
         TypeTrainer.initSpawns();
