@@ -29,11 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pokecube.core.PokecubeCore;
@@ -94,7 +90,7 @@ public class JERCompat
 
     public JERCompat()
     {
-        MinecraftForge.EVENT_BUS.register(this);
+        register();
     }
 
     private LootDrop[] getDrops(PokedexEntry entry)
@@ -175,14 +171,11 @@ public class JERCompat
         return biomes.toArray(new String[0]);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    @SideOnly(Side.CLIENT)
-    public void register(WorldEvent.Load event)
+    public void register()
     {
         registerMobs();
         registerOres();
         registerPlants();
-        MinecraftForge.EVENT_BUS.unregister(this);
     }
 
     @SuppressWarnings("unchecked")
