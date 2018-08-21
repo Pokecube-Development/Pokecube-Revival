@@ -2,6 +2,7 @@ package pokecube.adventures.handlers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Map.Entry;
 
 import org.nfunk.jep.JEP;
@@ -43,31 +44,37 @@ import thut.api.maths.Vector3;
 
 public class TrainerSpawnHandler
 {
-    public static int                      trainerBox = 64;
 
     private static TrainerSpawnHandler     instance;
-    public static HashSet<ChunkCoordinate> trainers   = new HashSet<ChunkCoordinate>();
+    public static HashSet<ChunkCoordinate> trainers = new HashSet<ChunkCoordinate>();
+    private static Vector3                 vec1     = Vector3.getNewVector();
+    private static Vector3                 vec2     = Vector3.getNewVector();
 
     public static boolean addTrainerCoord(Entity e)
     {
-        int x = (int) e.posX;
-        int y = (int) e.posY;
-        int z = (int) e.posZ;
+        int x = ((int) e.posX) / 16;
+        int y = ((int) e.posY) / 16;
+        int z = ((int) e.posZ) / 16;
         int dim = e.dimension;
         return addTrainerCoord(x, y, z, dim);
     }
 
     public static boolean addTrainerCoord(int x, int y, int z, int dim)
     {
-        ChunkCoordinate coord = new ChunkCoordinate(x, y, z, dim);
-        if (trainers.contains(coord)) return false;
+        return trainers.add(new ChunkCoordinate(x, y, z, dim));
+    }
 
-        return trainers.add(coord);
+    public static int countTrainersNear(Entity e)
+    {
+        int x = ((int) e.posX) / 16;
+        int y = ((int) e.posY) / 16;
+        int z = ((int) e.posZ) / 16;
+        return countTrainersInArea(e.getEntityWorld(), x, y, z);
     }
 
     public static int countTrainersInArea(World world, int chunkPosX, int chunkPosY, int chunkPosZ)
     {
-        int tolerance = trainerBox;
+        int tolerance = Config.instance.trainerBox / 16;
 
         int ret = 0;
         for (Object o : trainers)
@@ -82,6 +89,41 @@ public class TrainerSpawnHandler
             }
         }
         return ret;
+    }
+
+    /** Given a player, find a random position near it. */
+    public static Vector3 getRandomSpawningPointNearEntity(World world, Entity player, int maxRange)
+    {
+        if (player == null) return null;
+
+        Vector3 v = vec1.set(player);
+
+        Random rand = new Random();
+
+        // SElect random gaussians from here.
+        double x = rand.nextGaussian() * maxRange;
+        double z = rand.nextGaussian() * maxRange;
+
+        // Cap x and z to distance.
+        if (Math.abs(x) > maxRange) x = Math.signum(x) * maxRange;
+        if (Math.abs(z) > maxRange) z = Math.signum(z) * maxRange;
+
+        // Don't select distances too far up/down from current.
+        double y = Math.min(Math.max(5, rand.nextGaussian() * 10), 10);
+        v.addTo(x, y, z);
+
+        // Find surface
+        Vector3 temp1 = Vector3.getNextSurfacePoint2(world, vec1, vec2.set(EnumFacing.DOWN), 10);
+
+        if (temp1 != null)
+        {
+            temp1.y++;
+            // Check for headroom
+            if (!temp1.addTo(0, 1, 0).isClearOfBlocks(world)) return null;
+            temp1.y--;
+            return temp1;
+        }
+        return null;
     }
 
     public static TrainerSpawnHandler getInstance()
@@ -149,7 +191,7 @@ public class TrainerSpawnHandler
         players.addAll(w.playerEntities);
         if (players.size() < 1) return;
         EntityPlayer p = (EntityPlayer) players.get(w.rand.nextInt(players.size()));
-        Vector3 v = SpawnHandler.getRandomSpawningPointNearEntity(w, p, trainerBox, 32);
+        Vector3 v = getRandomSpawningPointNearEntity(w, p, Config.instance.trainerBox);
         if (v == null) return;
         if (v.y < 0) v.y = v.getMaxY(w);
         Vector3 temp = Vector3.getNextSurfacePoint2(w, v, Vector3.secondAxisNeg, v.y);
@@ -157,9 +199,9 @@ public class TrainerSpawnHandler
         v = temp != null ? temp.offset(EnumFacing.UP) : v;
 
         if (!SpawnHandler.checkNoSpawnerInArea(w, v.intX(), v.intY(), v.intZ())) return;
-        int count = countTrainersInArea(w, v.intX(), v.intY(), v.intZ());
+        int count = countTrainersInArea(w, v.intX() / 16, v.intY() / 16, v.intZ() / 16);
 
-        if (count < 2)
+        if (count < Config.instance.trainerDensity)
         {
             long time = System.nanoTime();
             EntityTrainer t = getTrainer(v, w);
@@ -190,7 +232,7 @@ public class TrainerSpawnHandler
     public void tickEvent(WorldTickEvent evt)
     {
         if (Config.instance.trainerSpawn && evt.phase == Phase.END && evt.type != Type.CLIENT && evt.side != Side.CLIENT
-                && evt.world.getTotalWorldTime() % 100 == 0)
+                && evt.world.getTotalWorldTime() % PokecubeMod.core.getConfig().spawnRate == 0)
         {
             long time = System.nanoTime();
             tick(evt.world);

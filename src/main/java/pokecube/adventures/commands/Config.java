@@ -22,7 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
 import pokecube.adventures.blocks.warppad.TileEntityWarpPad;
-import pokecube.adventures.handlers.TrainerSpawnHandler;
 import pokecube.adventures.items.bags.ContainerBag;
 import pokecube.adventures.items.bags.InventoryBag;
 import pokecube.adventures.utils.DBLoader;
@@ -140,6 +139,8 @@ public class Config extends ConfigBase
     @Configure(category = trainers)
     public int                          trainerBox            = 128;
     @Configure(category = trainers)
+    public int                          trainerDensity        = 2;
+    @Configure(category = trainers)
     public int                          trainerCooldown       = 10000;
     @Configure(category = trainers)
     public int                          trainerSendOutDelay   = 50;
@@ -200,7 +201,6 @@ public class Config extends ConfigBase
     {
         TileEntityWarpPad.MAXRANGE = warpPadRange;
         TileEntityTradingTable.theftEnabled = theft;
-        TrainerSpawnHandler.trainerBox = trainerBox;
         DBLoader.FORCECOPY = forceDatabase;
         ContainerBag.HOLDALL = bagHoldAll;
         InventoryBag.PAGECOUNT = bagPageCount;

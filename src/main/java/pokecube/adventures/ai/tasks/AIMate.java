@@ -5,7 +5,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
+import pokecube.adventures.commands.Config;
 import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
+import pokecube.adventures.handlers.TrainerSpawnHandler;
 import thut.api.maths.Vector3;
 
 public class AIMate extends AITrainerBase
@@ -79,6 +81,7 @@ public class AIMate extends AITrainerBase
     public boolean shouldRun()
     {
         return thisEntity != null && thisEntity.getGrowingAge() == 0 && trainer.getGender() == 2
-                && aiTracker.getAIState(IHasNPCAIStates.MATES);
+                && aiTracker.getAIState(IHasNPCAIStates.MATES)
+                && TrainerSpawnHandler.countTrainersNear(thisEntity) < Config.instance.trainerDensity * 2;
     }
 }
