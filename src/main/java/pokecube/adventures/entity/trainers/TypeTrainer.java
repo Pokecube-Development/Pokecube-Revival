@@ -199,7 +199,6 @@ public class TypeTrainer
             {
                 if (s != null)
                 {
-                    System.out.println(s + " " + level + " " + variance.apply(level));
                     item = makeStack(s, owner, world, variance.apply(level));
                 }
                 if (CompatWrapper.isValid(item)) break;
