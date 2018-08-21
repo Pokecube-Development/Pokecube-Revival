@@ -410,6 +410,7 @@ public class EntityTrainer extends EntityTrainerBase
     public void setDead()
     {
         PCEventsHandler.recallAllPokemobs(this);
+        TrainerSpawnHandler.removeTrainer(this);
         super.setDead();
     }
 

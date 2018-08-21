@@ -1,11 +1,16 @@
 package pokecube.adventures.handlers;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 import org.nfunk.jep.JEP;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -45,23 +50,40 @@ import thut.api.maths.Vector3;
 public class TrainerSpawnHandler
 {
 
-    private static TrainerSpawnHandler     instance;
-    public static HashSet<ChunkCoordinate> trainers = new HashSet<ChunkCoordinate>();
-    private static Vector3                 vec1     = Vector3.getNewVector();
-    private static Vector3                 vec2     = Vector3.getNewVector();
+    private static TrainerSpawnHandler          instance;
+    public static Map<ChunkCoordinate, Integer> trainers   = Maps.newHashMap();
+    public static Set<UUID>                     trainerSet = Sets.newHashSet();
+    private static Vector3                      vec1       = Vector3.getNewVector();
+    private static Vector3                      vec2       = Vector3.getNewVector();
 
     public static boolean addTrainerCoord(Entity e)
+    {
+        if (trainerSet.contains(e.getUniqueID())) return false;
+        int x = ((int) e.posX) / 16;
+        int y = ((int) e.posY) / 16;
+        int z = ((int) e.posZ) / 16;
+        int dim = e.dimension;
+        ChunkCoordinate coord = new ChunkCoordinate(x, y, z, dim);
+        if (trainers.containsKey(coord)) trainers.put(coord, 1 + trainers.get(coord));
+        else trainers.put(coord, 1);
+        trainerSet.add(e.getUniqueID());
+        return true;
+    }
+
+    public static void removeTrainer(Entity e)
     {
         int x = ((int) e.posX) / 16;
         int y = ((int) e.posY) / 16;
         int z = ((int) e.posZ) / 16;
         int dim = e.dimension;
-        return addTrainerCoord(x, y, z, dim);
-    }
-
-    public static boolean addTrainerCoord(int x, int y, int z, int dim)
-    {
-        return trainers.add(new ChunkCoordinate(x, y, z, dim));
+        ChunkCoordinate coord = new ChunkCoordinate(x, y, z, dim);
+        trainerSet.remove(e.getUniqueID());
+        if (trainers.containsKey(coord))
+        {
+            int num = trainers.get(coord) - 1;
+            if (num > 0) trainers.put(coord, num);
+            else trainers.remove(coord);
+        }
     }
 
     public static int countTrainersNear(Entity e)
@@ -75,9 +97,8 @@ public class TrainerSpawnHandler
     public static int countTrainersInArea(World world, int chunkPosX, int chunkPosY, int chunkPosZ)
     {
         int tolerance = Config.instance.trainerBox / 16;
-
         int ret = 0;
-        for (Object o : trainers)
+        for (ChunkCoordinate o : trainers.keySet())
         {
             ChunkCoordinate coord = (ChunkCoordinate) o;
             if (chunkPosX >= coord.getX() - tolerance && chunkPosZ >= coord.getZ() - tolerance
@@ -85,7 +106,7 @@ public class TrainerSpawnHandler
                     && chunkPosX <= coord.getX() + tolerance && chunkPosZ <= coord.getZ() + tolerance
                     && world.provider.getDimension() == coord.dim)
             {
-                ret++;
+                ret += trainers.get(coord);
             }
         }
         return ret;
@@ -129,12 +150,6 @@ public class TrainerSpawnHandler
     public static TrainerSpawnHandler getInstance()
     {
         return instance;
-    }
-
-    public static boolean removeTrainerCoord(int x, int y, int z, int dim)
-    {
-        ChunkCoordinate coord = new ChunkCoordinate(x, y, z, dim);
-        return trainers.remove(coord);
     }
 
     Vector3 v      = Vector3.getNewVector(), v1 = Vector3.getNewVector(), v2 = Vector3.getNewVector();
@@ -220,7 +235,6 @@ public class TrainerSpawnHandler
             if (t.pokemobsCap.countPokemon() > 0
                     && SpawnHandler.checkNoSpawnerInArea(w, (int) t.posX, (int) t.posY, (int) t.posZ))
             {
-                addTrainerCoord(t);
                 w.spawnEntity(t);
             }
             else t.setDead();
