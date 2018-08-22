@@ -32,7 +32,7 @@ public class ClonerRecipeCategory implements IRecipeCategory<ClonerRecipeWrapper
     {
         ResourceLocation location = new ResourceLocation(PokecubeAdv.ID, "textures/gui/clonergui.png");
         background = guiHelper.createDrawable(location, 29, 16, 116, 54);
-        localizedName = Translator.translateToLocal("tile.cloner.reanimator.name");
+        localizedName = Translator.translateToLocal("tile.reanimator.name");
         icon = guiHelper.createDrawable(JEICompat.TABS, 16, 0, 16, 16);
     }
 
