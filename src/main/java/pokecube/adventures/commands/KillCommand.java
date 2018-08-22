@@ -38,35 +38,37 @@ public class KillCommand extends CommandBase
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
-        World world = sender.getEntityWorld();
         // TODO check argument for this
         boolean all = false;
         // TODO check argument for this.
         TypeTrainer type = null;
         int num = 0;
-        for (Entity mob : world.loadedEntityList)
+        for (World world : server.worlds)
         {
-            if (mob instanceof EntityTrainer)
+            for (Entity mob : world.loadedEntityList)
             {
-                EntityTrainer trainer = (EntityTrainer) mob;
-                if (trainer.aiStates.getAIState(IHasNPCAIStates.INVULNERABLE)) continue;
-                if (all)
+                if (mob instanceof EntityTrainer)
                 {
-                    trainer.setDead();
-                    num++;
-                    continue;
-                }
-                if (type != null && trainer.pokemobsCap.getType() == type)
-                {
-                    trainer.setDead();
-                    num++;
-                    continue;
-                }
-                if (!(trainer instanceof EntityLeader || trainer instanceof EntityPokemartSeller))
-                {
-                    trainer.setDead();
-                    num++;
-                    continue;
+                    EntityTrainer trainer = (EntityTrainer) mob;
+                    if (trainer.aiStates.getAIState(IHasNPCAIStates.INVULNERABLE)) continue;
+                    if (all)
+                    {
+                        trainer.setDead();
+                        num++;
+                        continue;
+                    }
+                    if (type != null && trainer.pokemobsCap.getType() == type)
+                    {
+                        trainer.setDead();
+                        num++;
+                        continue;
+                    }
+                    if (!(trainer instanceof EntityLeader || trainer instanceof EntityPokemartSeller))
+                    {
+                        trainer.setDead();
+                        num++;
+                        continue;
+                    }
                 }
             }
         }

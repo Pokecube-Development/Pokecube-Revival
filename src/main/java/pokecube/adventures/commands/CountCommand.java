@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import pokecube.adventures.entity.trainers.EntityTrainer;
+import pokecube.adventures.handlers.TrainerSpawnHandler;
 
 public class CountCommand extends CommandBase
 {
@@ -34,13 +35,23 @@ public class CountCommand extends CommandBase
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
-        World world = sender.getEntityWorld();
         int num = 0;
-        for (Entity mob : world.loadedEntityList)
+        if (args.length == 1)
         {
-            if (mob instanceof EntityTrainer)
+            int range = parseInt(args[0]);
+            num = TrainerSpawnHandler.countTrainersNear(sender.getCommandSenderEntity(), range);
+        }
+        else
+        {
+            for (World world : server.worlds)
             {
-                num++;
+                for (Entity mob : world.loadedEntityList)
+                {
+                    if (mob instanceof EntityTrainer)
+                    {
+                        num++;
+                    }
+                }
             }
         }
         sender.sendMessage(new TextComponentString("Trainer Count: " + num));

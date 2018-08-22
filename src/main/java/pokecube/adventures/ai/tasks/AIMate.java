@@ -8,6 +8,7 @@ import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import pokecube.adventures.commands.Config;
 import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
 import pokecube.adventures.handlers.TrainerSpawnHandler;
+import pokecube.core.interfaces.PokecubeMod;
 import thut.api.maths.Vector3;
 
 public class AIMate extends AITrainerBase
@@ -32,6 +33,8 @@ public class AIMate extends AITrainerBase
         super.doMainThreadTick(world);
         if (shouldRun())
         {
+            if (PokecubeMod.debug) PokecubeMod.log(this.thisEntity + " is Looking for mate");
+
             foundMate = this.world.findNearestEntityWithinAABB(targetClass,
                     this.thisEntity.getEntityBoundingBox().grow(8.0D, 3.0D, 8.0D), this.thisEntity);
             if (foundMate == null)
@@ -81,7 +84,7 @@ public class AIMate extends AITrainerBase
     public boolean shouldRun()
     {
         return thisEntity != null && thisEntity.getGrowingAge() == 0 && trainer.getGender() == 2
-                && aiTracker.getAIState(IHasNPCAIStates.MATES)
-                && TrainerSpawnHandler.countTrainersNear(thisEntity) < Config.instance.trainerDensity * 2;
+                && aiTracker.getAIState(IHasNPCAIStates.MATES) && TrainerSpawnHandler.countTrainersNear(thisEntity,
+                        Config.instance.trainerBox) < Config.instance.trainerDensity * 2;
     }
 }

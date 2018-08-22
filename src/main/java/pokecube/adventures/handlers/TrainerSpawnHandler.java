@@ -86,17 +86,18 @@ public class TrainerSpawnHandler
         }
     }
 
-    public static int countTrainersNear(Entity e)
+    public static int countTrainersNear(Entity e, int trainerBox)
     {
         int x = ((int) e.posX) / 16;
         int y = ((int) e.posY) / 16;
         int z = ((int) e.posZ) / 16;
-        return countTrainersInArea(e.getEntityWorld(), x, y, z);
+        return countTrainersInArea(e.getEntityWorld(), x, y, z, trainerBox);
     }
 
-    public static int countTrainersInArea(World world, int chunkPosX, int chunkPosY, int chunkPosZ)
+    public static int countTrainersInArea(World world, int chunkPosX, int chunkPosY, int chunkPosZ, int trainerBox)
     {
-        int tolerance = Config.instance.trainerBox / 16;
+        int tolerance = trainerBox / 16;
+        tolerance = Math.max(1, tolerance);
         int ret = 0;
         for (ChunkCoordinate o : trainers.keySet())
         {
@@ -214,7 +215,7 @@ public class TrainerSpawnHandler
         v = temp != null ? temp.offset(EnumFacing.UP) : v;
 
         if (!SpawnHandler.checkNoSpawnerInArea(w, v.intX(), v.intY(), v.intZ())) return;
-        int count = countTrainersInArea(w, v.intX() / 16, v.intY() / 16, v.intZ() / 16);
+        int count = countTrainersInArea(w, v.intX() / 16, v.intY() / 16, v.intZ() / 16, Config.instance.trainerBox);
 
         if (count < Config.instance.trainerDensity)
         {
