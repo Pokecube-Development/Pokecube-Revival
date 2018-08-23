@@ -134,6 +134,9 @@ public class TrainerSpawnHandler
         double y = Math.min(Math.max(5, rand.nextGaussian() * 10), 10);
         v.addTo(x, y, z);
 
+        // Don't select unloaded areas.
+        if (!world.isAreaLoaded(v.getPos(), 8)) return null;
+
         // Find surface
         Vector3 temp1 = Vector3.getNextSurfacePoint2(world, vec1, vec2.set(EnumFacing.DOWN), 10);
 
@@ -210,8 +213,7 @@ public class TrainerSpawnHandler
         Vector3 v = getRandomSpawningPointNearEntity(w, p, Config.instance.trainerBox);
         if (v == null) return;
         if (v.y < 0) v.y = v.getMaxY(w);
-        Vector3 temp = Vector3.getNextSurfacePoint2(w, v, Vector3.secondAxisNeg, v.y);
-        temp = Vector3.getNextSurfacePoint2(w, v, Vector3.secondAxisNeg, v.y);
+        Vector3 temp = Vector3.getNextSurfacePoint2(w, v, Vector3.secondAxisNeg, 20);
         v = temp != null ? temp.offset(EnumFacing.UP) : v;
 
         if (!SpawnHandler.checkNoSpawnerInArea(w, v.intX(), v.intY(), v.intZ())) return;
