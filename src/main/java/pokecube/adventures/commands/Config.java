@@ -125,6 +125,8 @@ public class Config extends ConfigBase
     String[]                            biomeLevels           = { "mound:5-10" };
 
     @Configure(category = trainers)
+    public boolean                      trainerTick           = true;
+    @Configure(category = trainers)
     public boolean                      trainerSpawn          = true;
     @Configure(category = trainers)
     public boolean                      trainersInvul         = false;

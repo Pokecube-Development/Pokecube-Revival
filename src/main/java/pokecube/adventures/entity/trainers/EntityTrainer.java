@@ -37,7 +37,6 @@ import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import pokecube.adventures.ai.helper.PathNavigateTrainer;
 import pokecube.adventures.commands.Config;
-import pokecube.adventures.commands.GeneralCommands;
 import pokecube.adventures.entity.helper.EntityTrainerBase;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.DefaultPokemobs.DefeatEntry;
@@ -244,12 +243,7 @@ public class EntityTrainer extends EntityTrainerBase
     @Override
     public void onLivingUpdate()
     {
-        if (GeneralCommands.TRAINERSDIE)
-        {
-            this.setDead();
-            return;
-        }
-
+        if (!Config.instance.trainerTick) return;
         super.onLivingUpdate();
         if (getEntityWorld().isRemote || pokemobsCap.getType() == null) return;
 

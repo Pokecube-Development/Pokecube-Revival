@@ -26,7 +26,6 @@ import pokecube.adventures.advancements.Triggers;
 import pokecube.adventures.commands.BattleCommand;
 import pokecube.adventures.commands.Config;
 import pokecube.adventures.commands.CountCommand;
-import pokecube.adventures.commands.GeneralCommands;
 import pokecube.adventures.commands.KillCommand;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.DefaultPokemobs;
@@ -225,7 +224,6 @@ public class PokecubeAdv
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new GeneralCommands());
         event.registerServerCommand(new KillCommand());
         event.registerServerCommand(new CountCommand());
         event.registerServerCommand(new BattleCommand());
