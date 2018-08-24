@@ -83,6 +83,7 @@ public class AIMate extends AITrainerBase
     @Override
     public boolean shouldRun()
     {
+        if (!Config.instance.trainersMate) return false;
         return thisEntity != null && thisEntity.getGrowingAge() == 0 && trainer.getGender() == 2
                 && aiTracker.getAIState(IHasNPCAIStates.MATES) && TrainerSpawnHandler.countTrainersNear(thisEntity,
                         Config.instance.trainerBox) < Config.instance.trainerDensity * 2;

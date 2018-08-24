@@ -151,6 +151,8 @@ public class Config extends ConfigBase
     @Configure(category = trainers)
     public int                          trainerDeAgressTicks  = 50;
     @Configure(category = trainers)
+    public boolean                      trainersMate          = true;
+    @Configure(category = trainers)
     public boolean                      npcsAreTrainers       = true;
     @Configure(category = trainers)
     public String                       defaultReward         = "minecraft:emerald 1 0";
