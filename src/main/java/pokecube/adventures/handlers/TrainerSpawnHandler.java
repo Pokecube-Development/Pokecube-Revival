@@ -1,16 +1,17 @@
 package pokecube.adventures.handlers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import org.nfunk.jep.JEP;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -50,40 +51,28 @@ import thut.api.maths.Vector3;
 public class TrainerSpawnHandler
 {
 
-    private static TrainerSpawnHandler          instance;
-    public static Map<ChunkCoordinate, Integer> trainers   = Maps.newHashMap();
-    public static Set<UUID>                     trainerSet = Sets.newHashSet();
-    private static Vector3                      vec1       = Vector3.getNewVector();
-    private static Vector3                      vec2       = Vector3.getNewVector();
+    private static TrainerSpawnHandler       instance;
+    public static Map<UUID, ChunkCoordinate> trainerMap = Maps.newHashMap();
+    private static Vector3                   vec1       = Vector3.getNewVector();
+    private static Vector3                   vec2       = Vector3.getNewVector();
 
-    public static boolean addTrainerCoord(Entity e)
+    /** Adds or updates the location of the trainer.
+     * 
+     * @param e
+     * @return */
+    public static void addTrainerCoord(Entity e)
     {
-        if (trainerSet.contains(e.getUniqueID())) return false;
         int x = ((int) e.posX) / 16;
         int y = ((int) e.posY) / 16;
         int z = ((int) e.posZ) / 16;
         int dim = e.dimension;
         ChunkCoordinate coord = new ChunkCoordinate(x, y, z, dim);
-        if (trainers.containsKey(coord)) trainers.put(coord, 1 + trainers.get(coord));
-        else trainers.put(coord, 1);
-        trainerSet.add(e.getUniqueID());
-        return true;
+        trainerMap.put(e.getUniqueID(), coord);
     }
 
     public static void removeTrainer(Entity e)
     {
-        int x = ((int) e.posX) / 16;
-        int y = ((int) e.posY) / 16;
-        int z = ((int) e.posZ) / 16;
-        int dim = e.dimension;
-        ChunkCoordinate coord = new ChunkCoordinate(x, y, z, dim);
-        trainerSet.remove(e.getUniqueID());
-        if (trainers.containsKey(coord))
-        {
-            int num = trainers.get(coord) - 1;
-            if (num > 0) trainers.put(coord, num);
-            else trainers.remove(coord);
-        }
+        trainerMap.remove(e.getUniqueID());
     }
 
     public static int countTrainersNear(Entity e, int trainerBox)
@@ -97,9 +86,8 @@ public class TrainerSpawnHandler
     public static int countTrainersInArea(World world, int chunkPosX, int chunkPosY, int chunkPosZ, int trainerBox)
     {
         int tolerance = trainerBox / 16;
-        tolerance = Math.max(1, tolerance);
         int ret = 0;
-        for (ChunkCoordinate o : trainers.keySet())
+        for (ChunkCoordinate o : trainerMap.values())
         {
             ChunkCoordinate coord = (ChunkCoordinate) o;
             if (chunkPosX >= coord.getX() - tolerance && chunkPosZ >= coord.getZ() - tolerance
@@ -107,7 +95,7 @@ public class TrainerSpawnHandler
                     && chunkPosX <= coord.getX() + tolerance && chunkPosZ <= coord.getZ() + tolerance
                     && world.provider.getDimension() == coord.dim)
             {
-                ret += trainers.get(coord);
+                ret++;
             }
         }
         return ret;
@@ -239,6 +227,7 @@ public class TrainerSpawnHandler
                     && SpawnHandler.checkNoSpawnerInArea(w, (int) t.posX, (int) t.posY, (int) t.posZ))
             {
                 w.spawnEntity(t);
+                addTrainerCoord(t);
             }
             else t.setDead();
         }
@@ -268,8 +257,10 @@ public class TrainerSpawnHandler
             v = v.getTopBlockPos(w).offsetBy(EnumFacing.UP);
         }
         SpawnCheck checker = new SpawnCheck(v, w);
+        List<TypeTrainer> types = Lists.newArrayList(TypeTrainer.typeMap.values());
+        Collections.shuffle(types);
         types:
-        for (TypeTrainer type : TypeTrainer.typeMap.values())
+        for (TypeTrainer type : types)
         {
             for (Entry<SpawnBiomeMatcher, Float> entry : type.matchers.entrySet())
             {

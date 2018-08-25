@@ -234,7 +234,7 @@ public class PokecubeAdv
     @EventHandler
     public void serverEnding(FMLServerStoppedEvent evt)
     {
-        TrainerSpawnHandler.trainers.clear();
+        TrainerSpawnHandler.trainerMap.clear();
         InventoryBag.clearInventory();
     }
 

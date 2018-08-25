@@ -51,6 +51,7 @@ import pokecube.core.events.handlers.PCEventsHandler;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.capabilities.CapabilityPokemob;
 import pokecube.core.items.pokecubes.PokecubeManager;
+import pokecube.core.utils.ChunkCoordinate;
 import pokecube.core.utils.TimePeriod;
 import pokecube.core.utils.Tools;
 import thut.api.maths.Vector3;
@@ -58,14 +59,15 @@ import thut.lib.CompatWrapper;
 
 public class EntityTrainer extends EntityTrainerBase
 {
-    private boolean randomize   = false;
-    public Vector3  location    = null;
-    public String   name        = "";
-    public String   playerName  = "";
-    public String   urlSkin     = "";
-    boolean         added       = false;
-    public GuardAI  guardAI;
-    public long     visibleTime = 0;
+    private boolean         randomize   = false;
+    public Vector3          location    = null;
+    public String           name        = "";
+    public String           playerName  = "";
+    public String           urlSkin     = "";
+    boolean                 added       = false;
+    public GuardAI          guardAI;
+    public long             visibleTime = 0;
+    private ChunkCoordinate coord       = null;
 
     public EntityTrainer(World par1World)
     {
@@ -252,11 +254,20 @@ public class EntityTrainer extends EntityTrainerBase
             aiStates.setAIState(IHasNPCAIStates.INBATTLE, false);
         }
 
-        if (!added)
+        // Update the trainer spawn handler about our location.
+        if (ticksExisted % 20 == 0)
         {
-            added = true;
-            TrainerSpawnHandler.addTrainerCoord(this);
+            int x = ((int) this.posX) / 16;
+            int y = ((int) this.posY) / 16;
+            int z = ((int) this.posZ) / 16;
+            int dim = this.dimension;
+            ChunkCoordinate current = new ChunkCoordinate(x, y, z, dim);
+            if (!current.equals(coord))
+            {
+                TrainerSpawnHandler.addTrainerCoord(this);
+            }
         }
+
         ItemStack next;
         if (pokemobsCap.getCooldown() > getEntityWorld().getTotalWorldTime()) next = ItemStack.EMPTY;
         else next = pokemobsCap.getNextPokemob();
