@@ -394,8 +394,7 @@ public class PAEventsHandler
         if (npc instanceof EntityTrainerBase)
         {
             mob.getAI().addAITask(new AIFindTarget(npc, EntityPlayer.class).setPriority(10));
-            mob.getAI()
-                    .addAITask(new AIMate(npc, ((EntityTrainerBase) npc).getClass()));
+            mob.getAI().addAITask(new AIMate(npc, ((EntityTrainerBase) npc).getClass()));
         }
         // 5% chance of battling a random nearby pokemob if they see it.
         mob.getAI().addAITask(new AIFindTarget(npc, 0.05f, EntityPokemob.class).setPriority(20));

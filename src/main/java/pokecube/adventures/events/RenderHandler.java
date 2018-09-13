@@ -16,6 +16,7 @@ import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.blocks.cloner.container.ContainerBase;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.SelectorValue;
+import pokecube.adventures.commands.Config;
 import thut.api.entity.genetics.Alleles;
 import thut.api.entity.genetics.Gene;
 import thut.api.entity.genetics.IMobGenetics;
@@ -63,6 +64,11 @@ public class RenderHandler
                 for (Alleles a : genes.getAlleles().values())
                 {
                     evt.getToolTip().add(a.getExpressed().getKey().getResourcePath() + ": " + a.getExpressed());
+                    if (Config.instance.expandedDNATooltips)
+                    {
+                        evt.getToolTip().add("    " + a.getAlleles()[0]);
+                        evt.getToolTip().add("    " + a.getAlleles()[1]);
+                    }
                 }
             }
             if (index != -1)

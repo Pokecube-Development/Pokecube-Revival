@@ -97,6 +97,8 @@ dependencies {
     deobfCompile "blusunrize:ImmersiveEngineering:${ie_version}"
     //Journeymap
     provided "info.journeymap:journeymap-api:${journeymap_version}"
+    //Thaumcraft
+    deobfCompile "thaumcraft:Thaumcraft:${version_minecraft}:${thaumcraft_version}"
 }
 
 sourceCompatibility = 1.8

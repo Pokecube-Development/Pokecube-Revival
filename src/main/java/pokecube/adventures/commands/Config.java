@@ -97,6 +97,8 @@ public class Config extends ConfigBase
     @Configure(category = machines)
     public boolean                      warpPadEnergy         = true;
     @Configure(category = machines)
+    public boolean                      expandedDNATooltips   = false;
+    @Configure(category = machines)
     public String                       warpPadCostFunction   = "(dx)*(dx) + (dy)*(dy) + (dz)*(dz) + (5*dw)^4";
     @Configure(category = machines)
     public boolean                      theft                 = false;
@@ -114,13 +116,7 @@ public class Config extends ConfigBase
     public int                          afaMaxEnergy          = 3200;
     @Configure(category = machines)
     public int                          energyHungerCost      = 5;
-    @Configure(category = machines)
-    String[]                            ranchables            = {
-            // @formatter:off
-            "arceus:nether_star:100000", "chinchou:glowstone_dust:500", "lanturn:glowstone_dust,2:500",
-            "lotad:waterlily:100", "tangela:vine:100", "bulbasaur:vine:100", "octillery:dye:100", "camerupt::lava:1000"
-            // @formatter:on
-    };
+
     @Configure(category = spawning)
     String[]                            biomeLevels           = { "mound:5-10" };
 
