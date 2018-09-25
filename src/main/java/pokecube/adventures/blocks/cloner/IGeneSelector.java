@@ -1,5 +1,6 @@
 package pokecube.adventures.blocks.cloner;
 
+import java.lang.reflect.Array;
 import java.util.Random;
 import java.util.logging.Level;
 
@@ -8,8 +9,6 @@ import pokecube.core.interfaces.PokecubeMod;
 import thut.api.entity.genetics.Alleles;
 import thut.api.entity.genetics.Gene;
 import thut.api.entity.genetics.GeneRegistry;
-import thut.core.common.genetics.genes.GeneByteArr;
-import thut.core.common.genetics.genes.GeneIntArray;
 
 public interface IGeneSelector
 {
@@ -38,19 +37,13 @@ public interface IGeneSelector
         {
             try
             {
-                if (geneSource instanceof GeneByteArr)
+                Object source = geneSource.getValue();
+                Object dest = geneDest.getValue();
+                if (source.getClass().isArray())
                 {
-                    byte[] source = geneSource.getValue();
+                    int index = arrIndex();
                     geneSource = copy(geneDest);
-                    byte[] dest = geneDest.getValue();
-                    dest[arrIndex()] = source[arrIndex()];
-                }
-                else if (geneSource instanceof GeneIntArray)
-                {
-                    int[] source = geneSource.getValue();
-                    geneSource = copy(geneDest);
-                    int[] dest = geneDest.getValue();
-                    dest[arrIndex()] = source[arrIndex()];
+                    Array.set(dest, index, Array.get(source, index));
                 }
             }
             catch (Exception e)
