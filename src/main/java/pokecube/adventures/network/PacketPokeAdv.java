@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import pokecube.adventures.blocks.afa.ContainerAFA;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
-import pokecube.adventures.items.ItemTarget;
+import pokecube.adventures.items.ItemSubbiomeSetter;
 import pokecube.adventures.network.packets.PacketAFA;
 import pokecube.adventures.network.packets.PacketBag;
 import pokecube.adventures.network.packets.PacketCommander;
@@ -160,8 +160,7 @@ public class PacketPokeAdv
                         NBTTagCompound tag = buffer.readCompoundTag();
                         String biome = tag.getString("biome");
                         if (player.getHeldItemMainhand() != null
-                                && player.getHeldItemMainhand().getItem() instanceof ItemTarget
-                                && player.getHeldItemMainhand().getItemDamage() == 3)
+                                && player.getHeldItemMainhand().getItem() instanceof ItemSubbiomeSetter)
                         {
                             player.getHeldItemMainhand().setTagCompound(tag);
                             BiomeType type = BiomeType.getBiome(biome);

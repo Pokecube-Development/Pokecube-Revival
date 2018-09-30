@@ -179,9 +179,11 @@ public class ItemSubbiomeSetter extends Item
         return new ActionResult<>(EnumActionResult.PASS, itemstack);
     }
 
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos,
-            EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand,
+            EnumFacing side, float hitX, float hitY, float hitZ)
     {
+        ItemStack stack = playerIn.getHeldItem(hand);
         Vector3 hit = Vector3.getNewVector().set(pos);
         if (stack.hasTagCompound())
         {
