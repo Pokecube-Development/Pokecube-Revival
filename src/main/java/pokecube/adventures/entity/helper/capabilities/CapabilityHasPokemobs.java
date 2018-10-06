@@ -591,7 +591,7 @@ public class CapabilityHasPokemobs
         @Override
         public void onDefeated(Entity defeater)
         {
-            if (hasDefeated(defeater)) return;
+            if (hasDefeated(defeater) || (user.isDead || user.getHealth() <= 0)) return;
             if (defeater instanceof EntityPlayer)
             {
                 setCooldown(user.getEntityWorld().getTotalWorldTime() + battleCooldown);
