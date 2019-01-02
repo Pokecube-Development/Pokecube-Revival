@@ -452,6 +452,9 @@ public class CapabilityHasPokemobs
             {
                 if (s.defeater.equals(name))
                 {
+                    // If this is the case, then this mob is not re-battleable.
+                    if (resetTime <= 0) return true;
+                    // Otherwise check the diff.
                     long diff = user.getEntityWorld().getTotalWorldTime() - s.defeatTime;
                     if (diff > resetTime) { return false; }
                     return true;
@@ -591,10 +594,19 @@ public class CapabilityHasPokemobs
         @Override
         public void onDefeated(Entity defeater)
         {
-            if (hasDefeated(defeater) || (user.isDead || user.getHealth() <= 0)) return;
+            // Get this cleanup stuff done first.
             if (defeater instanceof EntityPlayer)
             {
                 setCooldown(user.getEntityWorld().getTotalWorldTime() + battleCooldown);
+            }
+            else setCooldown(user.getEntityWorld().getTotalWorldTime() + 10);
+            this.setTarget(null);
+
+            // Then parse if rewards and actions should be dealt with.
+            boolean reward = !(hasDefeated(defeater) || (user.isDead || user.getHealth() <= 0));
+
+            if (reward && defeater instanceof EntityPlayer)
+            {
                 DefeatEntry entry = new DefeatEntry(defeater.getCachedUniqueIdString(),
                         user.getEntityWorld().getTotalWorldTime());
                 if (defeaters.contains(entry))
@@ -612,12 +624,9 @@ public class CapabilityHasPokemobs
                     checkDefeatAchievement(player);
                 }
             }
-            else setCooldown(user.getEntityWorld().getTotalWorldTime() + 10);
             if (defeater != null)
             {
                 messages.sendMessage(MessageState.DEFEAT, defeater, user.getDisplayName(), defeater.getDisplayName());
-                if (defeater instanceof EntityLivingBase)
-                    messages.doAction(MessageState.DEFEAT, (EntityLivingBase) defeater);
                 if (notifyDefeat && defeater instanceof EntityPlayerMP)
                 {
                     PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGENOTIFYDEFEAT);
@@ -625,8 +634,10 @@ public class CapabilityHasPokemobs
                     packet.data.setLong("L", user.getEntityWorld().getTotalWorldTime() + resetTime);
                     PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) defeater);
                 }
+
+                if (reward && defeater instanceof EntityLivingBase)
+                    messages.doAction(MessageState.DEFEAT, (EntityLivingBase) defeater);
             }
-            this.setTarget(null);
         }
 
         public void checkDefeatAchievement(EntityPlayer player)
