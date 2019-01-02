@@ -604,8 +604,11 @@ public class CapabilityHasPokemobs
 
             // Then parse if rewards and actions should be dealt with.
             boolean reward = !(hasDefeated(defeater) || (user.isDead || user.getHealth() <= 0));
+            
+            //TODO possible have alternate message for invalid defeat?
+            if (!reward) return;
 
-            if (reward && defeater instanceof EntityPlayer)
+            if (defeater instanceof EntityPlayer)
             {
                 DefeatEntry entry = new DefeatEntry(defeater.getCachedUniqueIdString(),
                         user.getEntityWorld().getTotalWorldTime());
@@ -634,8 +637,7 @@ public class CapabilityHasPokemobs
                     packet.data.setLong("L", user.getEntityWorld().getTotalWorldTime() + resetTime);
                     PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) defeater);
                 }
-
-                if (reward && defeater instanceof EntityLivingBase)
+                if (defeater instanceof EntityLivingBase)
                     messages.doAction(MessageState.DEFEAT, (EntityLivingBase) defeater);
             }
         }
