@@ -191,6 +191,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     @Override
     public World getWorld()
     {
+        if (this.buyingPlayer == null) return this.getEntityWorld();
         return this.buyingPlayer.world;
     }
 
