@@ -2,23 +2,15 @@ package pokecube.adventures.blocks.siphon;
 
 import org.nfunk.jep.JEP;
 
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Callback;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.Optional.Interface;
-import net.minecraftforge.fml.common.Optional.InterfaceList;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.core.database.PokedexEntry;
 
-@InterfaceList({ @Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers") })
-public class TileEntitySiphon extends TileEntity implements ITickable, SimpleComponent
+public class TileEntitySiphon extends TileEntity implements ITickable
 {
     AxisAlignedBB     box;
     public static JEP parser;
@@ -33,12 +25,6 @@ public class TileEntitySiphon extends TileEntity implements ITickable, SimpleCom
     public TileEntitySiphon(World world)
     {
         this();
-    }
-
-    @Override
-    public String getComponentName()
-    {
-        return "pokesiphon";
     }
 
     public static int getEnergyGain(int level, int spAtk, int atk, PokedexEntry entry)
@@ -70,13 +56,6 @@ public class TileEntitySiphon extends TileEntity implements ITickable, SimpleCom
     public static int getMaxEnergy(int level, int spAtk, int atk, PokedexEntry entry)
     {
         return getEnergyGain(level, spAtk, atk, entry);
-    }
-
-    @Callback
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getPower(Context context, Arguments args)
-    {
-        return new Object[] { currentOutput };
     }
 
     private static void initParser()

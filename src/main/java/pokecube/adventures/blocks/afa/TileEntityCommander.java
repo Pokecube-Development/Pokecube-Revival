@@ -4,10 +4,6 @@ import java.lang.reflect.Constructor;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Callback;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -16,11 +12,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pokecube.core.blocks.TileEntityOwnable;
-import pokecube.core.interfaces.IMoveConstants.AIRoutine;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.interfaces.capabilities.CapabilityPokemob;
@@ -29,12 +23,11 @@ import pokecube.core.interfaces.pokemob.IHasCommands.Command;
 import pokecube.core.interfaces.pokemob.IHasCommands.IMobCommandHandler;
 import thut.api.maths.Vector3;
 
-@Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class TileEntityCommander extends TileEntityOwnable implements SimpleComponent
+public class TileEntityCommander extends TileEntityOwnable
 {
     protected boolean          addedToNetwork = false;
-    private UUID               pokeID         = null;
-    private Command            command        = null;
+    public UUID                pokeID         = null;
+    public Command             command        = null;
     private IMobCommandHandler handler        = null;
     public String              args           = "";
     protected int              power          = 0;
@@ -239,193 +232,5 @@ public class TileEntityCommander extends TileEntityOwnable implements SimpleComp
             PokecubeMod.log(Level.SEVERE, "Error executing a command for a pokemob", e);
             throw new Exception("Error handling the command", e);
         }
-    }
-
-    ////////////////////////// Open computers stuff below
-
-    @Override
-    @Optional.Method(modid = "opencomputers")
-    public String getComponentName()
-    {
-        return "poke_commander";
-    }
-
-    @Callback(doc = "function(uuid:string) - gets the uuid of the pokemob to command.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getPokeID(Context context, Arguments args) throws Exception
-    {
-        return new Object[] { pokeID };
-    }
-
-    @Callback(doc = "function(uuid:string) - Sets the uuid of the pokemob to command.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setPokeID(Context context, Arguments args) throws Exception
-    {
-        String var = args.checkString(0);
-        pokeID = UUID.fromString(var);
-        return new Object[] { true, pokeID };
-    }
-
-    @Callback(doc = "function(command:string, args...) - Sets the command and the arguments for it to run, positions are relative to the controller")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setCommand(Context context, Arguments args) throws Exception
-    {
-        Command command = Command.valueOf(args.checkString(0));
-        Object[] commandArgs = getArgs(command, args);
-        setCommand(command, commandArgs);
-        return new Object[] { true, command };
-    }
-
-    @Callback(doc = "function() - Executes the set command, setCommand must be called beforehand.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] executeCommand(Context context, Arguments args) throws Exception
-    {
-        sendCommand();
-        return new Object[] { true, command };
-    }
-
-    @Callback(doc = "function() - Gets the moves known by the pokemob.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getMoves(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        return pokemob.getMoves();
-    }
-
-    @Callback(doc = "function() - Gets the current move index for the pokemob.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getMoveIndex(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        return new Object[] { pokemob.getMoveIndex() };
-    }
-
-    @Callback(doc = "function(index:number) - Sets the current move index for the pokemob.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setMoveIndex(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        pokemob.setMoveIndex(args.checkInteger(0));
-        return new Object[] { pokemob.getMoveIndex() };
-    }
-
-    @Callback(doc = "function(routine:string) - Gets the state of the given routine.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getRoutineState(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        AIRoutine routine = AIRoutine.valueOf(args.checkString(0));
-        return new Object[] { pokemob.isRoutineEnabled(routine) };
-    }
-
-    @Callback(doc = "function(routine:string, state:boolean) - Sets the state of the given routine.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setRoutineState(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        AIRoutine routine = AIRoutine.valueOf(args.checkString(0));
-        pokemob.setRoutineState(routine, args.checkBoolean(1));
-        return new Object[] { true, pokemob.isRoutineEnabled(routine) };
-    }
-
-    @Callback(doc = "function() - Gets the home location for the pokemob.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getHome(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        return new Object[] { pokemob.getHome() };
-    }
-
-    @Callback(doc = "function(x:number, y:number, z:number, d:homeDistance) - Sets home location, relative to the controller.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setHome(Context context, Arguments args) throws Exception
-    {
-        if (pokeID == null) throw new Exception("No Pokemob set");
-        WorldServer world = (WorldServer) getWorld();
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
-        if (pokemob == null) throw new Exception("No Pokemob found for set ID");
-        pokemob.setHome(args.checkInteger(0) + getPos().getX(), args.checkInteger(1) + getPos().getY(),
-                args.checkInteger(2) + getPos().getZ(), 16);
-        return new Object[] { true };
-    }
-
-    @Optional.Method(modid = "opencomputers")
-    private Object[] getArgs(Command command, Arguments args) throws Exception
-    {
-        Class<? extends IMobCommandHandler> clazz = IHasCommands.COMMANDHANDLERS.get(command);
-        for (Constructor<?> c : clazz.getConstructors())
-        {
-            if (c.getParameterCount() != 0) { return getArgs(c, args); }
-        }
-        return null;
-    }
-
-    @Optional.Method(modid = "opencomputers")
-    private Object[] getArgs(Constructor<?> constructor, Arguments args) throws Exception
-    {
-        Class<?>[] argTypes = constructor.getParameterTypes();
-        int index = 1;
-        Object[] ret = new Object[argTypes.length];
-        for (int i = 0; i < ret.length; i++)
-        {
-            Class<?> type = argTypes[i];
-            if (type == Vector3.class)
-            {
-                Vector3 arg = Vector3.getNewVector();
-                arg.set(args.checkDouble(index) + getPos().getX(), args.checkDouble(index + 1) + getPos().getY(),
-                        args.checkDouble(index + 2) + getPos().getZ());
-                index += 3;
-                ret[i] = arg;
-            }
-            else if (type == float.class || type == Float.class)
-            {
-                float arg = (float) args.checkDouble(index);
-                index += 1;
-                ret[i] = arg;
-            }
-            else if (type == byte.class || type == Byte.class)
-            {
-                byte arg = (byte) args.checkInteger(index);
-                index += 1;
-                ret[i] = arg;
-            }
-            else if (type == int.class || type == Integer.class)
-            {
-                int arg = args.checkInteger(index);
-                index += 1;
-                ret[i] = arg;
-            }
-            else if (type == boolean.class || type == Boolean.class)
-            {
-                boolean arg = args.checkBoolean(index);
-                index += 1;
-                ret[i] = arg;
-            }
-            else if (type == String.class)
-            {
-                String arg = args.checkString(index);
-                index += 1;
-                ret[i] = arg;
-            }
-        }
-        return ret;
     }
 }

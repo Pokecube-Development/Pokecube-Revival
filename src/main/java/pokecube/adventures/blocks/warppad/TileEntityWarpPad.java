@@ -3,10 +3,6 @@ package pokecube.adventures.blocks.warppad;
 import org.nfunk.jep.JEP;
 
 import io.netty.buffer.Unpooled;
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Callback;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -15,9 +11,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.Optional.Interface;
-import net.minecraftforge.fml.common.Optional.InterfaceList;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.commands.Config;
 import pokecube.adventures.network.PacketPokeAdv.MessageClient;
@@ -29,8 +22,7 @@ import thut.api.entity.Transporter;
 import thut.api.maths.Vector3;
 import thut.api.maths.Vector4;
 
-@InterfaceList({ @Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers") })
-public class TileEntityWarpPad extends TileEntityOwnable implements SimpleComponent
+public class TileEntityWarpPad extends TileEntityOwnable
 {
     public static JEP parser;
 
@@ -62,21 +54,6 @@ public class TileEntityWarpPad extends TileEntityOwnable implements SimpleCompon
     public TileEntityWarpPad()
     {
     }
-
-    @Override
-    public String getComponentName()
-    {
-        return "warppad";
-    }
-
-    @Callback(doc = "Returns the current 4-vector destination")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getDestination(Context context, Arguments args) throws Exception
-    {
-        if (link != null) { return new Object[] { link.x, link.y, link.z, link.w }; }
-        throw new Exception("no link");
-    }
-
     /** Overriden in a sign to provide the text. */
     @Override
     public SPacketUpdateTileEntity getUpdatePacket()
@@ -199,29 +176,6 @@ public class TileEntityWarpPad extends TileEntityOwnable implements SimpleCompon
             energy += receive;
         }
         return receive;
-    }
-
-    @Callback(doc = "function(x:number, y:number, z:number, w:number) - Sets the 4-vector destination, w is the dimension")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setDestination(Context context, Arguments args) throws Exception
-    {
-        if (args.isDouble(0) && args.isDouble(1) && args.isDouble(2) && args.isDouble(3))
-        {
-            float x = (float) args.checkDouble(0);
-            float y = (float) args.checkDouble(1);
-            float z = (float) args.checkDouble(2);
-            float w = (float) args.checkDouble(3);
-            if (link == null)
-            {
-                link = new Vector4(x, y, z, w);
-            }
-            else
-            {
-                link.set(x, y, z, w);
-            }
-            return new Object[] { link.x, link.y, link.z, link.w };
-        }
-        throw new Exception("invalid arguments, expected number,number,number,number");
     }
 
     @Override

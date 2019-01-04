@@ -5,11 +5,6 @@ import java.util.Random;
 
 import org.nfunk.jep.JEP;
 
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Callback;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.SidedComponent;
-import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
@@ -27,8 +22,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -45,9 +38,7 @@ import thut.api.maths.Vector3;
 import thut.api.network.PacketHandler;
 import thut.lib.CompatWrapper;
 
-@Optional.InterfaceList(value = { @Interface(iface = "li.cil.oc.api.network.SidedComponent", modid = "opencomputers"),
-        @Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers") })
-public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITickable, SimpleComponent, SidedComponent
+public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITickable
 {
     public static JEP parser;
     public static JEP parserS;
@@ -58,8 +49,8 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     public int        scale          = 1000;
     public String     animation      = "idle";
     public Ability    ability        = null;
-    int               energy         = 0;
-    int               distance       = 4;
+    public int        energy         = 0;
+    public int        distance       = 4;
     public int        transparency   = 128;
     public boolean    rotates        = true;
     public float      angle          = 0;
@@ -96,12 +87,6 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     public TileEntityAFA()
     {
         super();
-    }
-
-    @Override
-    public boolean canConnectNode(EnumFacing side)
-    {
-        return side == EnumFacing.DOWN;
     }
 
     @Override
@@ -143,35 +128,10 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
         return ItemStack.EMPTY;
     }
 
-    @Callback(doc = "Returns the current loaded ability")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getAbility(Context context, Arguments args) throws Exception
-    {
-        if (ability != null)
-        {
-            String arg = ability.toString();
-            return new Object[] { arg };
-        }
-        throw new Exception("no ability");
-    }
-
-    @Override
-    public String getComponentName()
-    {
-        return "afa";
-    }
-
     @Override
     public ITextComponent getDisplayName()
     {
         return new TextComponentString("Ability Field Amplifier");
-    }
-
-    @Callback(doc = "Returns the amount of stored energy")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getEnergy(Context context, Arguments args)
-    {
-        return new Object[] { energy };
     }
 
     @Override
@@ -208,13 +168,6 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     public String getName()
     {
         return "AFA";
-    }
-
-    @Callback(doc = "Returns the current set range")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getRange(Context context, Arguments args)
-    {
-        return new Object[] { distance };
     }
 
     @Override
@@ -397,38 +350,11 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
         }
     }
 
-    @Callback(doc = "function(scale:number, dx:number, dy:number, dz:number)- Sets the parameters for the hologram.")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setHoloState(Context context, Arguments args)
-    {
-        scale = args.checkInteger(0);
-        shift[0] = args.checkInteger(1);
-        shift[1] = args.checkInteger(2);
-        shift[2] = args.checkInteger(3);
-        if (!world.isRemote)
-        {
-            PacketHandler.sendTileUpdate(this);
-        }
-        return new Object[0];
-    }
-
     @Override
     public void setInventorySlotContents(int index, ItemStack stack)
     {
         if (CompatWrapper.isValid(stack)) inventory.set(index, ItemStack.EMPTY);
         inventory.set(index, stack);
-    }
-
-    @Callback(doc = "function(range:number) - sets the radius of affect")
-    @Optional.Method(modid = "opencomputers")
-    public Object[] setRange(Context context, Arguments args)
-    {
-        distance = args.checkInteger(0);
-        if (!world.isRemote)
-        {
-            PacketHandler.sendTileUpdate(this);
-        }
-        return new Object[] { distance };
     }
 
     @SubscribeEvent
