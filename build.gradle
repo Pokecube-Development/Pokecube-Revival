@@ -69,15 +69,17 @@ dependencies {
     deobfCompile "thutcore:thutcore:${version_minecraft}:${version_thutcore}"
     //Thut Wearables
     deobfCompile "thut-wearables:thut-wearables:release:deobf"
-    //Open Computers API
-    deobfCompile "li.cil.oc:OpenComputers:MC1.12.+:api"
     
     //Pokecube Core
     deobfCompile "pokecube-core:pokecube-core:release:deobf"
     //Pokecube Mobs
     deobfCompile "pokecube-mobs:pokecube-mobs:release:deobf"
+    //Inventory tweaks
+    compile "inventory-tweaks:InventoryTweaks:1.63:api"
     
     //Things for compat
+    //Open Computers API
+    deobfCompile "li.cil.oc:OpenComputers:${version_oc}:api"
     //Thut Essentials
     deobfCompile "thut-essentials:thutessentials:${version_minecraft}:${version_thutessentials}"
     //Thut Bling
@@ -89,8 +91,6 @@ dependencies {
 	compile "mezz.jei:jei_${jei_mcversion}:${jei_version}"
     //JER
     deobfCompile "just-enough-resources-jer:JustEnoughResources:${version_minecraft}:${version_jer}"
-    //Inventory tweaks
-    compile "inventory-tweaks:InventoryTweaks:1.63:api"
     //TOP
     compileOnly "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.+"//1.1x-1.4.4-55
     //IE
@@ -105,7 +105,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "${version_long}"
+    version = "${version_minecraft}-${version_forge}"
     runDir = "run"
     mappings = "${version_mappings}"
     useDepAts = false
