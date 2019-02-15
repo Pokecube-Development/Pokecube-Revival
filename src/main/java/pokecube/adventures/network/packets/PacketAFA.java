@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import pokecube.adventures.blocks.afa.ContainerAFA;
-import pokecube.adventures.blocks.afa.ContainerDaycare;
+import pokecube.adventures.blocks.daycare.ContainerDaycare;
 import pokecube.core.PokecubeCore;
 import thut.api.network.PacketHandler;
 

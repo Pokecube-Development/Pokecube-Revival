@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.nbt.NBTTagCompound;
-import pokecube.adventures.blocks.afa.TileEntityCommander;
+import pokecube.adventures.blocks.commander.TileEntityCommander;
 import pokecube.adventures.network.packets.PacketCommander;
 import pokecube.core.interfaces.pokemob.IHasCommands.Command;
 import pokecube.core.network.PokecubePacketHandler;

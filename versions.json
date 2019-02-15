@@ -1,0 +1,10 @@
+{
+  "homepage": "https://github.com/Pokecube-Development/Pokecube-Issues-and-Wiki",
+  "promos": {
+    "1.12.2-latest": "6.16.18",
+    "1.12.2-recommended": "6.16.18"
+  },
+  "1.12.2": {
+    "6.16.18": "Re-add this version thingy"
+  }
+}

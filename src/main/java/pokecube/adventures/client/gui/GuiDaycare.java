@@ -7,8 +7,8 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import pokecube.adventures.blocks.afa.ContainerDaycare;
-import pokecube.adventures.blocks.afa.TileEntityDaycare;
+import pokecube.adventures.blocks.daycare.ContainerDaycare;
+import pokecube.adventures.blocks.daycare.TileEntityDaycare;
 
 public class GuiDaycare extends GuiContainer
 {

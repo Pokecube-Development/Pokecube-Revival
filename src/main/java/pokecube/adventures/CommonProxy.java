@@ -9,13 +9,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import pokecube.adventures.blocks.afa.ContainerAFA;
-import pokecube.adventures.blocks.afa.ContainerDaycare;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
-import pokecube.adventures.blocks.afa.TileEntityDaycare;
 import pokecube.adventures.blocks.cloner.container.ContainerCloner;
 import pokecube.adventures.blocks.cloner.container.ContainerGeneExtractor;
 import pokecube.adventures.blocks.cloner.container.ContainerSplicer;
 import pokecube.adventures.blocks.cloner.tileentity.TileEntityCloner;
+import pokecube.adventures.blocks.daycare.ContainerDaycare;
+import pokecube.adventures.blocks.daycare.TileEntityDaycare;
 import pokecube.adventures.items.bags.ContainerBag;
 
 public class CommonProxy implements IGuiHandler
