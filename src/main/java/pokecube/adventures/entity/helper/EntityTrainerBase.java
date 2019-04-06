@@ -15,6 +15,7 @@ import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages;
 import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages.IHasMessages;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.capabilities.CapabilityPokemob;
+import pokecube.core.utils.Tools;
 
 public abstract class EntityTrainerBase extends EntityHasTrades
 {
@@ -49,6 +50,8 @@ public abstract class EntityTrainerBase extends EntityHasTrades
         if (pokemobsCap.countPokemon() == 0 && !aiStates.getAIState(IHasNPCAIStates.STATIONARY)
                 && !aiStates.getAIState(IHasNPCAIStates.PERMFRIENDLY))
         {
+            // Do not despawn if there is a player nearby.
+            if (Tools.isAnyPlayerInRange(10, this)) return;
             despawncounter++;
             if (despawncounter > 200)
             {
