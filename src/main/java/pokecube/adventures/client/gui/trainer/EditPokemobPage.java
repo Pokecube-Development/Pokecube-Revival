@@ -173,6 +173,7 @@ public class EditPokemobPage extends Page
         pokemob = PokecubeManager.itemToPokemob(stack, parent.entity.getEntityWorld());
         if (pokemob != null)
         {
+            pokemob.onGenesChanged();
             entry = pokemob.getPokedexEntry();
             name = entry.getName();
             level = pokemob.getLevel();
