@@ -78,15 +78,15 @@ public class RenderAFA extends TileEntitySpecialRenderer<TileEntityAFA>
         if ((o = RenderPokemobs.getInstance().getRenderer(mob.getPokedexEntry())) instanceof RenderAdvancedPokemobModel)
         {
             RenderAdvancedPokemobModel<?> render = (RenderAdvancedPokemobModel<?>) o;
-            render.anim = te.animation;
-            render.overrideAnim = true;
+            render.wrapper.anim = te.animation;
+            render.wrapper.overrideAnim = true;
         }
         EventsHandlerClient.renderMob(mob, partialTicks, te.rotates);
         if ((o = RenderPokemobs.getInstance().getRenderer(mob.getPokedexEntry())) instanceof RenderAdvancedPokemobModel)
         {
             RenderAdvancedPokemobModel<?> render = (RenderAdvancedPokemobModel<?>) o;
-            render.anim = "";
-            render.overrideAnim = false;
+            render.wrapper.anim = "";
+            render.wrapper.overrideAnim = false;
         }
         GL11.glPopMatrix();
         GL11.glPopMatrix();

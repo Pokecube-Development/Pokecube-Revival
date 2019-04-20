@@ -173,6 +173,8 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
             NBTBase tag = message.data.getTag("T");
             int id = message.data.getInteger("I");
             Entity mob = player.getEntityWorld().getEntityByID(id);
+            
+            //O for Open Gui Packet.
             if (message.data.getBoolean("O"))
             {
                 if (mob != null && message.data.hasKey("C"))
