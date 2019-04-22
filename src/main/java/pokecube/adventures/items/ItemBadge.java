@@ -5,16 +5,15 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pokecube.adventures.PokecubeAdv;
-import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.utils.PokeType;
-import thut.lib.CompatItem;
 
-public class ItemBadge extends CompatItem
+public class ItemBadge extends Item
 {
 
     public static boolean isBadge(ItemStack stackIn)
@@ -27,7 +26,6 @@ public class ItemBadge extends CompatItem
     public ItemBadge(PokeType type)
     {
         super();
-        this.setCreativeTab(PokecubeMod.creativeTabPokecube);
         String name = type.name.equals("???") ? "unknown" : type.name;
         this.setRegistryName(PokecubeAdv.ID, "badge_" + name);
         this.setUnlocalizedName("badge_" + name);
