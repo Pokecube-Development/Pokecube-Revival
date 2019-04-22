@@ -53,8 +53,8 @@ public class ItemHandler
     {
         for (PokeType type : PokeType.values())
         {
-            Item badge = new ItemBadge(type);
-            PokecubeItems.register(badge, registry);
+            Item badge = new ItemBadge(type).setCreativeTab(creativeTabPokecube);
+            register(badge, registry);
             if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
             {
                 String name = type.name.equals("???") ? "unknown" : type.name;

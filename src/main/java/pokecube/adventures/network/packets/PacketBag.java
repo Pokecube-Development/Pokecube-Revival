@@ -4,15 +4,18 @@ import java.io.IOException;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.items.bags.ContainerBag;
 import pokecube.adventures.items.bags.InventoryBag;
 import pokecube.core.PokecubeCore;
+import pokecube.core.interfaces.PokecubeMod;
 
 public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
 {
@@ -23,6 +26,27 @@ public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
 
     byte                     message;
     public NBTTagCompound    data    = new NBTTagCompound();
+
+    public static void OpenBag(EntityPlayer playerIn)
+    {
+        InventoryBag inv = InventoryBag.getBag(playerIn);
+        PacketBag packet = new PacketBag(PacketBag.ONOPEN);
+        packet.data.setInteger("N", inv.boxes.length);
+        packet.data.setInteger("S", InventoryBag.PAGECOUNT);
+        for (int i = 0; i < inv.boxes.length; i++)
+        {
+            packet.data.setString("N" + i, inv.boxes[i]);
+        }
+        PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) playerIn);
+        for (int i = 0; i < inv.boxes.length; i++)
+        {
+            packet = new PacketBag(PacketBag.OPEN);
+            packet.data = inv.serializeBox(i);
+            PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) playerIn);
+        }
+        playerIn.openGui(PokecubeAdv.instance, PokecubeAdv.GUIBAG_ID, playerIn.getEntityWorld(),
+                InventoryBag.getBag(playerIn).getPage() + 1, 0, 0);
+    }
 
     public PacketBag()
     {
@@ -98,7 +122,12 @@ public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
                 container.changeName(name);
             }
         }
-        if (message.message == ONOPEN)
+        if (message.message == OPEN && ctx.side == Side.CLIENT)
+        {
+            InventoryBag inv = InventoryBag.getBag(player);
+            inv.deserializeBox(message.data);
+        }
+        if (message.message == ONOPEN && ctx.side == Side.CLIENT)
         {
             InventoryBag.blank = new InventoryBag(InventoryBag.blankID);
             InventoryBag bag = InventoryBag.getBag(player);

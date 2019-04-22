@@ -407,4 +407,39 @@ public class InventoryBag implements IInventory
         return true;
     }
 
+    public NBTTagCompound serializeBox(int box)
+    {
+        NBTTagCompound items = new NBTTagCompound();
+        items.setInteger("box", box);
+        int start = box * 54;
+        for (int i = start; i < start + 54; i++)
+        {
+            ItemStack itemstack = map.get(owner).getStackInSlot(i);
+            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            if (!itemstack.isEmpty())
+            {
+                nbttagcompound.setShort("Slot", (short) i);
+                itemstack.writeToNBT(nbttagcompound);
+                items.setTag("item" + i, nbttagcompound);
+            }
+        }
+        return items;
+    }
+
+    public void deserializeBox(NBTTagCompound nbt)
+    {
+        int start = nbt.getInteger("box") * 54;
+        for (int i = start; i < start + 54; i++)
+        {
+            if (!nbt.hasKey("item" + i)) continue;
+            NBTTagCompound nbttagcompound = nbt.getCompoundTag("item" + i);
+            int j = nbttagcompound.getShort("Slot");
+            if (j >= start && j < start + 54)
+            {
+                ItemStack itemstack = new ItemStack(nbttagcompound);
+                this.setInventorySlotContents(j, itemstack);
+            }
+        }
+    }
+
 }

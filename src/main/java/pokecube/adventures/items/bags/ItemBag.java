@@ -15,7 +15,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pokecube.adventures.PokecubeAdv;
+import pokecube.adventures.network.packets.PacketBag;
 
 public class ItemBag extends Item
 {
@@ -52,8 +52,7 @@ public class ItemBag extends Item
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
     {
-        if (!world.isRemote) player.openGui(PokecubeAdv.instance, PokecubeAdv.GUIBAG_ID, player.getEntityWorld(),
-                InventoryBag.getBag(player).getPage() + 1, 0, 0);
+        if (!world.isRemote) PacketBag.OpenBag(player);
         return super.onItemRightClick(world, player, hand);
     }
 }
