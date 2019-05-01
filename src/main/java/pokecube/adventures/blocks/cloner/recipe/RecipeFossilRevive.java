@@ -16,6 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.commands.Config;
 import pokecube.core.database.Database;
@@ -131,6 +132,7 @@ public class RecipeFossilRevive implements IPoweredRecipe
         PokedexEntry entry = ClonerHelper.getFromGenes(dna);
         if (pokedexEntry == Database.missingno && entry != null)
         {
+            if (!PokecubeAdv.conf.anyReanimate) return false;
             tame = !entry.legendary;
             actualEntry = entry;
         }

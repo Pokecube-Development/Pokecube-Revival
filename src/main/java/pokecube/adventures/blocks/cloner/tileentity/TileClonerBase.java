@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.nfunk.jep.JEP;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -25,6 +27,21 @@ import thut.lib.CompatWrapper;
 
 public abstract class TileClonerBase extends TileEntity implements IPoweredProgress, ITickable, ISidedInventory
 {
+    public static JEP parser;
+
+    public static void initParser(String function)
+    {
+        parser = new JEP();
+        parser.initFunTab(); // clear the contents of the function table
+        parser.addStandardFunctions();
+        parser.initSymTab(); // clear the contents of the symbol table
+        parser.addStandardConstants();
+        parser.addComplex(); // among other things adds i to the symbol
+                             // table
+        parser.addVariable("x", 0);
+        parser.parseExpression(function);
+    }
+
     final List<ItemStack>  inventory;
     final int              outputSlot;
     private boolean        check          = true;
@@ -79,7 +96,8 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     public int addEnergy(int energy, boolean simulate)
     {
         if (getProcess() == null || !getProcess().valid()) return 0;
-        int num = Math.min(energy, getProcess().needed);
+        parser.setVarValue("x", energy);
+        int num = (int) Math.min(parser.getValue(), getProcess().needed);
         if (!simulate)
         {
             getProcess().needed -= num;

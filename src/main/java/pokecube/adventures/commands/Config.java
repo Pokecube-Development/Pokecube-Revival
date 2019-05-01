@@ -21,6 +21,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
+import pokecube.adventures.blocks.cloner.tileentity.TileClonerBase;
 import pokecube.adventures.blocks.warppad.TileEntityWarpPad;
 import pokecube.adventures.items.bags.ContainerBag;
 import pokecube.adventures.items.bags.InventoryBag;
@@ -39,18 +40,18 @@ import thut.core.common.config.Configure;
 public class Config extends ConfigBase
 {
 
-    public static final String          machines              = "machine";
-    public static final String          client                = "client";
-    public static final String          trainers              = "trainers";
-    public static final String          database              = "database";
+    public static final String          machines                 = "machine";
+    public static final String          client                   = "client";
+    public static final String          trainers                 = "trainers";
+    public static final String          database                 = "database";
 
     public static Config                instance;
 
-    public static Map<String, Integer>  biomeMap              = new HashMap<String, Integer>();
-    public Set<Class<? extends Entity>> customTrainers        = Sets.newHashSet();
+    public static Map<String, Integer>  biomeMap                 = new HashMap<String, Integer>();
+    public Set<Class<? extends Entity>> customTrainers           = Sets.newHashSet();
 
     @Configure(category = world)
-    String[]                            structureBiomes       = {
+    String[]                            structureBiomes          = {
             // @formatter:off
             "meteorsite:" + BiomeType.METEOR.name, "smallfortruins:" + BiomeType.RUIN.name,
             "VillageForgeLarge:" + BiomeType.INDUSTRIAL.name, "VillageGuardTower:" + BiomeType.VILLAGE.name,
@@ -72,113 +73,115 @@ public class Config extends ConfigBase
             // @formatter:on
     };
     @Configure(category = world)
-    public boolean                      loot_exp_share        = true;
+    public boolean                      loot_exp_share           = true;
     @Configure(category = world)
-    public boolean                      loot_hms              = true;
+    public boolean                      loot_hms                 = true;
     @Configure(category = world)
-    public boolean                      loot_larvesta         = true;
+    public boolean                      loot_larvesta            = true;
     @Configure(category = world)
-    public boolean                      villagePokemarts      = true;
+    public boolean                      villagePokemarts         = true;
     @Configure(category = world)
-    public boolean                      villageGyms           = true;
+    public boolean                      villageGyms              = true;
 
     @Configure(category = machines)
-    public int                          afaShinyRate          = 4096;
+    public int                          afaShinyRate             = 4096;
     @Configure(category = machines)
-    public int                          maxOutput             = 256;
+    public int                          maxOutput                = 256;
     @Configure(category = machines)
-    public int                          daycareTicks          = 100;
+    public int                          daycareTicks             = 100;
     @Configure(category = machines)
-    public int                          daycareExp            = 100;
+    public int                          daycareExp               = 100;
     @Configure(category = machines)
-    public int                          daycareCost           = 1;
+    public int                          daycareCost              = 1;
     @Configure(category = machines)
-    public String                       powerFunction         = "a*x/10";
+    public String                       powerFunction            = "a*x/10";
     @Configure(category = machines)
-    public boolean                      warpPadEnergy         = true;
+    public boolean                      warpPadEnergy            = true;
     @Configure(category = machines)
-    public boolean                      expandedDNATooltips   = false;
+    public boolean                      expandedDNATooltips      = false;
     @Configure(category = machines)
-    public String                       warpPadCostFunction   = "(dx)*(dx) + (dy)*(dy) + (dz)*(dz) + (5*dw)^4";
+    public String                       warpPadCostFunction      = "(dx)*(dx) + (dy)*(dy) + (dz)*(dz) + (5*dw)^4";
     @Configure(category = machines)
-    public boolean                      theft                 = false;
+    public boolean                      theft                    = false;
     @Configure(category = machines)
-    public int                          warpPadRange          = -1;
+    public int                          warpPadRange             = -1;
     @Configure(category = machines)
-    public int                          warpPadMaxEnergy      = 100000000;
+    public int                          warpPadMaxEnergy         = 100000000;
     @Configure(category = machines)
-    public int                          fossilReanimateCost   = 20000;
+    public int                          fossilReanimateCost      = 20000;
     @Configure(category = machines)
-    public String                       afaCostFunction       = "(d^3)/(10 + 5*l)";
+    public String                       afaCostFunction          = "(d^3)/(10 + 5*l)";
     @Configure(category = machines)
-    public String                       afaCostFunctionShiny  = "(d^3)/10";
+    public String                       afaCostFunctionShiny     = "(d^3)/10";
     @Configure(category = machines)
-    public int                          afaMaxEnergy          = 3200;
+    public int                          afaMaxEnergy             = 3200;
     @Configure(category = machines)
-    public int                          energyHungerCost      = 5;
+    public int                          energyHungerCost         = 5;
+    @Configure(category = machines)
+    public String                       clonerEfficiencyFunction = "x";
+    @Configure(category = machines)
+    public boolean                      anyReanimate             = true;
 
     @Configure(category = spawning)
-    String[]                            biomeLevels           = { "mound:5-10" };
+    String[]                            biomeLevels              = { "mound:5-10" };
 
     @Configure(category = trainers)
-    public boolean                      trainerTick           = true;
+    public boolean                      trainerTick              = true;
     @Configure(category = trainers)
-    public boolean                      trainerSpawn          = true;
+    public boolean                      trainerSpawn             = true;
     @Configure(category = trainers)
-    public boolean                      trainersInvul         = false;
+    public boolean                      trainersInvul            = false;
     @Configure(category = trainers)
-    public boolean                      trainerslevel         = true;
+    public boolean                      trainerslevel            = true;
     @Configure(category = trainers)
-    public boolean                      trainersTradeMobs     = true;
+    public boolean                      trainersTradeMobs        = true;
     @Configure(category = trainers)
-    public boolean                      trainersTradeItems    = true;
+    public boolean                      trainersTradeItems       = true;
     @Configure(category = trainers)
-    public boolean                      pokemobsHarmNPCs      = false;
+    public boolean                      pokemobsHarmNPCs         = false;
     @Configure(category = trainers)
-    public int                          trainerBox            = 128;
+    public int                          trainerBox               = 128;
     @Configure(category = trainers)
-    public int                          trainerDensity        = 2;
+    public int                          trainerDensity           = 2;
     @Configure(category = trainers)
-    public int                          trainerCooldown       = 10000;
+    public int                          trainerCooldown          = 10000;
     @Configure(category = trainers)
-    public int                          trainerSendOutDelay   = 50;
+    public int                          trainerSendOutDelay      = 50;
     @Configure(category = trainers)
-    public int                          trainerBattleDelay    = 100;
+    public int                          trainerBattleDelay       = 100;
     @Configure(category = trainers)
-    public int                          trainerSightRange     = 10;
+    public int                          trainerSightRange        = 10;
     @Configure(category = trainers)
-    public int                          trainerDeAgressTicks  = 50;
+    public int                          trainerDeAgressTicks     = 50;
     @Configure(category = trainers)
-    public boolean                      trainersMate          = true;
+    public boolean                      trainersMate             = true;
     @Configure(category = trainers)
-    public boolean                      npcsAreTrainers       = true;
+    public boolean                      npcsAreTrainers          = true;
     @Configure(category = trainers)
-    public String                       defaultReward         = "minecraft:emerald 1 0";
+    public String                       defaultReward            = "minecraft:emerald 1 0";
     @Configure(category = trainers)
-    String[]                            customNPCtrainers     = { "noppes.npcs.entity.EntityCustomNpc" };
+    String[]                            customNPCtrainers        = { "noppes.npcs.entity.EntityCustomNpc" };
 
     @Configure(category = misc)
-    public boolean                      bagHoldAll            = false;
+    public boolean                      bagHoldAll               = false;
     @Configure(category = misc)
-    public int                          bagPageCount          = 32;
+    public int                          bagPageCount             = 32;
     @Configure(category = misc)
-    public boolean                      legendaryConditions   = true;
+    public boolean                      legendaryConditions      = true;
     @Configure(category = database)
-    protected boolean                   forceDatabase         = true;
+    protected boolean                   forceDatabase            = true;
     @Configure(category = database)
-    public boolean                      forceRecipes          = true;
+    public boolean                      forceRecipes             = true;
     @Configure(category = database)
-    public boolean                      autoAddFossils        = true;
+    public boolean                      autoAddFossils           = true;
     @Configure(category = database)
-    public boolean                      anyReanimate          = true;
+    public String[]                     extraTrainerDatabases    = {};
     @Configure(category = database)
-    public String[]                     extraTrainerDatabases = {};
-    @Configure(category = database)
-    public String[]                     extraTradeDatabases   = {};
+    public String[]                     extraTradeDatabases      = {};
     @Configure(category = client)
-    public boolean                      journeymapRepels      = true;
+    public boolean                      journeymapRepels         = true;
     @Configure(category = client)
-    public boolean                      jeiModels             = false;
+    public boolean                      jeiModels                = false;
 
     public Config()
     {
@@ -226,6 +229,7 @@ public class Config extends ConfigBase
         }
         TileEntityAFA.initParser(afaCostFunction, afaCostFunctionShiny);
         TileEntityWarpPad.initParser(warpPadCostFunction);
+        TileClonerBase.initParser(clonerEfficiencyFunction);
     }
 
     @SubscribeEvent
