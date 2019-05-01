@@ -97,6 +97,14 @@ public class RecipeSelector implements IDefaultRecipe
             toolTip.add(I18n.format("container.geneselector.tooltip.a", selectorDestructChance));
             toolTip.add(I18n.format("container.geneselector.tooltip.b", dnaDestructChance));
         }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj instanceof SelectorValue) { return ((SelectorValue) obj).selectorDestructChance == this.selectorDestructChance
+                    && ((SelectorValue) obj).dnaDestructChance == this.dnaDestructChance; }
+            return false;
+        }
     }
 
     public static SelectorValue defaultSelector = new SelectorValue(0.0f, 0.9f);
@@ -142,7 +150,8 @@ public class RecipeSelector implements IDefaultRecipe
         ItemStack modifier = inv.getStackInSlot(1);
         if (ClonerHelper.getGeneSelectors(book).isEmpty() || modifier.isEmpty()) return false;
         SelectorValue value = getSelectorValue(modifier);
-        if (value == defaultSelector) return false;
+        SelectorValue oldValue = ClonerHelper.getSelectorValue(book);
+        if (value.equals(oldValue)) return false;
         output = book.copy();
         output.setCount(1);
         output.getTagCompound().setTag(ClonerHelper.SELECTORTAG, value.save());

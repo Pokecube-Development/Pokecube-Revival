@@ -35,11 +35,15 @@ import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.StartTracking;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.ai.helper.AIStuffHolder;
 import pokecube.adventures.ai.tasks.AIBattle;
 import pokecube.adventures.ai.tasks.AIFindTarget;
 import pokecube.adventures.ai.tasks.AIMate;
+import pokecube.adventures.blocks.cloner.ClonerHelper;
+import pokecube.adventures.blocks.cloner.recipe.RecipeSelector;
+import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.SelectorValue;
 import pokecube.adventures.commands.Config;
 import pokecube.adventures.entity.helper.EntityTrainerBase;
 import pokecube.adventures.entity.helper.MessageState;
@@ -133,6 +137,39 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** This method will make sure that cloned selectors do not keep any
+     * additional effects added to them.
+     * 
+     * @param event */
+    public void BookCloneRecipeHandle(ItemCraftedEvent event)
+    {
+        // Not a selector, we do nothing.
+        if (!RecipeSelector.isSelector(event.crafting)) return;
+        SelectorValue value = ClonerHelper.getSelectorValue(event.crafting);
+        for (int i = 0; i < event.craftMatrix.getSizeInventory(); i++)
+        {
+            ItemStack temp = event.craftMatrix.getStackInSlot(i);
+            // If one of the ingredients is a selector, then we will reset the
+            // generated selector.
+            if (RecipeSelector.isSelector(temp))
+            {
+                SelectorValue value2 = ClonerHelper.getSelectorValue(temp);
+                // Reset the selector if it is, infact, the same selector.
+                // Otherwise it is a newly upgraded one.
+                if (value2.dnaDestructChance == value.dnaDestructChance
+                        && value2.selectorDestructChance == value.selectorDestructChance)
+                {
+                    event.crafting.getTagCompound().removeTag(ClonerHelper.SELECTORTAG);
+                }
+                return;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    /** This prevents trainer's pokemobs going to PC
+     * 
+     * @param evt */
     public void TrainerPokemobPC(PCEvent evt)
     {
         if (evt.owner instanceof EntityTrainer)
@@ -142,6 +179,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent(receiveCanceled = false)
+    /** This sends pokemobs back to their NPC trainers when they are recalled.
+     * 
+     * @param evt */
     public void TrainerRecallEvent(pokecube.core.events.RecallEvent evt)
     {
         IPokemob recalled = evt.recalled;
@@ -159,6 +199,10 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** This takes care of randomization for trainer teams when spawned in
+     * structuress.
+     * 
+     * @param event */
     public void StructureSpawn(StructureEvent.SpawnEntity event)
     {
         IHasPokemobs mobs = CapabilityHasPokemobs.getHasPokemobs(event.getEntity());
@@ -175,6 +219,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** This assigns subbiomes for structures which spawn.
+     * 
+     * @param event */
     public void StructureBuild(StructureEvent.BuildStructure event)
     {
         String name = event.getStructure();
@@ -208,6 +255,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** This links the pokemob to the trainer when it is sent out.
+     * 
+     * @param evt */
     public void TrainerSendOutEvent(SendOut.Post evt)
     {
         IPokemob sent = evt.pokemob;
@@ -231,6 +281,10 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** This manages invulnerability of npcs to pokemobs, as well as managing
+     * the target allocation for trainers.
+     * 
+     * @param evt */
     public void livingHurtEvent(LivingHurtEvent evt)
     {
         IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(evt.getEntityLiving());
@@ -258,6 +312,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** Calls processInteract
+     * 
+     * @param evt */
     public void interactEvent(PlayerInteractEvent.EntityInteractSpecific evt)
     {
         if (evt.getWorld().isRemote) return;
@@ -269,6 +326,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** Calls processInteract
+     * 
+     * @param evt */
     public void interactEvent(PlayerInteractEvent.EntityInteract evt)
     {
         if (evt.getWorld().isRemote) return;
@@ -279,6 +339,13 @@ public class PAEventsHandler
         evt.getTarget().getEntityData().setLong(ID, evt.getTarget().getEntityWorld().getTotalWorldTime());
     }
 
+    /** This deals with the interaction logic for trainers. It sends the
+     * messages for MessageState.INTERACT, as well as applies the doAction. It
+     * also handles opening the edit gui for the trainers when the player has
+     * the trainer editor.
+     * 
+     * @param evt
+     * @param target */
     public void processInteract(PlayerInteractEvent evt, Entity target)
     {
         IHasMessages messages = CapabilityNPCMessages.getMessages(target);
@@ -301,6 +368,10 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** Ensures the IHasPokemobs object has synced target with the EntityLiving
+     * object.
+     * 
+     * @param evt */
     public void livingSetTargetEvent(LivingSetAttackTargetEvent evt)
     {
         if (evt.getTarget() == null) return;
@@ -312,6 +383,10 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** This manages making of trainers invisible if they have been defeated, if
+     * this is enabled for the given trainer.
+     * 
+     * @param event */
     public void TrainerWatchEvent(StartTracking event)
     {
         if (event.getEntity().getEntityWorld().isRemote) return;
@@ -332,6 +407,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** Attaches the various capabilities.
+     * 
+     * @param event */
     public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
     {
         if (!(event.getObject() instanceof EntityLiving) || event.getObject().getEntityWorld() == null
@@ -377,6 +455,9 @@ public class PAEventsHandler
     }
 
     @SubscribeEvent
+    /** Initializes the AI for the trainers when they join the world.
+     * 
+     * @param event */
     public void onJoinWorld(EntityJoinWorldEvent event)
     {
         if (!(event.getEntity() instanceof EntityLivingBase)) return;
@@ -413,6 +494,9 @@ public class PAEventsHandler
     private static final Map<Class<? extends Entity>, DataParamHolder> parameters = Maps.newHashMap();
 
     @SubscribeEvent
+    /** Initializes the datamanger for the trainer when it is being constructed.
+     * 
+     * @param event */
     public void onConstruct(EntityConstructing event)
     {
         if (!(event.getEntity() instanceof EntityLivingBase)
