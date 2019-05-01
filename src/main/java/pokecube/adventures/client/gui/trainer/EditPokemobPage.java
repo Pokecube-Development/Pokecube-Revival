@@ -589,15 +589,16 @@ public class EditPokemobPage extends Page
 
     private void setNature(String value)
     {
-        Nature nature = Nature.valueOf(value.toUpperCase(Locale.ENGLISH));
-        ITextComponent mess;
-        if (nature != null)
+        Nature nature = null;
+        ITextComponent mess = null;
+        try
         {
+            nature = Nature.valueOf(value.toUpperCase(Locale.ENGLISH));
             mess = new TextComponentTranslation("traineredit.set.nature", nature);
             pokemob.setNature(nature);
             sendUpdate();
         }
-        else
+        catch (Exception e)
         {
             mess = new TextComponentTranslation("traineredit.info.invalidnature", value);
         }
