@@ -52,7 +52,7 @@ public class TrainerSpawnHandler
 {
 
     private static TrainerSpawnHandler       instance;
-    public static Map<UUID, ChunkCoordinate> trainerMap = Maps.newHashMap();
+    public static Map<UUID, ChunkCoordinate> trainerMap = Maps.newConcurrentMap();
     private static Vector3                   vec1       = Vector3.getNewVector();
     private static Vector3                   vec2       = Vector3.getNewVector();
 
