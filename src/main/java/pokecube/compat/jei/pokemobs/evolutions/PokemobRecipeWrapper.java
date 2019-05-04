@@ -13,6 +13,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.Biome;
 import pokecube.core.database.PokedexEntry;
+import pokecube.core.database.PokedexEntry.EvolutionData;
 import pokecube.core.database.SpawnBiomeMatcher;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.moves.MovesUtils;
@@ -50,92 +51,11 @@ public class PokemobRecipeWrapper implements IRecipeWrapper
         List<String> tooltips = Lists.newArrayList();
         Rectangle arrow = new Rectangle(44, 18, 32, 17);
         if (!arrow.contains(mouseX, mouseY)) return tooltips;
-        if (recipe.data.level > 0)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.level", recipe.data.level));
-        }
-        if (recipe.data.traded)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.traded"));
-        }
-        if (recipe.data.nightOnly)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.night"));
-        }
-        if (recipe.data.dayOnly)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.day"));
-        }
-        if (recipe.data.duskOnly)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.dusk"));
-        }
-        if (recipe.data.dawnOnly)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.dawn"));
-        }
-        if (recipe.data.matcher != null)
-        {
-            recipe.data.matcher.reset();
-            recipe.data.matcher.parse();
-            List<String> biomeNames = Lists.newArrayList();
-            Iterator<Biome> it = Biome.REGISTRY.iterator();
-            for (BiomeType t : recipe.data.matcher.validSubBiomes)
-            {
-                biomeNames.add(t.readableName);
-            }
-            while (it.hasNext())
-            {
-                Biome test = it.next();
-                boolean valid = recipe.data.matcher.validBiomes.contains(test);
-                if (valid)
-                {
-                    biomeNames.add(test.getBiomeName());
-                }
-            }
-            for (SpawnBiomeMatcher matcher : recipe.data.matcher.children)
-            {
-                it = Biome.REGISTRY.iterator();
-                for (BiomeType t : matcher.validSubBiomes)
-                {
-                    biomeNames.add(t.readableName);
-                }
-                while (it.hasNext())
-                {
-                    Biome test = it.next();
-                    boolean valid = matcher.validBiomes.contains(test);
-                    if (valid)
-                    {
-                        biomeNames.add(test.getBiomeName());
-                    }
-                }
-            }
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.biome", biomeNames));
-        }
-        if (recipe.data.happy)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.happy"));
-        }
-        if (recipe.data.move != null && !recipe.data.move.isEmpty())
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.move",
-                    I18n.format(MovesUtils.getUnlocalizedMove(recipe.data.move))));
-        }
-        if (recipe.data.rainOnly)
-        {
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.rain"));
-        }
-        if (recipe.data.gender != 0)
-        {
-            String gender = I18n
-                    .format("gui.jei.pokemob.gender." + (recipe.data.gender == IPokemob.MALE ? "male" : "female"));
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.gender", gender));
-        }
-        if (recipe.data.randomFactor != 1)
-        {
-            String var = ((int) (100 * recipe.data.randomFactor)) + "%";
-            tooltips.add(I18n.format("gui.jei.pokemob.evo.chance", var));
-        }
+        EvolutionData data = this.recipe.data;
+        String[] messages = data.getEvoString().split("\n");
+        // index 0 is just the header..
+        for (int i = 1; i < messages.length; i++)
+            tooltips.add(messages[i]);
         return tooltips;
     }
 
