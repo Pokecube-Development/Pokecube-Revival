@@ -138,6 +138,10 @@ public class Config extends ConfigBase
     @Configure(category = trainers)
     public boolean                      trainersTradeItems       = true;
     @Configure(category = trainers)
+    public boolean                      trainersBattleEachOther  = true;
+    @Configure(category = trainers)
+    public boolean                      trainersBattlePokemobs   = true;
+    @Configure(category = trainers)
     public boolean                      pokemobsHarmNPCs         = false;
     @Configure(category = trainers)
     public int                          trainerBox               = 128;
