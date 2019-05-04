@@ -17,6 +17,8 @@ import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.blocks.cloner.ClonerHelper.DNAPack;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.ItemBasedSelector;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.SelectorValue;
+import pokecube.core.handlers.playerdata.PlayerPokemobCache;
+import pokecube.core.items.pokecubes.PokecubeManager;
 import pokecube.core.utils.Tools;
 import thut.api.entity.genetics.Alleles;
 import thut.api.entity.genetics.IMobGenetics;
@@ -153,7 +155,15 @@ public class RecipeExtract implements IPoweredRecipe
         {
             ItemStack stack = remaining.get(i);
             if (CompatWrapper.isValid(stack)) tile.setInventorySlotContents(i, stack);
-            else tile.decrStackSize(i, 1);
+            else
+            {
+                ItemStack old = tile.getStackInSlot(i);
+                if (PokecubeManager.isFilled(old))
+                {
+                    PlayerPokemobCache.UpdateCache(old, false, true);
+                }
+                tile.decrStackSize(i, 1);
+            }
         }
         if (tile.getCraftMatrix().eventHandler != null)
         {

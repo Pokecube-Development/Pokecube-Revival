@@ -182,7 +182,7 @@ public class PAEventsHandler
     /** This sends pokemobs back to their NPC trainers when they are recalled.
      * 
      * @param evt */
-    public void TrainerRecallEvent(pokecube.core.events.RecallEvent evt)
+    public void TrainerRecallEvent(pokecube.core.events.pokemob.RecallEvent evt)
     {
         IPokemob recalled = evt.recalled;
         EntityLivingBase owner = recalled.getPokemonOwner();

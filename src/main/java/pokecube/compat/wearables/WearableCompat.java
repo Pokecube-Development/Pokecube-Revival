@@ -7,26 +7,31 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Optional.Method;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.items.bags.ItemBag;
+import pokecube.core.events.pokemob.InteractEvent;
 import thut.core.client.render.model.IExtendedModelPart;
 import thut.core.client.render.x3d.X3dModel;
 import thut.lib.CompatClass;
 import thut.lib.CompatClass.Phase;
 import thut.wearables.EnumWearable;
 import thut.wearables.IActiveWearable;
+import thut.wearables.ThutWearables;
 
 public class WearableCompat
 {
@@ -48,6 +53,23 @@ public class WearableCompat
         if (event.getObject().getItem() instanceof ItemBag)
         {
             event.addCapability(new ResourceLocation("pokecube_adv:wearable"), new WearableBag());
+        }
+    }
+
+    @SubscribeEvent
+    public void interactWithPokemob(InteractEvent event)
+    {
+        if (event.pokemob.getOwner() == event.player)
+        {
+            EntityPlayer player = event.player;
+            EnumHand hand = event.event.getHand();
+            ItemStack held = player.getHeldItem(hand);
+            if (held.getDisplayName().equalsIgnoreCase("wearables"))
+            {
+                player.openGui(ThutWearables.instance, event.pokemob.getEntity().getEntityId(), player.getEntityWorld(),
+                        0, 0, 0);
+                event.setResult(Result.DENY);
+            }
         }
     }
 
