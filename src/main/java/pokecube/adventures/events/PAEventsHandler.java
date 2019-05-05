@@ -35,6 +35,7 @@ import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.StartTracking;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.ai.helper.AIStuffHolder;
@@ -71,6 +72,7 @@ import pokecube.core.events.PCEvent;
 import pokecube.core.events.SpawnEvent.SendOut;
 import pokecube.core.events.StructureEvent;
 import pokecube.core.events.handlers.SpawnHandler;
+import pokecube.core.events.pokemob.InteractEvent;
 import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.items.pokecubes.PokecubeManager;
@@ -308,6 +310,22 @@ public class PAEventsHandler
             {
                 pokemobHolder.setTarget((EntityLivingBase) evt.getSource().getTrueSource());
             }
+        }
+    }
+
+    /** For custom item interactions with pokemobs.
+     * 
+     * @param event */
+    @SubscribeEvent
+    public void interactWithPokemob(InteractEvent event)
+    {
+        EntityPlayer player = event.player;
+        EnumHand hand = event.event.getHand();
+        ItemStack held = player.getHeldItem(hand);
+        if (held.getItem() instanceof ItemTrainer)
+        {
+            PacketTrainer.sendEditOpenPacket(event.pokemob.getEntity(), (EntityPlayerMP) player);
+            event.setResult(Result.DENY);
         }
     }
 

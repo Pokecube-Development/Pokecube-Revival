@@ -78,7 +78,7 @@ public class GuiBag extends GuiContainer
     {
         GL11.glPushMatrix();
         GL11.glScaled(0.8, 0.8, 0.8);
-        String pcTitle = cont.invPlayer.player.getName() + "'s Bag";
+        String pcTitle = I18n.format("gui.pokemobbag.title", cont.invPlayer.player.getName());
         fontRenderer.drawString(cont.getPage(), xSize / 2 - fontRenderer.getStringWidth(cont.getPage()) / 3 - 60, 13,
                 4210752);
         fontRenderer.drawString(pcTitle, xSize / 2 - fontRenderer.getStringWidth(pcTitle) / 3 - 60, 4, 4210752);
