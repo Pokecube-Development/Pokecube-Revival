@@ -155,9 +155,15 @@ public class EntityTrainer extends EntityTrainerBase
             }
         }
         if (source == DamageSource.DROWN) return false;
+
+        boolean invul = aiStates.getAIState(IHasNPCAIStates.INVULNERABLE);
+
+        if (this instanceof EntityLeader) invul = invul || Config.instance.leadersInvul;
+        else if (this instanceof EntityPokemartSeller) invul = invul || Config.instance.merchantsInvul;
+        else invul = invul || Config.instance.trainersInvul;
+
         // Apply 0 damage to still count as an "attack"
-        if (Config.instance.trainersInvul || aiStates.getAIState(IHasNPCAIStates.INVULNERABLE))
-            return super.attackEntityFrom(source, 0.0f);
+        if (invul) return super.attackEntityFrom(source, 0.0f);
         return super.attackEntityFrom(source, amount);
     }
 
