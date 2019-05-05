@@ -156,6 +156,7 @@ public class EditTrainerPage extends ListPage
         {
             textList.add(new GuiTextField(1, fontRenderer, x + 50, y - 40, 70, 10));
             textList.get(1).setText((((EntityTrainer) parent.entity).urlSkin));
+            textList.get(1).setMaxStringLength(200);
             textList.add(new GuiTextField(2, fontRenderer, x + 50, y - 18, 70, 10));
             textList.get(2).setText((((EntityTrainer) parent.entity).playerName));
         }
