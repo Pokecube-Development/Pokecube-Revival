@@ -10,6 +10,7 @@ import thut.api.entity.ai.IAIMob;
 public class AIStuffHolder implements IAIMob, ICapabilityProvider
 {
     final AIStuff stuff;
+    boolean       wrapped = false;
 
     public AIStuffHolder(EntityLiving entity)
     {
@@ -29,6 +30,12 @@ public class AIStuffHolder implements IAIMob, ICapabilityProvider
     }
 
     @Override
+    public boolean vanillaWrapped()
+    {
+        return wrapped;
+    }
+
+    @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing)
     {
         return capability == IAIMob.THUTMOBAI;
@@ -38,6 +45,12 @@ public class AIStuffHolder implements IAIMob, ICapabilityProvider
     public <T> T getCapability(Capability<T> capability, EnumFacing facing)
     {
         return hasCapability(capability, facing) ? IAIMob.THUTMOBAI.cast(this) : null;
+    }
+
+    @Override
+    public void setWrapped(boolean wrapped)
+    {
+        this.wrapped = wrapped;
     }
 
 }

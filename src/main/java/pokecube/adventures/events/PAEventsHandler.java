@@ -79,6 +79,7 @@ import pokecube.core.items.pokecubes.PokecubeManager;
 import pokecube.core.moves.PokemobDamageSource;
 import pokecube.core.moves.TerrainDamageSource;
 import pokecube.core.utils.PokeType;
+import thut.api.entity.ai.EntityAIBaseManager;
 import thut.api.entity.ai.IAIMob;
 import thut.api.maths.Vector3;
 import thut.api.terrain.BiomeType;
@@ -483,6 +484,14 @@ public class PAEventsHandler
         IHasPokemobs mobs = CapabilityHasPokemobs.getHasPokemobs(npc);
         if (mobs == null || !npc.hasCapability(IAIMob.THUTMOBAI, null)) return;
         IAIMob mob = npc.getCapability(IAIMob.THUTMOBAI, null);
+
+        // Wrap it as a fake vanilla AI
+        if (npc instanceof EntityLiving)
+        {
+            mob.setWrapped(true);
+            EntityLiving living = (EntityLiving) npc;
+            living.tasks.addTask(0, new EntityAIBaseManager(mob, npc));
+        }
 
         // All can battle, but only trainers will path during battle.
         mob.getAI().addAITask(new AIBattle(npc, !(npc instanceof EntityTrainer)).setPriority(0));
