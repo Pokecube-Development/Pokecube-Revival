@@ -146,7 +146,7 @@ public class PAEventsHandler
     public void BookCloneRecipeHandle(ItemCraftedEvent event)
     {
         // Not a selector, we do nothing.
-        if (!RecipeSelector.isSelector(event.crafting)) return;
+        if (!RecipeSelector.isSelector(event.crafting) || !event.crafting.hasTagCompound()) return;
         SelectorValue value = ClonerHelper.getSelectorValue(event.crafting);
         for (int i = 0; i < event.craftMatrix.getSizeInventory(); i++)
         {
