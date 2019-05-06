@@ -209,13 +209,6 @@ public class ClonerHelper
         return geneClass;
     }
 
-    public static float destroyChance(ItemStack selector)
-    {
-        if (!CompatWrapper.isValid(selector) || !selector.hasTagCompound()) return 1;
-        if (!selector.getDisplayName().startsWith("Selector")) return 1;
-        return 0;
-    }
-
     public static void mergeGenes(IMobGenetics genesIn, ItemStack destination, IGeneSelector selector)
     {
         IMobGenetics eggs = getGenes(destination);

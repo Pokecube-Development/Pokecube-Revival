@@ -17,8 +17,7 @@
       "item": "minecraft:nether_star"
     },
     "M": {
-      "item": "minecraft:golden_apple",
-      "data": 1
+      "item": "pokecube:shiny_charm"
     }
   },
   "result": {
