@@ -1,10 +1,7 @@
 package pokecube.adventures.events;
 
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
-
-import com.google.common.collect.Maps;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -20,22 +17,18 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.StartTracking;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.ai.helper.AIStuffHolder;
@@ -84,6 +77,11 @@ import thut.api.entity.ai.IAIMob;
 import thut.api.maths.Vector3;
 import thut.api.terrain.BiomeType;
 import thut.api.terrain.TerrainManager;
+import thut.api.world.mobs.data.DataSync;
+import thut.core.common.world.mobs.data.DataSync_Impl;
+import thut.core.common.world.mobs.data.SyncHandler;
+import thut.core.common.world.mobs.data.types.Data_ItemStack;
+import thut.core.common.world.mobs.data.types.Data_String;
 
 public class PAEventsHandler
 {
@@ -92,6 +90,7 @@ public class PAEventsHandler
     final ResourceLocation MESSAGECAP  = new ResourceLocation(PokecubeAdv.ID, "messages");
     final ResourceLocation REWARDSCAP  = new ResourceLocation(PokecubeAdv.ID, "rewards");
     final ResourceLocation AISTUFFCAP  = new ResourceLocation(PokecubeAdv.ID, "aiStuff");
+    final ResourceLocation DATASCAP    = new ResourceLocation(PokecubeAdv.ID, "data");
 
     public static void randomizeTrainerTeam(Entity trainer, IHasPokemobs mobs)
     {
@@ -455,12 +454,35 @@ public class PAEventsHandler
         event.addCapability(AICAP, aiStates);
         event.addCapability(MESSAGECAP, messages);
         event.addCapability(REWARDSCAP, rewards);
+
+        DataSync data = getData(event);
+        if (data == null)
+        {
+            data = new DataSync_Impl();
+            event.addCapability(DATASCAP, (DataSync_Impl) data);
+        }
+        mobs.datasync = data;
+        mobs.holder.TYPE = data.register(new Data_String(), "");
+        for (int i = 0; i < 6; i++)
+        {
+            mobs.holder.POKEMOBS[i] = data.register(new Data_ItemStack(), ItemStack.EMPTY);
+        }
+
         for (ICapabilityProvider p : event.getCapabilities().values())
         {
             if (p.hasCapability(IAIMob.THUTMOBAI, null)) return;
         }
         AIStuffHolder aiHolder = new AIStuffHolder((EntityLiving) event.getObject());
         event.addCapability(AISTUFFCAP, aiHolder);
+    }
+
+    private DataSync getData(AttachCapabilitiesEvent<Entity> event)
+    {
+        for (ICapabilityProvider provider : event.getCapabilities().values())
+        {
+            if (provider.hasCapability(SyncHandler.CAP, null)) return provider.getCapability(SyncHandler.CAP, null);
+        }
+        return null;
     }
 
     private boolean hasCap(AttachCapabilitiesEvent<Entity> event)
@@ -520,20 +542,6 @@ public class PAEventsHandler
         TypeTrainer.getRandomTeam(mobs, npc, level, npc.getEntityWorld());
     }
 
-    private static final Map<Class<? extends Entity>, DataParamHolder> parameters = Maps.newHashMap();
-
-    @SubscribeEvent
-    /** Initializes the datamanger for the trainer when it is being constructed.
-     * 
-     * @param event */
-    public void onConstruct(EntityConstructing event)
-    {
-        if (!(event.getEntity() instanceof EntityLivingBase)
-                || TypeTrainer.mobTypeMapper.getType((EntityLivingBase) event.getEntity(), false) == null)
-            return;
-        initDataManager(event.getEntity());
-    }
-
     public static ItemStack fromString(String arg, ICommandSender sender) throws CommandException
     {
         String[] args = arg.split(" ");
@@ -557,44 +565,5 @@ public class PAEventsHandler
         if (args.length >= 2)
             itemstack.setCount(CommandBase.parseInt(args[1].trim(), 1, item.getItemStackLimit(itemstack)));
         return itemstack;
-    }
-
-    public static DataParamHolder initDataManager(Entity e)
-    {
-        DataParamHolder holder = getParameterHolder(e.getClass());
-        e.getDataManager().register(holder.TYPE, "");
-        for (int i = 0; i < 6; i++)
-            e.getDataManager().register(holder.pokemobs[i], ItemStack.EMPTY);
-        return holder;
-    }
-
-    public static DataParamHolder getParameterHolder(Class<? extends Entity> clazz)
-    {
-        // TODO this should be found via class checking the entitylist, and
-        // initialize thise at startup.
-        if (parameters.containsKey(clazz)) return parameters.get(clazz);
-        DataParameter<String> value = EntityDataManager.<String> createKey(clazz, DataSerializers.STRING);
-        DataParamHolder holder = new DataParamHolder(value);
-        for (int i = 0; i < 6; i++)
-        {
-            DataParameter<ItemStack> CUBE = EntityDataManager.<ItemStack> createKey(clazz, DataSerializers.ITEM_STACK);
-
-            holder.pokemobs[i] = CUBE;
-        }
-        parameters.put(clazz, holder);
-        return holder;
-    }
-
-    public static class DataParamHolder
-    {
-        public final DataParameter<String>      TYPE;
-        @SuppressWarnings({ "unchecked" })
-        public final DataParameter<ItemStack>[] pokemobs = new DataParameter[6];
-
-        DataParamHolder(DataParameter<String> type)
-        {
-            this.TYPE = type;
-        }
-
     }
 }

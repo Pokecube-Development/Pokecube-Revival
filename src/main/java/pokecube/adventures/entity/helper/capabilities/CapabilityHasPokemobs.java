@@ -32,8 +32,6 @@ import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages.IHas
 import pokecube.adventures.entity.trainers.EntityLeader;
 import pokecube.adventures.entity.trainers.EntityTrainer;
 import pokecube.adventures.entity.trainers.TypeTrainer;
-import pokecube.adventures.events.PAEventsHandler;
-import pokecube.adventures.events.PAEventsHandler.DataParamHolder;
 import pokecube.adventures.network.packets.PacketTrainer;
 import pokecube.core.events.handlers.PCEventsHandler;
 import pokecube.core.interfaces.IPokecube;
@@ -41,6 +39,7 @@ import pokecube.core.interfaces.IPokemob;
 import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.items.pokecubes.PokecubeManager;
 import thut.api.maths.Vector3;
+import thut.api.world.mobs.data.DataSync;
 import thut.lib.CompatWrapper;
 
 public class CapabilityHasPokemobs
@@ -380,6 +379,12 @@ public class CapabilityHasPokemobs
             }
         }
 
+        public static class DataParamHolder
+        {
+            public int   TYPE;
+            public int[] POKEMOBS = new int[6];
+        }
+
         public long                   resetTime        = 0;
         public int                    friendlyCooldown = 0;
         public ArrayList<DefeatEntry> defeaters        = new ArrayList<DefeatEntry>();
@@ -409,7 +414,8 @@ public class CapabilityHasPokemobs
         private LevelMode             levelmode        = LevelMode.CONFIG;
         private Set<ITargetWatcher>   watchers         = Sets.newHashSet();
 
-        DataParamHolder               holder;
+        public final DataParamHolder  holder           = new DataParamHolder();
+        public DataSync               datasync;
 
         public void init(EntityLivingBase user, IHasNPCAIStates aiStates, IHasMessages messages, IHasRewards rewards)
         {
@@ -419,7 +425,6 @@ public class CapabilityHasPokemobs
             this.rewards = rewards;
             battleCooldown = Config.instance.trainerCooldown;
             resetTime = battleCooldown;
-            holder = PAEventsHandler.getParameterHolder(user.getClass());
             if (!TypeTrainer.mobTypeMapper.shouldSync(user))
                 pokecubes = NonNullList.<ItemStack> withSize(6, ItemStack.EMPTY);
         }
@@ -473,7 +478,7 @@ public class CapabilityHasPokemobs
         public ItemStack getPokemob(int slot)
         {
             if (pokecubes != null) return pokecubes.get(slot);
-            return user.getDataManager().get(holder.pokemobs[slot]);
+            return datasync.get(holder.POKEMOBS[slot]);
         }
 
         @Override
@@ -484,7 +489,7 @@ public class CapabilityHasPokemobs
                 pokecubes.set(slot, cube);
                 return;
             }
-            user.getDataManager().set(holder.pokemobs[slot], cube);
+            datasync.set(holder.POKEMOBS[slot], cube);
         }
 
         @Override
@@ -579,7 +584,7 @@ public class CapabilityHasPokemobs
         {
             if (user.getEntityWorld().isRemote)
             {
-                String t = user.getDataManager().get(holder.TYPE);
+                String t = datasync.get(holder.TYPE);
                 return t.isEmpty() ? type : TypeTrainer.getTrainer(t);
             }
             return type;
@@ -604,8 +609,8 @@ public class CapabilityHasPokemobs
 
             // Then parse if rewards and actions should be dealt with.
             boolean reward = !(hasDefeated(defeater) || (user.isDead || user.getHealth() <= 0));
-            
-            //TODO possible have alternate message for invalid defeat?
+
+            // TODO possible have alternate message for invalid defeat?
             if (!reward) return;
 
             if (defeater instanceof EntityPlayer)
@@ -754,7 +759,7 @@ public class CapabilityHasPokemobs
         public void setType(TypeTrainer type)
         {
             this.type = type;
-            if (!user.getEntityWorld().isRemote) user.getDataManager().set(holder.TYPE, type == null ? "" : type.name);
+            if (!user.getEntityWorld().isRemote) datasync.set(holder.TYPE, type == null ? "" : type.name);
         }
 
         @Override

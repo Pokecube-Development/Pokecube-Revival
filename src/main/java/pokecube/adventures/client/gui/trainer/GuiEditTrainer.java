@@ -47,7 +47,7 @@ public class GuiEditTrainer extends GuiScreen
             this.fontRenderer = parent.fontRenderer;
         }
 
-        //Allows access below
+        // Allows access below
         @Override
         protected void actionPerformed(GuiButton button) throws IOException
         {
@@ -64,14 +64,14 @@ public class GuiEditTrainer extends GuiScreen
             }
         }
 
-        //Allows access below
+        // Allows access below
         @Override
         protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
         {
             super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
         }
 
-        //Allows access below
+        // Allows access below
         @Override
         protected void mouseReleased(int mouseX, int mouseY, int state)
         {
@@ -156,6 +156,8 @@ public class GuiEditTrainer extends GuiScreen
         super.initGui();
         pages.clear();
         pokemobPages.clear();
+
+        // TODO Add a button for resetting the "Defeated By" list.
 
         int num = 1;
         if (trainer != null)
