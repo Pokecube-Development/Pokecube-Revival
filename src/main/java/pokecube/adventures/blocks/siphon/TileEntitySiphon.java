@@ -1,7 +1,12 @@
 package pokecube.adventures.blocks.siphon;
 
+import java.util.List;
+
 import org.nfunk.jep.JEP;
 
+import com.google.common.collect.Lists;
+
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -12,10 +17,15 @@ import pokecube.core.database.PokedexEntry;
 
 public class TileEntitySiphon extends TileEntity implements ITickable
 {
-    AxisAlignedBB     box;
-    public static JEP parser;
-    public int        currentOutput     = 0;
-    public int        theoreticalOutput = 0;
+    public static int         UPDATERATE        = 20;
+    public AxisAlignedBB      box;
+    // Caches the mobs nearby, to reduce calls to check for them.
+    public List<EntityLiving> mobs              = Lists.newArrayList();
+    // Time of last check.
+    public long               updateTime        = -1;
+    public static JEP         parser;
+    public int                currentOutput     = 0;
+    public int                theoreticalOutput = 0;
 
     public TileEntitySiphon()
     {

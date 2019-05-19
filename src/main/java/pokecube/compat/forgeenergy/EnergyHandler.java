@@ -39,13 +39,19 @@ public class EnergyHandler
     {
         if (tile.getWorld() == null || power == 0) return 0;
         Vector3 v = Vector3.getNewVector().set(tile);
-        AxisAlignedBB box = v.getAABB().grow(10, 10, 10);
-        List<EntityLiving> l = tile.getWorld().getEntitiesWithinAABB(EntityLiving.class, box);
+        AxisAlignedBB box = (tile.box != null) ? tile.box : (tile.box = v.getAABB().grow(10, 10, 10));
+        List<EntityLiving> l = tile.mobs;
+        if (tile.updateTime == -1 || tile.updateTime < tile.getWorld().getTotalWorldTime())
+        {
+            l.clear();
+            l = tile.mobs = tile.getWorld().getEntitiesWithinAABB(EntityLiving.class, box);
+            tile.updateTime = tile.getWorld().getTotalWorldTime() + TileEntitySiphon.UPDATERATE;
+        }
         int ret = 0;
         power = Math.min(power, PokecubeAdv.conf.maxOutput);
         for (EntityLiving living : l)
         {
-            if (living != null)
+            if (living != null && living.addedToChunk)
             {
                 IEnergyStorage producer = living.getCapability(CapabilityEnergy.ENERGY, null);
                 if (producer != null)

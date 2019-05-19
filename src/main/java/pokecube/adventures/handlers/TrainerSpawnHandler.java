@@ -89,7 +89,7 @@ public class TrainerSpawnHandler
         int ret = 0;
         for (ChunkCoordinate o : trainerMap.values())
         {
-            ChunkCoordinate coord = (ChunkCoordinate) o;
+            ChunkCoordinate coord = o;
             if (chunkPosX >= coord.getX() - tolerance && chunkPosZ >= coord.getZ() - tolerance
                     && chunkPosY >= coord.getY() - tolerance && chunkPosY <= coord.getY() + tolerance
                     && chunkPosX <= coord.getX() + tolerance && chunkPosZ <= coord.getZ() + tolerance

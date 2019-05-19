@@ -463,6 +463,7 @@ public class PAEventsHandler
         }
         mobs.datasync = data;
         mobs.holder.TYPE = data.register(new Data_String(), "");
+
         for (int i = 0; i < 6; i++)
         {
             mobs.holder.POKEMOBS[i] = data.register(new Data_ItemStack(), ItemStack.EMPTY);
