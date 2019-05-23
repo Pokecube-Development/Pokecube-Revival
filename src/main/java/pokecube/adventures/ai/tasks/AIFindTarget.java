@@ -94,6 +94,7 @@ public class AIFindTarget extends AITrainerBase implements ITargetWatcher
                 trainer.resetPokemob();
                 return false;
             }
+            return false;
         }
         // Dead trainers can't fight.
         if (!entity.isEntityAlive() || entity.ticksExisted % 20 != 0) return false;

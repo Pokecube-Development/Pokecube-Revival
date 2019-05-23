@@ -102,6 +102,20 @@ public class AIBattle extends AITrainerBase
 
     void doAggression()
     {
+        // Check if we are being targetted by the enemies pokemob, if so, we
+        // will make it be passive for now.
+        if (entity instanceof EntityLiving)
+        {
+            EntityLiving living = (EntityLiving) entity;
+            Entity target = living.getAttackTarget();
+            IPokemob tarMob = CapabilityPokemob.getPokemobFor(target);
+            if (tarMob != null)
+            {
+                tarMob.setCombatState(CombatStates.ANGRY, true);
+                tarMob.getEntity().setAttackTarget(null);
+            }
+        }
+
         // Check if maybe mob was sent out, but just not seen
         List<IPokemob> pokemobs = PCEventsHandler.getOutMobs(entity);
         if (!pokemobs.isEmpty())

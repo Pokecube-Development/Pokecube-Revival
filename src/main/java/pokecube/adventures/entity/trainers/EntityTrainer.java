@@ -183,7 +183,8 @@ public class EntityTrainer extends EntityTrainerBase
     @Override
     public EntityLivingBase getAttackTarget()
     {
-        return pokemobsCap.getTarget();
+        EntityLivingBase def = super.getAttackTarget();
+        return def == null ? pokemobsCap.getTarget() : def;
     }
 
     private int getBaseStats(IPokemob mob)
@@ -202,6 +203,7 @@ public class EntityTrainer extends EntityTrainerBase
     @Override
     public void setAttackTarget(@Nullable EntityLivingBase entity)
     {
+        super.setAttackTarget(entity);
         IPokemob mob = CapabilityPokemob.getPokemobFor(entity);
         if (mob != null)
         {
