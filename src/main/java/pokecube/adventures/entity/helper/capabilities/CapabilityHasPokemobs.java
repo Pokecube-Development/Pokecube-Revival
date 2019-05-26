@@ -312,6 +312,8 @@ public class CapabilityHasPokemobs
             if (type == LevelMode.CONFIG) return Config.instance.trainerslevel;
             return type == LevelMode.YES ? true : false;
         }
+
+        void resetDefeatList();
     }
 
     public static class Storage implements Capability.IStorage<IHasPokemobs>
@@ -901,6 +903,12 @@ public class CapabilityHasPokemobs
         public LevelMode getLevelMode()
         {
             return levelmode;
+        }
+
+        @Override
+        public void resetDefeatList()
+        {
+            defeaters.clear();
         }
     }
 }

@@ -170,11 +170,10 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         }
         if (message.message == MESSAGEUPDATETRAINER)
         {
-            NBTBase tag = message.data.getTag("T");
             int id = message.data.getInteger("I");
             Entity mob = player.getEntityWorld().getEntityByID(id);
-            
-            //O for Open Gui Packet.
+
+            // O for Open Gui Packet.
             if (message.data.getBoolean("O"))
             {
                 if (mob != null && message.data.hasKey("C"))
@@ -214,6 +213,15 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
             if (mob == null) return;
             IHasPokemobs cap = CapabilityHasPokemobs.getHasPokemobs(mob);
             IGuardAICapability guard = mob.getCapability(EventsHandler.GUARDAI_CAP, null);
+            
+            //Reset defeat list.
+            if(message.data.getBoolean("RDL"))
+            {
+                cap.resetDefeatList();
+                return;
+            }
+            
+            NBTBase tag = message.data.getTag("T");
             if (tag instanceof NBTTagCompound && ((NBTTagCompound) tag).hasKey("GU") && guard != null)
             {
                 RouteEditHelper.applyServerPacket(tag, mob, guard);

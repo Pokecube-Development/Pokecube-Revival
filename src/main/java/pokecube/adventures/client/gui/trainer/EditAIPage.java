@@ -123,12 +123,20 @@ public class EditAIPage extends Page
         String button = parent.aiStates.getAIState(IHasNPCAIStates.MATES) ? I18n.format("traineredit.button.mates")
                 : I18n.format("traineredit.button.nomates");
         parent.getButtons().add(new Button(6, x - 120, y + 51, 60, 12, button));
+
+        // button for toggling invlunerability
         button = parent.aiStates.getAIState(IHasNPCAIStates.INVULNERABLE)
                 ? I18n.format("traineredit.button.invulnerable") : I18n.format("traineredit.button.vulnerable");
         parent.getButtons().add(new Button(7, x - 120, y + 63, 60, 12, button));
+
+        // Button for toggling trade status
         button = parent.aiStates.getAIState(IHasNPCAIStates.TRADES) ? I18n.format("traineredit.button.trade")
                 : I18n.format("traineredit.button.notrade");
         parent.getButtons().add(new Button(8, x - 120, y + 15, 60, 12, button));
+
+        // Button for resetting their defeat list.
+        String resetbutton = I18n.format("traineredit.button.reset_list");
+        parent.getButtons().add(new Button(9, x - 120, y - 54, 60, 12, resetbutton));
 
         textList.get(0).setValidator(floatValid);
         textList.get(0).setText(guard.getPrimaryTask().getRoamDistance() + "");
@@ -198,8 +206,7 @@ public class EditAIPage extends Page
             packet.data.setInteger("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             this.onPageOpened();
-            mess = new TextComponentTranslation(
-                    "traineredit.set.notify." + parent.aiStates.getAIState(IHasNPCAIStates.FIXEDDIRECTION));
+            mess = new TextComponentTranslation("traineredit.set.notify." + trainer.notifyDefeat);
             parent.mc.player.sendStatusMessage(mess, true);
             break;
         case 4:
@@ -245,6 +252,13 @@ public class EditAIPage extends Page
             mess = new TextComponentTranslation(
                     "traineredit.set.trade." + parent.aiStates.getAIState(IHasNPCAIStates.TRADES));
             parent.mc.player.sendStatusMessage(mess, true);
+            break;
+        case 9:
+            packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
+            //Reset defeat list.
+            packet.data.setBoolean("RDL", true);
+            packet.data.setInteger("I", parent.entity.getEntityId());
+            PokecubeMod.packetPipeline.sendToServer(packet);
             break;
         }
     }
