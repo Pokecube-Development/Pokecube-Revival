@@ -90,6 +90,12 @@ public class TrainerEntryLoader
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         FileReader reader = new FileReader(file);
         XMLDatabase database = (XMLDatabase) unmarshaller.unmarshal(reader);
+        for (TrainerEntry entry : database.trainers)
+        {
+            if (entry.type != null) entry.type = entry.type.trim();
+            if (entry.pokemon != null) entry.pokemon = entry.pokemon.trim();
+            if (entry.gender != null) entry.gender = entry.gender.trim();
+        }
         reader.close();
         return database;
     }
