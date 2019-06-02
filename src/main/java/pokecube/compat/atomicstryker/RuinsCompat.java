@@ -4,6 +4,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pokecube.adventures.commands.Config;
+import pokecube.core.interfaces.PokecubeMod;
 import thut.api.terrain.BiomeType;
 import thut.api.terrain.TerrainManager;
 import thut.lib.CompatClass;
@@ -29,12 +30,14 @@ public class RuinsCompat
         int z = event.z;
         atomicstryker.ruins.common.RuinTemplate template = event.template;
         atomicstryker.ruins.common.RuinData data = template.getRuinData(x, y, z, event.rotation);
+        String name = data.name.toLowerCase(java.util.Locale.ENGLISH);
 
         int biome = BiomeType.RUIN.getType();
-        if (Config.biomeMap.containsKey(data.name.toLowerCase(java.util.Locale.ENGLISH).replace("tml", "")))
+        if (Config.biomeMap.containsKey(name.replace(".tml", "")))
         {
-            biome = Config.biomeMap.get(data.name.toLowerCase(java.util.Locale.ENGLISH).replace("tml", ""));
+            biome = Config.biomeMap.get(name.replace(".tml", ""));
         }
+        if (PokecubeMod.debug) PokecubeMod.log("Assigning subbiome for: " + name);
 
         for (int i = data.xMin; i < data.xMax; i++)
             for (int j = data.yMin; j < data.yMax; j++)
