@@ -97,6 +97,13 @@ public class ContainerDaycare extends Container
     }
 
     @Override
+    public void onContainerClosed(EntityPlayer playerIn)
+    {
+        super.onContainerClosed(playerIn);
+        tile.closeInventory(playerIn);
+    }
+
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
@@ -107,8 +114,7 @@ public class ContainerDaycare extends Container
             itemstack = itemstack1.copy();
             if (index < 1)
             {
-                if (!this.mergeItemStack(itemstack1, 1, this.inventorySlots.size(),
-                        false)) { return ItemStack.EMPTY; }
+                if (!this.mergeItemStack(itemstack1, 1, this.inventorySlots.size(), false)) { return ItemStack.EMPTY; }
             }
             else if (!this.mergeItemStack(itemstack1, 0, 1, false)) { return ItemStack.EMPTY; }
             if (!CompatWrapper.isValid(itemstack1))

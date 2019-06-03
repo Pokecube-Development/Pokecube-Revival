@@ -93,6 +93,13 @@ public class ContainerAFA extends Container
     }
 
     @Override
+    public void onContainerClosed(EntityPlayer playerIn)
+    {
+        super.onContainerClosed(playerIn);
+        tile.closeInventory(playerIn);
+    }
+
+    @Override
     /** Looks for changes made in the container, sends them to every
      * listener. */
     public void detectAndSendChanges()
@@ -117,8 +124,7 @@ public class ContainerAFA extends Container
             itemstack = itemstack1.copy();
             if (index < 1)
             {
-                if (!this.mergeItemStack(itemstack1, 1, this.inventorySlots.size(),
-                        false)) { return ItemStack.EMPTY; }
+                if (!this.mergeItemStack(itemstack1, 1, this.inventorySlots.size(), false)) { return ItemStack.EMPTY; }
             }
             else if (!this.mergeItemStack(itemstack1, 0, 1, false)) { return ItemStack.EMPTY; }
             if (!CompatWrapper.isValid(itemstack1))
