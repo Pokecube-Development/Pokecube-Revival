@@ -63,6 +63,7 @@ public abstract class Condition implements ISpecialCaptureCondition, ISpecialSpa
     @Override
     public boolean canCapture(Entity trainer)
     {
+        if (trainer == null) return false;
         if (CaptureStats.getTotalNumberOfPokemobCaughtBy(trainer.getUniqueID(), getEntry()) > 0) return false;
         return true;
     }
@@ -75,6 +76,7 @@ public abstract class Condition implements ISpecialCaptureCondition, ISpecialSpa
     @Override
     public boolean canSpawn(Entity trainer)
     {
+        if (trainer == null) return false;
         if (CaptureStats.getTotalNumberOfPokemobCaughtBy(trainer.getUniqueID(), getEntry()) > 0) return false;
         return true;
     }
