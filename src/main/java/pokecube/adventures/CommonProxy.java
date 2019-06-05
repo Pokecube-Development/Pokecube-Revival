@@ -1,5 +1,9 @@
 package pokecube.adventures;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -20,6 +24,8 @@ import pokecube.adventures.items.bags.ContainerBag;
 
 public class CommonProxy implements IGuiHandler
 {
+    public static Map<Integer, IGuiHandler> custom_server_handlers = Maps.newHashMap();
+    public static Map<Integer, IGuiHandler> custom_client_handlers = Maps.newHashMap();
 
     @Override
     public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
@@ -85,6 +91,11 @@ public class CommonProxy implements IGuiHandler
             }
             return cont;
         }
+        if (custom_server_handlers.containsKey(guiID))
+        {
+            IGuiHandler handler = custom_server_handlers.get(guiID);
+            return handler.getServerGuiElement(guiID, player, world, x, y, z);
+        }
         return null;
     }
 
@@ -98,20 +109,32 @@ public class CommonProxy implements IGuiHandler
         return FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim);
     }
 
-    public void initClient() {}
+    public void initClient()
+    {
+    }
 
     public boolean isOnClientSide()
     {
         return false;
     }
-    
-    public void initItemModels() {}
-    
-    public void initBlockModels() {}
 
-    public void preinit() {}
+    public void initItemModels()
+    {
+    }
 
-    public void postinit() {}
+    public void initBlockModels()
+    {
+    }
 
-    public void registerEntities()  {}
+    public void preinit()
+    {
+    }
+
+    public void postinit()
+    {
+    }
+
+    public void registerEntities()
+    {
+    }
 }

@@ -24,6 +24,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import pokecube.adventures.CommonProxy;
@@ -82,6 +83,11 @@ public class ClientProxy extends CommonProxy
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof TileEntityDaycare) return new GuiDaycare(player.inventory, (TileEntityDaycare) tile);
             return new GuiAFA(player.inventory, (TileEntityAFA) tile);
+        }
+        if (custom_client_handlers.containsKey(guiID))
+        {
+            IGuiHandler handler = custom_client_handlers.get(guiID);
+            return handler.getClientGuiElement(guiID, player, world, x, y, z);
         }
         return null;
     }

@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
@@ -13,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -20,10 +22,13 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Optional.Method;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pokecube.adventures.CommonProxy;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.items.bags.ItemBag;
+import pokecube.core.PokecubeCore;
 import pokecube.core.events.pokemob.InteractEvent;
 import thut.core.client.render.model.IExtendedModelPart;
 import thut.core.client.render.x3d.X3dModel;
@@ -32,15 +37,72 @@ import thut.lib.CompatClass.Phase;
 import thut.wearables.EnumWearable;
 import thut.wearables.IActiveWearable;
 import thut.wearables.ThutWearables;
+import thut.wearables.inventory.ContainerWearables;
 
 public class WearableCompat
 {
+    private static int GUID = 240;
 
     @Method(modid = "thut_wearables")
     @CompatClass(phase = Phase.PRE)
     public static void preInitWearables()
     {
         MinecraftForge.EVENT_BUS.register(new WearableCompat());
+    }
+
+    @Method(modid = "thut_wearables")
+    @SideOnly(Side.CLIENT)
+    @CompatClass(phase = Phase.PRE)
+    public static void clientInitWearables()
+    {
+        IGuiHandler handler = new IGuiHandler()
+        {
+
+            @Override
+            public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            {
+                return null;
+            }
+
+            @Override
+            public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            {
+                Entity mob = PokecubeCore.core.getEntityProvider().getEntity(world, x, true);
+                if (!(mob instanceof EntityLivingBase)) return null;
+                EntityLivingBase base = (EntityLivingBase) mob;
+                if (ThutWearables.getWearables(
+                        base) != null) { return new thut.wearables.client.gui.GuiWearables(base, player); }
+                return null;
+            }
+        };
+        CommonProxy.custom_client_handlers.put(GUID, handler);
+    }
+
+    @Method(modid = "thut_wearables")
+    @SideOnly(Side.SERVER)
+    @CompatClass(phase = Phase.PRE)
+    public static void serverInitWearables()
+    {
+        IGuiHandler handler = new IGuiHandler()
+        {
+
+            @Override
+            public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            {
+                Entity mob = PokecubeCore.core.getEntityProvider().getEntity(world, x, true);
+                if (!(mob instanceof EntityLivingBase)) return null;
+                EntityLivingBase base = (EntityLivingBase) mob;
+                if (ThutWearables.getWearables(base) != null) { return new ContainerWearables(base, player); }
+                return null;
+            }
+
+            @Override
+            public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            {
+                return null;
+            }
+        };
+        CommonProxy.custom_server_handlers.put(GUID, handler);
     }
 
     public WearableCompat()
@@ -66,8 +128,8 @@ public class WearableCompat
             ItemStack held = player.getHeldItem(hand);
             if (held.getDisplayName().equalsIgnoreCase("wearables"))
             {
-                player.openGui(ThutWearables.instance, event.pokemob.getEntity().getEntityId(), player.getEntityWorld(),
-                        0, 0, 0);
+                player.openGui(PokecubeAdv.instance, GUID, player.getEntityWorld(),
+                        event.pokemob.getEntity().getEntityId(), 0, 0);
                 event.setResult(Result.DENY);
             }
         }
