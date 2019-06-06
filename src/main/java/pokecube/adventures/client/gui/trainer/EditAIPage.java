@@ -136,7 +136,7 @@ public class EditAIPage extends Page
 
         // Button for resetting their defeat list.
         String resetbutton = I18n.format("traineredit.button.reset_list");
-        parent.getButtons().add(new Button(9, x - 120, y - 54, 60, 12, resetbutton));
+        parent.getButtons().add(new Button(9, x + 30, y + 64, 90, 12, resetbutton));
 
         textList.get(0).setValidator(floatValid);
         textList.get(0).setText(guard.getPrimaryTask().getRoamDistance() + "");

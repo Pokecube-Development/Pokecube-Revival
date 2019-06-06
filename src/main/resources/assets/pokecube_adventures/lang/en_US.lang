@@ -157,6 +157,7 @@ traineredit.button.invulnerable=Invuln
 traineredit.button.vulnerable=Vulnerable
 traineredit.button.trade=Trade
 traineredit.button.notrade=No Trade
+traineredit.button.reset_list=Reset Defeaters
 
 traineredit.button.trainer=Trainer
 traineredit.button.leader=Leader
