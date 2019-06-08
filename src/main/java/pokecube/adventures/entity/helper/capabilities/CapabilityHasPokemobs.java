@@ -313,7 +313,10 @@ public class CapabilityHasPokemobs
             return type == LevelMode.YES ? true : false;
         }
 
-        void resetDefeatList();
+        default void resetDefeatList()
+        {
+            // No need to reset list for normal ones.
+        }
     }
 
     public static class Storage implements Capability.IStorage<IHasPokemobs>
