@@ -3,7 +3,7 @@ package pokecube.compat.opencomputers.drivers;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.network.ManagedEnvironment;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
@@ -17,13 +17,13 @@ public class AFADriver extends DriverBase
         return "afa";
     }
 
-    public boolean canConnectNode(EnumFacing side)
+    public boolean canConnectNode(Direction side)
     {
-        return side == EnumFacing.DOWN;
+        return side == Direction.DOWN;
     }
 
     @Override
-    public ManagedEnvironment createEnvironment(World world, BlockPos pos, EnumFacing side)
+    public ManagedEnvironment createEnvironment(World world, BlockPos pos, Direction side)
     {
         if (!canConnectNode(side)) return null;
         TileEntityAFA pc = (TileEntityAFA) world.getTileEntity(pos);

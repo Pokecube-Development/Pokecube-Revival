@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
@@ -75,7 +75,7 @@ public class RecipeExtract implements IPoweredRecipe
         output = destination.copy();
         output.setCount(1);
         if (!CompatWrapper.isValid(source) || genes == null) return output;
-        if (output.getTagCompound() == null) output.setTagCompound(new NBTTagCompound());
+        if (output.getTag() == null) output.setTag(new CompoundNBT());
         ClonerHelper.mergeGenes(genes, output, new ItemBasedSelector(selector));
         output.setCount(1);
         return this.output;

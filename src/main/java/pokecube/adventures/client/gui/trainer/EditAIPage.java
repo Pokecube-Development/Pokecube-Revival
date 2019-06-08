@@ -8,9 +8,9 @@ import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBT;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import pokecube.adventures.client.gui.trainer.GuiEditTrainer.Page;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.DefaultPokemobs;
@@ -168,7 +168,7 @@ public class EditAIPage extends Page
         super.actionPerformed(button);
         ITextComponent mess;
         PacketTrainer packet;
-        NBTBase tag;
+        INBT tag;
         DefaultPokemobs trainer = (DefaultPokemobs) parent.trainer;
         switch (button.id)
         {
@@ -185,7 +185,7 @@ public class EditAIPage extends Page
                     ? new TimePeriod(0, 0) : TimePeriod.fullDay);
             sendGuardUpdate();
             sendAIUpdate();
-            mess = new TextComponentTranslation(
+            mess = new TranslationTextComponent(
                     "traineredit.set.stationary." + parent.aiStates.getAIState(IHasNPCAIStates.STATIONARY));
             parent.mc.player.sendStatusMessage(mess, true);
             break;
@@ -193,7 +193,7 @@ public class EditAIPage extends Page
             parent.aiStates.setAIState(IHasNPCAIStates.FIXEDDIRECTION,
                     !parent.aiStates.getAIState(IHasNPCAIStates.FIXEDDIRECTION));
             sendAIUpdate();
-            mess = new TextComponentTranslation(
+            mess = new TranslationTextComponent(
                     "traineredit.set.norotates." + parent.aiStates.getAIState(IHasNPCAIStates.FIXEDDIRECTION));
             parent.mc.player.sendStatusMessage(mess, true);
             break;
@@ -206,14 +206,14 @@ public class EditAIPage extends Page
             packet.data.setInteger("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             this.onPageOpened();
-            mess = new TextComponentTranslation("traineredit.set.notify." + trainer.notifyDefeat);
+            mess = new TranslationTextComponent("traineredit.set.notify." + trainer.notifyDefeat);
             parent.mc.player.sendStatusMessage(mess, true);
             break;
         case 4:
             parent.aiStates.setAIState(IHasNPCAIStates.PERMFRIENDLY,
                     !parent.aiStates.getAIState(IHasNPCAIStates.PERMFRIENDLY));
             sendAIUpdate();
-            mess = new TextComponentTranslation(
+            mess = new TranslationTextComponent(
                     "traineredit.set.friendly." + parent.aiStates.getAIState(IHasNPCAIStates.PERMFRIENDLY));
             parent.mc.player.sendStatusMessage(mess, true);
             break;
@@ -228,13 +228,13 @@ public class EditAIPage extends Page
             PokecubeMod.packetPipeline.sendToServer(packet);
             this.onPageOpened();
             String levelsButton = I18n.format("traineredit.button.levels." + parent.trainer.getLevelMode());
-            mess = new TextComponentTranslation("traineredit.set.levels", levelsButton);
+            mess = new TranslationTextComponent("traineredit.set.levels", levelsButton);
             parent.mc.player.sendStatusMessage(mess, true);
             break;
         case 6:
             parent.aiStates.setAIState(IHasNPCAIStates.MATES, !parent.aiStates.getAIState(IHasNPCAIStates.MATES));
             sendAIUpdate();
-            mess = new TextComponentTranslation(
+            mess = new TranslationTextComponent(
                     "traineredit.set.mates." + parent.aiStates.getAIState(IHasNPCAIStates.MATES));
             parent.mc.player.sendStatusMessage(mess, true);
             break;
@@ -242,21 +242,21 @@ public class EditAIPage extends Page
             parent.aiStates.setAIState(IHasNPCAIStates.INVULNERABLE,
                     !parent.aiStates.getAIState(IHasNPCAIStates.INVULNERABLE));
             sendAIUpdate();
-            mess = new TextComponentTranslation(
+            mess = new TranslationTextComponent(
                     "traineredit.set.invulnerable." + parent.aiStates.getAIState(IHasNPCAIStates.INVULNERABLE));
             parent.mc.player.sendStatusMessage(mess, true);
             break;
         case 8:
             parent.aiStates.setAIState(IHasNPCAIStates.TRADES, !parent.aiStates.getAIState(IHasNPCAIStates.TRADES));
             sendAIUpdate();
-            mess = new TextComponentTranslation(
+            mess = new TranslationTextComponent(
                     "traineredit.set.trade." + parent.aiStates.getAIState(IHasNPCAIStates.TRADES));
             parent.mc.player.sendStatusMessage(mess, true);
             break;
         case 9:
             packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
             //Reset defeat list.
-            packet.data.setBoolean("RDL", true);
+            packet.data.putBoolean("RDL", true);
             packet.data.setInteger("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             break;
@@ -302,14 +302,14 @@ public class EditAIPage extends Page
         start = (float) old.startTime;
         end = (float) old.endTime;
         PacketTrainer packet;
-        NBTBase tag;
+        INBT tag;
         ITextComponent mess = null;
         switch (i)
         {
         case 0:
             argFloat = value.isEmpty() ? 0 : Float.parseFloat(value);
             guard.getPrimaryTask().setRoamDistance(argFloat);
-            mess = new TextComponentTranslation("traineredit.set.guarddist", argFloat);
+            mess = new TranslationTextComponent("traineredit.set.guarddist", argFloat);
             sendGuardUpdate();
             break;
         case 1:
@@ -336,7 +336,7 @@ public class EditAIPage extends Page
             packet.data.setInteger("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             this.onPageOpened();
-            mess = new TextComponentTranslation("traineredit.set.cooldown_p", argInt);
+            mess = new TranslationTextComponent("traineredit.set.cooldown_p", argInt);
             break;
         case 4:
             argInt = value.isEmpty() ? 0 : Integer.parseInt(value);
@@ -348,7 +348,7 @@ public class EditAIPage extends Page
             packet.data.setInteger("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             this.onPageOpened();
-            mess = new TextComponentTranslation("traineredit.set.cooldown_g", argInt);
+            mess = new TranslationTextComponent("traineredit.set.cooldown_g", argInt);
             break;
         case 5:
             argFloat = value.isEmpty() ? 0 : Float.parseFloat(value);
@@ -356,12 +356,12 @@ public class EditAIPage extends Page
             this.onPageClosed();
             sendAIUpdate();
             this.onPageOpened();
-            mess = new TextComponentTranslation("traineredit.set.look", argFloat);
+            mess = new TranslationTextComponent("traineredit.set.look", argFloat);
             break;
         }
         if (time != null)
         {
-            mess = new TextComponentTranslation("traineredit.set.guardtime", time.startTick, time.endTick);
+            mess = new TranslationTextComponent("traineredit.set.guardtime", time.startTick, time.endTick);
         }
         if (mess != null) parent.mc.player.sendStatusMessage(mess, true);
     }
@@ -371,7 +371,7 @@ public class EditAIPage extends Page
         onPageClosed();
         PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
         IGuardAICapability guard = parent.entity.getCapability(EventsHandler.GUARDAI_CAP, null);
-        NBTBase tag = EventsHandler.storage.writeNBT(EventsHandler.GUARDAI_CAP, guard, null);
+        INBT tag = EventsHandler.storage.writeNBT(EventsHandler.GUARDAI_CAP, guard, null);
         packet.data.setTag("T", tag);
         packet.data.setByte("V", (byte) 4);
         packet.data.setInteger("I", parent.entity.getEntityId());
@@ -383,7 +383,7 @@ public class EditAIPage extends Page
     {
         onPageClosed();
         PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-        NBTBase tag = CapabilityNPCAIStates.storage.writeNBT(CapabilityNPCAIStates.AISTATES_CAP, parent.aiStates, null);
+        INBT tag = CapabilityNPCAIStates.storage.writeNBT(CapabilityNPCAIStates.AISTATES_CAP, parent.aiStates, null);
         packet.data.setTag("T", tag);
         packet.data.setByte("V", (byte) 3);
         packet.data.setInteger("I", parent.entity.getEntityId());

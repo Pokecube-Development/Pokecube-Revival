@@ -1,7 +1,7 @@
 package pokecube.adventures.ai.tasks;
 
 import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
@@ -19,7 +19,7 @@ public class AIMate extends AITrainerBase
     EntityAgeable                        child     = null;
     int                                  mateTimer = -1;
 
-    public AIMate(EntityLivingBase trainer, Class<? extends EntityAgeable> targetClass)
+    public AIMate(LivingEntity trainer, Class<? extends EntityAgeable> targetClass)
     {
         super(trainer);
         this.targetClass = targetClass;
@@ -62,8 +62,8 @@ public class AIMate extends AITrainerBase
         {
             if (mateTimer-- <= 0)
             {
-                thisEntity.getNavigator().tryMoveToEntityLiving(foundMate, thisEntity.getAIMoveSpeed());
-                foundMate.getNavigator().tryMoveToEntityLiving(thisEntity, foundMate.getAIMoveSpeed());
+                thisEntity.getNavigator().tryMoveToMobEntity(foundMate, thisEntity.getAIMoveSpeed());
+                foundMate.getNavigator().tryMoveToMobEntity(thisEntity, foundMate.getAIMoveSpeed());
             }
             else
             {

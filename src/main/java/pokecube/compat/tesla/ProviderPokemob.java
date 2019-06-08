@@ -1,8 +1,8 @@
 package pokecube.compat.tesla;
 
 import net.darkhax.tesla.api.ITeslaProducer;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pokecube.adventures.blocks.siphon.TileEntitySiphon;
@@ -21,13 +21,13 @@ public class ProviderPokemob implements ITeslaProducer, ICapabilityProvider
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, Direction facing)
     {
         return capability == TeslaHandler.TESLA_PRODUCER;
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, Direction facing)
     {
         return (capability == TeslaHandler.TESLA_PRODUCER) ? TeslaHandler.TESLA_PRODUCER.cast(this) : null;
     }
@@ -36,14 +36,14 @@ public class ProviderPokemob implements ITeslaProducer, ICapabilityProvider
     public long takePower(long power, boolean simulated)
     {
         if (!pokemob.isType(PokeType.getType("electric"))) return 0;
-        EntityLiving living = pokemob.getEntity();
+        MobEntity living = pokemob.getEntity();
         int spAtk = pokemob.getStat(Stats.SPATTACK, true);
         int atk = pokemob.getStat(Stats.ATTACK, true);
         int level = pokemob.getLevel();
         int maxEnergy = TileEntitySiphon.getMaxEnergy(level, spAtk, atk, pokemob.getPokedexEntry());
         int pokeEnergy = maxEnergy;
         int dE;
-        long energyTime = living.getEntityWorld().getTotalWorldTime();
+        long energyTime = living.getEntityWorld().getGameTime();
         if (living.getEntityData().hasKey("energyRemaining"))
         {
             long time = living.getEntityData().getLong("energyTime");
@@ -60,7 +60,7 @@ public class ProviderPokemob implements ITeslaProducer, ICapabilityProvider
         dE = (int) Math.min(dE, power);
         if (!simulated)
         {
-            living.getEntityData().setLong("energyTime", energyTime);
+            living.getEntityData().putLong("energyTime", energyTime);
             living.getEntityData().setInteger("energyRemaining", pokeEnergy - dE);
             int drain = 0;
             if (pokeEnergy - dE < 0)

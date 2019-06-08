@@ -11,7 +11,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
@@ -25,7 +25,7 @@ import thut.core.client.render.model.IExtendedModelPart;
 import thut.core.client.render.x3d.X3dModel;
 import thut.lib.CompatWrapper;
 
-public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
+public class TrainerBeltRenderer implements LayerRenderer<LivingEntity>
 {
     X3dModel                          model;
     X3dModel                          model2;
@@ -47,11 +47,11 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
     }
 
     @Override
-    public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount,
+    public void doRenderLayer(LivingEntity LivingEntityIn, float limbSwing, float limbSwingAmount,
             float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         if (!enabled) return;
-        this.pokemobCap = CapabilityHasPokemobs.getHasPokemobs(entitylivingbaseIn);
+        this.pokemobCap = CapabilityHasPokemobs.getHasPokemobs(LivingEntityIn);
         if (this.pokemobCap == null)
         {
             enabled = false;
@@ -62,7 +62,7 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
         if ((this.livingEntityRenderer.getMainModel() instanceof ModelBiped))
         {
             ((ModelBiped) this.livingEntityRenderer.getMainModel()).bipedBody.postRender(0.0625F);
-            if (entitylivingbaseIn.isSneaking())
+            if (LivingEntityIn.isSneaking())
             {
                 GlStateManager.translate(0.0F, 0.13125F, -0.105F);
                 if (wearables) if ((offsetArr = thut.wearables.ThutWearables.renderOffsetsSneak.get(8)) != null)
@@ -76,7 +76,7 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
             GlStateManager.translate(offsetArr[0], offsetArr[1], offsetArr[2]);
         }
 
-        int brightness = entitylivingbaseIn.getBrightnessForRender();
+        int brightness = LivingEntityIn.getBrightnessForRender();
         // First pass of render
         GL11.glPushMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -93,11 +93,11 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
         GL11.glRotated(180, 0, 0, 1);
         GL11.glTranslatef(dx, dy, dz);
         float s = 0.525f;
-        if (!CompatWrapper.isValid(entitylivingbaseIn.getItemStackFromSlot(EntityEquipmentSlot.LEGS)))
+        if (!CompatWrapper.isValid(LivingEntityIn.getItemStackFromSlot(EntityEquipmentSlot.LEGS)))
         {
             s = 0.465f;
         }
-        if (entitylivingbaseIn instanceof EntityAgeable && entitylivingbaseIn.isChild())
+        if (LivingEntityIn instanceof EntityAgeable && LivingEntityIn.isChild())
         {
             s *= 0.6;
             dz -= 0.525;
@@ -135,7 +135,7 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
         for (int i = 0; i < max; i++)
         {
             ItemStack stack = pokemobCap.getPokemob(i);
-            if (CompatWrapper.isValid(stack) && !Tools.isSameStack(stack, entitylivingbaseIn.getHeldItemMainhand()))
+            if (CompatWrapper.isValid(stack) && !Tools.isSameStack(stack, LivingEntityIn.getHeldItemMainhand()))
             {
                 float j = i >= max / 2 ? i - (max / 2) : i;
                 float l = (j + 1f) * s;
@@ -156,7 +156,7 @@ public class TrainerBeltRenderer implements LayerRenderer<EntityLivingBase>
                 GlStateManager.rotate(ry, 0, 1, 0);
                 GlStateManager.rotate(rz, 0, 0, 1);
                 GlStateManager.scale(0.15, 0.15, 0.15);
-                Minecraft.getMinecraft().getItemRenderer().renderItem(entitylivingbaseIn, stack, null);
+                Minecraft.getInstance().getItemRenderer().renderItem(LivingEntityIn, stack, null);
                 GlStateManager.popMatrix();
             }
         }

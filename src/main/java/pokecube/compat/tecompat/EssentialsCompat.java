@@ -2,7 +2,7 @@ package pokecube.compat.tecompat;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import pokecube.core.handlers.TeamManager;
@@ -51,7 +51,7 @@ public class EssentialsCompat
         public String getTeam(Entity entityIn)
         {
             if (entityIn.world.isRemote) return defaults.getTeam(entityIn);
-            if (entityIn instanceof EntityPlayer)
+            if (entityIn instanceof PlayerEntity)
             {
                 LandTeam team = LandManager.getTeam(entityIn);
                 return team.teamName;

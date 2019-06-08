@@ -7,7 +7,7 @@ import org.nfunk.jep.JEP;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -20,7 +20,7 @@ public class TileEntitySiphon extends TileEntity implements ITickable
     public static int         UPDATERATE        = 20;
     public AxisAlignedBB      box;
     // Caches the mobs nearby, to reduce calls to check for them.
-    public List<EntityLiving> mobs              = Lists.newArrayList();
+    public List<MobEntity> mobs              = Lists.newArrayList();
     // Time of last check.
     public long               updateTime        = -1;
     public static JEP         parser;

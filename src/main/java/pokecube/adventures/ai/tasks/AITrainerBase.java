@@ -1,6 +1,6 @@
 package pokecube.adventures.ai.tasks;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.IHasPokemobs;
@@ -14,14 +14,14 @@ public class AITrainerBase extends AIBase
 {
     World                  world;
     // The trainer Entity
-    final EntityLivingBase entity;
+    final LivingEntity entity;
     final IHasPokemobs     trainer;
     final IHasNPCAIStates  aiTracker;
     final IHasMessages     messages;
     final boolean          valid;
     int                    noSeeTicks = 0;
 
-    public AITrainerBase(EntityLivingBase trainer)
+    public AITrainerBase(LivingEntity trainer)
     {
         this.entity = trainer;
         this.world = trainer.getEntityWorld();

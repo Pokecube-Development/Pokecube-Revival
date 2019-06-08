@@ -4,7 +4,7 @@ import java.util.List;
 
 import ivorius.reccomplex.events.StructureGenerationEventLite;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
@@ -51,9 +51,9 @@ public class ReComplexCompat
             {
                 for (Object o : entities)
                 {
-                    if (o instanceof EntityLiving)
+                    if (o instanceof MobEntity)
                     {
-                        EntityLiving v = (EntityLiving) o;
+                        MobEntity v = (MobEntity) o;
                         Vector3 pos = Vector3.getNewVector().set(v);
                         IGuardAICapability capability = null;
                         for (Object o2 : v.tasks.taskEntries)

@@ -13,17 +13,17 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerCustomHead;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySkullRenderer;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntitySkull;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import thut.core.client.render.model.IExtendedModelPart;
@@ -46,26 +46,26 @@ public class BetterCustomHeadLayer extends LayerCustomHead
     }
 
     @Override
-    public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount,
+    public void doRenderLayer(LivingEntity LivingEntityIn, float limbSwing, float limbSwingAmount,
             float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
-        ItemStack itemstack = entitylivingbaseIn.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+        ItemStack itemstack = LivingEntityIn.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 
         if (itemstack != null && itemstack.getItem() != null)
         {
             Item item = itemstack.getItem();
-            Minecraft minecraft = Minecraft.getMinecraft();
+            Minecraft minecraft = Minecraft.getInstance();
             GlStateManager.pushMatrix();
 
-            if (entitylivingbaseIn.isSneaking())
+            if (LivingEntityIn.isSneaking())
             {
                 GlStateManager.translate(0.0F, 0.2F, 0.0F);
             }
 
-            boolean flag = entitylivingbaseIn instanceof EntityVillager
-                    || entitylivingbaseIn instanceof EntityZombieVillager;
+            boolean flag = LivingEntityIn instanceof EntityVillager
+                    || LivingEntityIn instanceof EntityZombieVillager;
 
-            if (entitylivingbaseIn.isChild() && !(entitylivingbaseIn instanceof EntityVillager))
+            if (LivingEntityIn.isChild() && !(LivingEntityIn instanceof EntityVillager))
             {
                 float f = 2.0F;
                 float f1 = 1.4F;
@@ -89,31 +89,31 @@ public class BetterCustomHeadLayer extends LayerCustomHead
 
                 GameProfile gameprofile = null;
 
-                if (itemstack.hasTagCompound())
+                if (itemstack.hasTag())
                 {
-                    NBTTagCompound nbttagcompound = itemstack.getTagCompound();
+                    CompoundNBT CompoundNBT = itemstack.getTag();
 
-                    if (nbttagcompound.hasKey("SkullOwner", 10))
+                    if (CompoundNBT.hasKey("SkullOwner", 10))
                     {
-                        gameprofile = NBTUtil.readGameProfileFromNBT(nbttagcompound.getCompoundTag("SkullOwner"));
+                        gameprofile = NBTUtil.readGameProfileFromNBT(CompoundNBT.getCompound("SkullOwner"));
                     }
-                    else if (nbttagcompound.hasKey("SkullOwner", 8))
+                    else if (CompoundNBT.hasKey("SkullOwner", 8))
                     {
-                        String s = nbttagcompound.getString("SkullOwner");
+                        String s = CompoundNBT.getString("SkullOwner");
 
                         if (!StringUtils.isNullOrEmpty(s))
                         {
                             gameprofile = TileEntitySkull.updateGameprofile(new GameProfile((UUID) null, s));
-                            nbttagcompound.setTag("SkullOwner",
-                                    NBTUtil.writeGameProfile(new NBTTagCompound(), gameprofile));
+                            CompoundNBT.setTag("SkullOwner",
+                                    NBTUtil.writeGameProfile(new CompoundNBT(), gameprofile));
                         }
                     }
                 }
 
-                TileEntitySkullRenderer.instance.renderSkull(-0.5F, 0.0F, -0.5F, EnumFacing.UP, 180.0F,
+                TileEntitySkullRenderer.instance.renderSkull(-0.5F, 0.0F, -0.5F, Direction.UP, 180.0F,
                         itemstack.getMetadata(), gameprofile, -1, limbSwing);
             }
-            else if (!item.isValidArmor(itemstack, EntityEquipmentSlot.HEAD, entitylivingbaseIn))
+            else if (!item.isValidArmor(itemstack, EntityEquipmentSlot.HEAD, LivingEntityIn))
             {
                 float f3 = 0.625F;
                 GlStateManager.translate(0.0F, -0.25F, 0.0F);
@@ -125,7 +125,7 @@ public class BetterCustomHeadLayer extends LayerCustomHead
                     GlStateManager.translate(0.0F, 0.1875F, 0.0F);
                 }
 
-                minecraft.getItemRenderer().renderItem(entitylivingbaseIn, itemstack,
+                minecraft.getItemRenderer().renderItem(LivingEntityIn, itemstack,
                         ItemCameraTransforms.TransformType.HEAD);
             }
             else if (item.getUnlocalizedName(itemstack).replace("item.", "").equals("megahat"))
@@ -149,10 +149,10 @@ public class BetterCustomHeadLayer extends LayerCustomHead
                 GL11.glScaled(s * 0.995f, -s * 0.995f, -s * 0.995f);
                 minecraft.renderEngine.bindTexture(belt_2);
                 EnumDyeColor ret = EnumDyeColor.RED;
-                int brightness = entitylivingbaseIn.getBrightnessForRender();
-                if (itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("dyeColour"))
+                int brightness = LivingEntityIn.getBrightnessForRender();
+                if (itemstack.hasTag() && itemstack.getTag().hasKey("dyeColour"))
                 {
-                    int damage = itemstack.getTagCompound().getInteger("dyeColour");
+                    int damage = itemstack.getTag().getInteger("dyeColour");
                     ret = EnumDyeColor.byDyeDamage(damage);
                 }
                 Color colour = new Color(ret.getColorValue() + 0xFF000000);

@@ -31,7 +31,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLCommonSetupEvent;
 import pokecube.adventures.events.TrainerSpawnEvent;
 import pokecube.compat.events.TransferDimension;
 import pokecube.core.database.Database;
@@ -72,7 +72,7 @@ public class AdvancedRocketryCompat
 
     private static FileWriter  fwriter;
 
-    public static void setSpawnsFile(FMLPreInitializationEvent evt)
+    public static void setSpawnsFile(FMLCommonSetupEvent evt)
     {
         File file = evt.getSuggestedConfigurationFile();
         String seperator = System.getProperty("file.separator");
@@ -174,13 +174,13 @@ public class AdvancedRocketryCompat
 
     @Optional.Method(modid = "advancedrocketry")
     @CompatClass(takesEvent = true, phase = Phase.PRE)
-    public static void ARCompat(FMLPreInitializationEvent evt)
+    public static void ARCompat(FMLCommonSetupEvent evt)
     {
         MinecraftForge.EVENT_BUS.register(new pokecube.compat.advancedrocketry.AdvancedRocketryCompat(evt));
         PokecubeMod.log("Registered Advanced Rocketry Compat");
     }
 
-    public AdvancedRocketryCompat(FMLPreInitializationEvent event)
+    public AdvancedRocketryCompat(FMLCommonSetupEvent event)
     {
         setSpawnsFile(event);
         Database.addSpawnData(CUSTOMSPAWNSFILE);
@@ -191,7 +191,7 @@ public class AdvancedRocketryCompat
         try
         {
             IAtmosphere atmos;
-            atmos = (IAtmosphere) getAtmosphereType.invoke(getOxygenHandler.invoke(null, world.provider.getDimension()),
+            atmos = (IAtmosphere) getAtmosphereType.invoke(getOxygenHandler.invoke(null, world.dimension.getDimension()),
                     pos);
             if (!atmos.isBreathable() && !vacuumBreathers.contains(entry)) { return false; }
         }
@@ -277,7 +277,7 @@ public class AdvancedRocketryCompat
             World world = evt.getWorld();
             BlockPos pos = evt.getLocation();
             IAtmosphere atmos;
-            atmos = (IAtmosphere) getAtmosphereType.invoke(getOxygenHandler.invoke(null, world.provider.getDimension()),
+            atmos = (IAtmosphere) getAtmosphereType.invoke(getOxygenHandler.invoke(null, world.dimension.getDimension()),
                     pos);
             if (!atmos.isBreathable())
             {
@@ -387,7 +387,7 @@ public class AdvancedRocketryCompat
         if (pokemob != null)
         {
             PokedexEntry entry = pokemob.getPokedexEntry();
-            if (entry == megaray && event.getEntityLiving().isBeingRidden())
+            if (entry == megaray && event.getMobEntity().isBeingRidden())
             {
                 boolean goUp = event.getEntity().posY > Configuration.orbit / 2
                         && event.getEntity().dimension != Configuration.spaceDimId;
@@ -436,7 +436,7 @@ public class AdvancedRocketryCompat
                             {
                                 pos.x = object.getSpawnLocation().x;
                                 pos.z = object.getSpawnLocation().z;
-                                int dimId = event.getEntity().world.provider.getDimension();
+                                int dimId = event.getEntity().world.dimension.getDimension();
                                 DimensionProperties props = DimensionManager.getInstance()
                                         .getDimensionProperties(dimId);
                                 int stationParent = object.getOrbitingPlanetId();
@@ -461,7 +461,7 @@ public class AdvancedRocketryCompat
                 if (targetDim == -1)
                 {
                     DimensionProperties props = DimensionManager.getInstance()
-                            .getDimensionProperties(dim = event.getEntity().world.provider.getDimension());
+                            .getDimensionProperties(dim = event.getEntity().world.dimension.getDimension());
                     boolean moon = props.isMoon();
                     if (moon && goUp)
                     {
@@ -473,7 +473,7 @@ public class AdvancedRocketryCompat
                         Collections.sort(moons);
                         if (!moons.isEmpty())
                         {
-                            double angle = ((event.getEntity().world.getWorldTime() % props.rotationalPeriod)
+                            double angle = ((event.getEntity().world.getDayTime() % props.rotationalPeriod)
                                     / (double) props.rotationalPeriod) * 2 * Math.PI;
                             double diff = 2 * Math.PI;
                             int whichMoon = 0;

@@ -12,8 +12,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.text.TranslationTextComponent;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards.Reward;
 import pokecube.adventures.events.PAEventsHandler;
@@ -66,9 +66,9 @@ public class EditRewardsPage extends ListPage
             {
                 ItemStack stack = reward2.stack;
                 String value = stack.getItem().getRegistryName() + " " + stack.getCount() + " " + stack.getMetadata();
-                if (stack.hasTagCompound())
+                if (stack.hasTag())
                 {
-                    value = value + " " + stack.getTagCompound().toString();
+                    value = value + " " + stack.getTag().toString();
                 }
                 reward.setText(value);
             }
@@ -154,11 +154,11 @@ public class EditRewardsPage extends ListPage
                         {
                             Reward rreward = parent.parent.rewards.getRewards().remove(index);
                             ItemStack removed = rreward.stack;
-                            parent.mc.player.sendStatusMessage(new TextComponentTranslation(
+                            parent.mc.player.sendStatusMessage(new TranslationTextComponent(
                                     "traineredit.set.removereward", removed.getTextComponent()), true);
                             parent.onPageClosed();
                             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-                            NBTBase tag = CapabilityHasRewards.storage.writeNBT(CapabilityHasRewards.REWARDS_CAP,
+                            INBT tag = CapabilityHasRewards.storage.writeNBT(CapabilityHasRewards.REWARDS_CAP,
                                     parent.parent.rewards, null);
                             packet.data.setTag("T", tag);
                             packet.data.setByte("V", (byte) 1);
@@ -174,18 +174,18 @@ public class EditRewardsPage extends ListPage
                         if (itemstack.isEmpty())
                         {
                             parent.mc.player.sendStatusMessage(
-                                    new TextComponentTranslation("traineredit.info.invalidreward"), true);
+                                    new TranslationTextComponent("traineredit.info.invalidreward"), true);
                         }
                         else
                         {
                             if (index != -1)
                             {
                                 parent.parent.rewards.getRewards().set(index, new Reward(itemstack, prob));
-                                parent.mc.player.sendStatusMessage(new TextComponentTranslation(
+                                parent.mc.player.sendStatusMessage(new TranslationTextComponent(
                                         "traineredit.set.reward", itemstack.getTextComponent()), true);
                                 parent.onPageClosed();
                                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-                                NBTBase tag = CapabilityHasRewards.storage.writeNBT(CapabilityHasRewards.REWARDS_CAP,
+                                INBT tag = CapabilityHasRewards.storage.writeNBT(CapabilityHasRewards.REWARDS_CAP,
                                         parent.parent.rewards, null);
                                 packet.data.setTag("T", tag);
                                 packet.data.setByte("V", (byte) 1);
@@ -196,11 +196,11 @@ public class EditRewardsPage extends ListPage
                             else
                             {
                                 parent.parent.rewards.getRewards().add(new Reward(itemstack, prob));
-                                parent.mc.player.sendStatusMessage(new TextComponentTranslation(
+                                parent.mc.player.sendStatusMessage(new TranslationTextComponent(
                                         "traineredit.set.rewardnew", itemstack.getTextComponent()), true);
                                 parent.onPageClosed();
                                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-                                NBTBase tag = CapabilityHasRewards.storage.writeNBT(CapabilityHasRewards.REWARDS_CAP,
+                                INBT tag = CapabilityHasRewards.storage.writeNBT(CapabilityHasRewards.REWARDS_CAP,
                                         parent.parent.rewards, null);
                                 packet.data.setTag("T", tag);
                                 packet.data.setByte("V", (byte) 1);
@@ -213,7 +213,7 @@ public class EditRewardsPage extends ListPage
                     catch (Exception e)
                     {
                         parent.mc.player.sendStatusMessage(
-                                new TextComponentTranslation("traineredit.info.invalidreward"), true);
+                                new TranslationTextComponent("traineredit.info.invalidreward"), true);
                     }
 
                 }

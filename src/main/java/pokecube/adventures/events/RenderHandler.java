@@ -4,10 +4,10 @@ import java.util.Set;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,7 +22,7 @@ import thut.api.entity.genetics.Gene;
 import thut.api.entity.genetics.IMobGenetics;
 import thut.lib.CompatWrapper;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RenderHandler
 {
     public static float partialTicks = 0.0F;
@@ -34,10 +34,10 @@ public class RenderHandler
     @SubscribeEvent
     public void onToolTip(ItemTooltipEvent evt)
     {
-        EntityPlayer player = evt.getEntityPlayer();
+        PlayerEntity player = evt.getPlayerEntity();
         ItemStack stack = evt.getItemStack();
         if (!CompatWrapper.isValid(stack)) return;
-        NBTTagCompound tag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
+        CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
         if (tag.getBoolean("isapokebag"))
         {
             evt.getToolTip().add("PokeBag");

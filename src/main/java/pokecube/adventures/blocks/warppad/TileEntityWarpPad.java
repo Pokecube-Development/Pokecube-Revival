@@ -4,12 +4,12 @@ import org.nfunk.jep.JEP;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundEvents;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.commands.Config;
@@ -58,10 +58,10 @@ public class TileEntityWarpPad extends TileEntityOwnable
     @Override
     public SPacketUpdateTileEntity getUpdatePacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
-        this.writeToNBT(nbttagcompound);
-        return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
+        this.writeToNBT(CompoundNBT);
+        return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
     }
 
     /** Called when you receive a TileEntityData packet for the location this
@@ -78,7 +78,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
     {
         if (world.isRemote)
         {
-            NBTTagCompound nbt = pkt.getNbtCompound();
+            CompoundNBT nbt = pkt.getNbtCompound();
             readFromNBT(nbt);
         }
     }
@@ -93,7 +93,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
         }
 
         double distSq = 0;
-        long time = world.getTotalWorldTime();
+        long time = world.getGameTime();
         long lastStepped = stepper.getEntityData().getLong("lastWarpPadUse");
         boolean tele = link != null && !link.isEmpty() && lastStepped + COOLDOWN <= time
                 && (MAXRANGE < 0 || (distSq = here.distToSq(linkPos)) < MAXRANGE * MAXRANGE);
@@ -112,7 +112,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
             parser.setVarValue("dx", (link.x - here.x));
             parser.setVarValue("dy", (link.y - here.y));
             parser.setVarValue("dz", (link.z - here.z));
-            parser.setVarValue("dw", (link.w - getWorld().provider.getDimension()));
+            parser.setVarValue("dw", (link.w - getWorld().dimension.getDimension()));
             distSq = parser.getValue();
             tele = energy > distSq;
             if (!tele)
@@ -124,7 +124,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
             {
                 energy -= distSq;
             }
-            stepper.getEntityData().setLong("lastWarpPadUse", time);
+            stepper.getEntityData().putLong("lastWarpPadUse", time);
         }
         if (tele)
         {
@@ -137,7 +137,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
             TeleDest d = new TeleDest(link);
             Vector3 loc = d.getLoc();
             int dim = d.getDim();
-            if (stepper instanceof EntityPlayer)
+            if (stepper instanceof PlayerEntity)
             {
                 stepper = Transporter.teleportEntity(stepper, loc, dim, false);
             }
@@ -159,16 +159,16 @@ public class TileEntityWarpPad extends TileEntityOwnable
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound)
+    public void readFromNBT(CompoundNBT tagCompound)
     {
         super.readFromNBT(tagCompound);
-        link = new Vector4(tagCompound.getCompoundTag("link"));
+        link = new Vector4(tagCompound.getCompound("link"));
         noEnergy = tagCompound.getBoolean("noEnergy");
         admin = tagCompound.getBoolean("admin");
         energy = tagCompound.getInteger("energy");
     }
 
-    public int receiveEnergy(EnumFacing facing, int maxReceive, boolean simulate)
+    public int receiveEnergy(Direction facing, int maxReceive, boolean simulate)
     {
         int receive = Math.min(maxReceive, PokecubeAdv.conf.warpPadMaxEnergy - energy);
         if (!simulate && receive > 0)
@@ -179,17 +179,17 @@ public class TileEntityWarpPad extends TileEntityOwnable
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound)
+    public CompoundNBT writeToNBT(CompoundNBT tagCompound)
     {
         super.writeToNBT(tagCompound);
         if (link != null)
         {
-            NBTTagCompound linkTag = new NBTTagCompound();
+            CompoundNBT linkTag = new CompoundNBT();
             link.writeToNBT(linkTag);
             tagCompound.setTag("link", linkTag);
         }
-        tagCompound.setBoolean("noEnergy", noEnergy);
-        tagCompound.setBoolean("admin", admin);
+        tagCompound.putBoolean("noEnergy", noEnergy);
+        tagCompound.putBoolean("admin", admin);
         tagCompound.setInteger("energy", energy);
         return tagCompound;
     }

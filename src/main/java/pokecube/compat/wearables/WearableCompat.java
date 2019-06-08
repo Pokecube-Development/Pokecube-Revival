@@ -8,12 +8,12 @@ import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -51,7 +51,7 @@ public class WearableCompat
     }
 
     @Method(modid = "thut_wearables")
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @CompatClass(phase = Phase.PRE)
     public static void clientInitWearables()
     {
@@ -59,17 +59,17 @@ public class WearableCompat
         {
 
             @Override
-            public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            public Object getServerGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z)
             {
                 return null;
             }
 
             @Override
-            public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            public Object getClientGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z)
             {
                 Entity mob = PokecubeCore.core.getEntityProvider().getEntity(world, x, true);
-                if (!(mob instanceof EntityLivingBase)) return null;
-                EntityLivingBase base = (EntityLivingBase) mob;
+                if (!(mob instanceof LivingEntity)) return null;
+                LivingEntity base = (LivingEntity) mob;
                 if (ThutWearables.getWearables(
                         base) != null) { return new thut.wearables.client.gui.GuiWearables(base, player); }
                 return null;
@@ -79,7 +79,7 @@ public class WearableCompat
     }
 
     @Method(modid = "thut_wearables")
-    @SideOnly(Side.SERVER)
+    @OnlyIn(Dist.DEDICATED_SERVER)
     @CompatClass(phase = Phase.PRE)
     public static void serverInitWearables()
     {
@@ -87,17 +87,17 @@ public class WearableCompat
         {
 
             @Override
-            public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            public Object getServerGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z)
             {
                 Entity mob = PokecubeCore.core.getEntityProvider().getEntity(world, x, true);
-                if (!(mob instanceof EntityLivingBase)) return null;
-                EntityLivingBase base = (EntityLivingBase) mob;
+                if (!(mob instanceof LivingEntity)) return null;
+                LivingEntity base = (LivingEntity) mob;
                 if (ThutWearables.getWearables(base) != null) { return new ContainerWearables(base, player); }
                 return null;
             }
 
             @Override
-            public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+            public Object getClientGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z)
             {
                 return null;
             }
@@ -123,8 +123,8 @@ public class WearableCompat
     {
         if (event.pokemob.getOwner() == event.player)
         {
-            EntityPlayer player = event.player;
-            EnumHand hand = event.event.getHand();
+            PlayerEntity player = event.player;
+            Hand hand = event.event.getHand();
             ItemStack held = player.getHeldItem(hand);
             if (held.getDisplayName().equalsIgnoreCase("wearables"))
             {
@@ -144,16 +144,16 @@ public class WearableCompat
         }
 
         // One model for each layer.
-        @SideOnly(Side.CLIENT)
+        @OnlyIn(Dist.CLIENT)
         X3dModel                 bag;
 
         // One Texture for each layer.
         private ResourceLocation BAG_1 = new ResourceLocation(PokecubeAdv.ID, "textures/worn/bag_1.png");
         private ResourceLocation BAG_2 = new ResourceLocation(PokecubeAdv.ID, "textures/worn/bag_2.png");
 
-        @SideOnly(Side.CLIENT)
+        @OnlyIn(Dist.CLIENT)
         @Override
-        public void renderWearable(EnumWearable slot, EntityLivingBase wearer, ItemStack stack, float partialTicks)
+        public void renderWearable(EnumWearable slot, LivingEntity wearer, ItemStack stack, float partialTicks)
         {
             if (bag == null)
             {
@@ -171,7 +171,7 @@ public class WearableCompat
             GL11.glRotated(180, 0, 0, 1);
             GL11.glTranslated(0, -0.125, -0.6);
             GL11.glScaled(0.7, 0.7, 0.7);
-            Minecraft.getMinecraft().renderEngine.bindTexture(pass1);
+            Minecraft.getInstance().renderEngine.bindTexture(pass1);
             int[] col = new int[] { 255, 255, 255, 255, brightness };
             for (IExtendedModelPart part1 : bag.getParts().values())
             {
@@ -186,11 +186,11 @@ public class WearableCompat
             GL11.glRotated(180, 0, 0, 1);
             GL11.glTranslated(0, -0.125, -0.6);
             GL11.glScaled(0.7, 0.7, 0.7);
-            Minecraft.getMinecraft().renderEngine.bindTexture(pass2);
+            Minecraft.getInstance().renderEngine.bindTexture(pass2);
             EnumDyeColor ret = EnumDyeColor.YELLOW;
-            if (stack.hasTagCompound() && stack.getTagCompound().hasKey("dyeColour"))
+            if (stack.hasTag() && stack.getTag().hasKey("dyeColour"))
             {
-                int damage = stack.getTagCompound().getInteger("dyeColour");
+                int damage = stack.getTag().getInteger("dyeColour");
                 ret = EnumDyeColor.byDyeDamage(damage);
             }
             Color colour = new Color(ret.getColorValue() + 0xFF000000);
@@ -209,13 +209,13 @@ public class WearableCompat
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == WEARABLE_CAP;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return hasCapability(capability, facing) ? IActiveWearable.WEARABLE_CAP.cast(this) : null;
         }

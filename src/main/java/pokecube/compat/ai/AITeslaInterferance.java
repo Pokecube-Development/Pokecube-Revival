@@ -3,10 +3,10 @@ package pokecube.compat.ai;
 import net.darkhax.tesla.api.ITeslaConsumer;
 import net.darkhax.tesla.api.ITeslaHolder;
 import net.darkhax.tesla.api.ITeslaProducer;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -27,7 +27,7 @@ public class AITeslaInterferance extends EntityAIBase
 
     final IPokemob                           pokemob;
     final Vector3                            mobLoc         = Vector3.getNewVector();
-    final EntityLiving                       entity;
+    final MobEntity                       entity;
 
     public AITeslaInterferance(IPokemob pokemob_)
     {
@@ -72,7 +72,7 @@ public class AITeslaInterferance extends EntityAIBase
             }
             catch (Exception e)
             {
-                for (EnumFacing side : EnumFacing.VALUES)
+                for (Direction side : Direction.VALUES)
                 {
                     cap = tile.getCapability(TESLA_CONSUMER, side);
                     if (cap != null) break;

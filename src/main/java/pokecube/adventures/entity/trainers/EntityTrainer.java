@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAIMoveIndoors;
@@ -19,18 +19,18 @@ import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityAIWatchClosest2;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
@@ -119,7 +119,7 @@ public class EntityTrainer extends EntityTrainerBase
                 mon.setPokemonOwner(trader1);
                 mon.setTraded(!everstone);
                 stack = PokecubeManager.pokemobToItem(mon);
-                stack.getTagCompound().setInteger("slotnum", i);
+                stack.getTag().setInteger("slotnum", i);
                 tradeList.add(new MerchantRecipe(buy, stack));
             }
         }
@@ -135,8 +135,8 @@ public class EntityTrainer extends EntityTrainerBase
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (source.getTrueSource() != null && (source.getTrueSource() instanceof EntityLivingBase)
-                && !(source.getTrueSource() instanceof EntityPlayer))
+        if (source.getTrueSource() != null && (source.getTrueSource() instanceof LivingEntity)
+                && !(source.getTrueSource() instanceof PlayerEntity))
         {
             Entity entity = source.getTrueSource();
             if (entity instanceof IEntityOwnable)
@@ -149,7 +149,7 @@ public class EntityTrainer extends EntityTrainerBase
             if (pokemobsCap.getAttackCooldown() <= 0)
             {
                 // Only set target if not already have one.
-                if (pokemobsCap.getTarget() == null) pokemobsCap.setTarget((EntityLivingBase) entity);
+                if (pokemobsCap.getTarget() == null) pokemobsCap.setTarget((LivingEntity) entity);
                 if (entity != source.getTrueSource()) return false;
             }
         }
@@ -180,9 +180,9 @@ public class EntityTrainer extends EntityTrainerBase
     }
 
     @Override
-    public EntityLivingBase getAttackTarget()
+    public LivingEntity getAttackTarget()
     {
-        EntityLivingBase def = super.getAttackTarget();
+        LivingEntity def = super.getAttackTarget();
         return def == null ? pokemobsCap.getTarget() : def;
     }
 
@@ -200,7 +200,7 @@ public class EntityTrainer extends EntityTrainerBase
 
     /** Sets the active target the Task system uses for tracking */
     @Override
-    public void setAttackTarget(@Nullable EntityLivingBase entity)
+    public void setAttackTarget(@Nullable LivingEntity entity)
     {
         super.setAttackTarget(entity);
         IPokemob mob = CapabilityPokemob.getPokemobFor(entity);
@@ -223,9 +223,9 @@ public class EntityTrainer extends EntityTrainerBase
         this.tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 0.6D));
         this.tasks.addTask(5, new EntityAILookIdle(this));
         this.tasks.addTask(9,
-                new EntityAIWatchClosest2(this, EntityPlayer.class, Config.instance.trainerSightRange, 1.0F));
+                new EntityAIWatchClosest2(this, PlayerEntity.class, Config.instance.trainerSightRange, 1.0F));
         this.tasks.addTask(9, new EntityAIWander(this, 0.6D));
-        this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, Config.instance.trainerSightRange));
+        this.tasks.addTask(10, new EntityAIWatchClosest(this, MobEntity.class, Config.instance.trainerSightRange));
         this.guardAI = new GuardAI(this, this.getCapability(EventsHandler.GUARDAI_CAP, null));
         this.tasks.addTask(1, guardAI);
         if (location != null)
@@ -276,7 +276,7 @@ public class EntityTrainer extends EntityTrainerBase
         }
 
         ItemStack next;
-        if (pokemobsCap.getCooldown() > getEntityWorld().getTotalWorldTime()) next = ItemStack.EMPTY;
+        if (pokemobsCap.getCooldown() > getEntityWorld().getGameTime()) next = ItemStack.EMPTY;
         else next = pokemobsCap.getNextPokemob();
         if (CompatWrapper.isValid(next))
         {
@@ -292,7 +292,7 @@ public class EntityTrainer extends EntityTrainerBase
             this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, pokemobsCap.getType().held);
         }
 
-        EntityLivingBase target = getAttackTarget() != null ? getAttackTarget()
+        LivingEntity target = getAttackTarget() != null ? getAttackTarget()
                 : getAttackTarget() != null ? getAttackTarget() : null;
 
         if (target != null)
@@ -314,7 +314,7 @@ public class EntityTrainer extends EntityTrainerBase
     }
 
     @Override
-    public void populateBuyingList(EntityPlayer player)
+    public void populateBuyingList(PlayerEntity player)
     {
         tradeList = new MerchantRecipeList();
         if (shouldrefresh) itemList = null;
@@ -335,7 +335,7 @@ public class EntityTrainer extends EntityTrainerBase
         if (Config.instance.trainersTradeItems) tradeList.addAll(itemList);
     }
 
-    public boolean processInteract(EntityPlayer player, EnumHand hand, ItemStack stack)
+    public boolean processInteract(PlayerEntity player, Hand hand, ItemStack stack)
     {
         if (player.capabilities.isCreativeMode && player.isSneaking())
         {
@@ -349,7 +349,7 @@ public class EntityTrainer extends EntityTrainerBase
                     ItemStack i = pokemobsCap.getPokemob(ind);
                     if (CompatWrapper.isValid(i)) message += i.getDisplayName() + " ";
                 }
-                player.sendMessage(new TextComponentString(message));
+                player.sendMessage(new StringTextComponent(message));
             }
             else if (!getEntityWorld().isRemote && player.isSneaking()
                     && player.getHeldItemMainhand().getItem() == Items.STICK)
@@ -393,7 +393,7 @@ public class EntityTrainer extends EntityTrainerBase
     }
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound nbt)
+    public void readEntityFromNBT(CompoundNBT nbt)
     {
         super.readEntityFromNBT(nbt);
         playerName = nbt.getString("playerName");
@@ -409,9 +409,9 @@ public class EntityTrainer extends EntityTrainerBase
             if (nbt.hasKey("resetTime")) pokemobsCap.resetTime = nbt.getLong("resetTime");
             if (nbt.hasKey("DefeatList", 9))
             {
-                NBTTagList nbttaglist = nbt.getTagList("DefeatList", 10);
-                for (int i = 0; i < nbttaglist.tagCount(); i++)
-                    pokemobsCap.defeaters.add(DefeatEntry.createFromNBT(nbttaglist.getCompoundTagAt(i)));
+                ListNBT ListNBT = nbt.getTagList("DefeatList", 10);
+                for (int i = 0; i < ListNBT.size(); i++)
+                    pokemobsCap.defeaters.add(DefeatEntry.createFromNBT(ListNBT.getCompound(i)));
             }
             pokemobsCap.notifyDefeat = nbt.getBoolean("notifyDefeat");
         }
@@ -460,8 +460,8 @@ public class EntityTrainer extends EntityTrainerBase
         ItemStack poke2 = recipe.getItemToSell();
         if (!(PokecubeManager.isFilled(poke1) && PokecubeManager.isFilled(poke2))) { return; }
 
-        int num = poke2.getTagCompound().getInteger("slotnum");
-        EntityLivingBase player2 = this;
+        int num = poke2.getTag().getInteger("slotnum");
+        LivingEntity player2 = this;
         IPokemob mon1 = PokecubeManager.itemToPokemob(poke1, getEntityWorld());
         UUID trader2 = player2.getUniqueID();
         mon1.setPokemonOwner(trader2);
@@ -488,17 +488,17 @@ public class EntityTrainer extends EntityTrainerBase
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound nbt)
+    public void writeEntityToNBT(CompoundNBT nbt)
     {
         super.writeEntityToNBT(nbt);
-        nbt.setString("playerName", playerName);
-        nbt.setString("urlSkin", urlSkin);
-        nbt.setBoolean("randomTeam", randomize);
-        nbt.setString("name", name);
+        nbt.putString("playerName", playerName);
+        nbt.putString("urlSkin", urlSkin);
+        nbt.putBoolean("randomTeam", randomize);
+        nbt.putString("name", name);
     }
 
     @Override
-    public boolean processInteract(EntityPlayer player, EnumHand hand)
+    public boolean processInteract(PlayerEntity player, Hand hand)
     {
         return processInteract(player, hand, player.getHeldItem(hand));
     }

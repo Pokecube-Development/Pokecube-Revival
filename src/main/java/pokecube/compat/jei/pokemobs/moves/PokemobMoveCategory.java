@@ -144,7 +144,7 @@ public class PokemobMoveCategory implements IRecipeCategory<PokemobMoveRecipeWra
                                     + Translator.translateToLocalFormatted("jei.tooltip.recipe.by", modName));
                         }
 
-                        boolean showAdvanced = Minecraft.getMinecraft().gameSettings.advancedItemTooltips
+                        boolean showAdvanced = Minecraft.getInstance().gameSettings.advancedItemTooltips
                                 || GuiScreen.isShiftKeyDown();
                         if (showAdvanced)
                         {

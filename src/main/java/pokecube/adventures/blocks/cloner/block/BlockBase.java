@@ -5,14 +5,14 @@ import java.util.Random;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.BlockStateContainer;
@@ -79,20 +79,20 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
     public IBlockState getStateFromMeta(int meta)
     {
         int direction = meta / 4;
-        EnumFacing dir = EnumFacing.NORTH;
+        Direction dir = Direction.NORTH;
         switch (direction)
         {
         case 0:
-            dir = EnumFacing.NORTH;
+            dir = Direction.NORTH;
             break;
         case 1:
-            dir = EnumFacing.EAST;
+            dir = Direction.EAST;
             break;
         case 2:
-            dir = EnumFacing.SOUTH;
+            dir = Direction.SOUTH;
             break;
         case 3:
-            dir = EnumFacing.WEST;
+            dir = Direction.WEST;
             break;
         }
         return this.getDefaultState().withProperty(FACING, dir);
@@ -106,8 +106,8 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
     }
 
     @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY,
-            float hitZ, int meta, EntityLivingBase placer)
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, Direction facing, float hitX, float hitY,
+            float hitZ, int meta, LivingEntity placer)
     {
         return this.getStateFromMeta(meta).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
     }
@@ -132,11 +132,11 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
                 float rx = rand.nextFloat() * 0.6F + 0.1F;
                 float ry = rand.nextFloat() * 0.6F + 0.1F;
                 float rz = rand.nextFloat() * 0.6F + 0.1F;
-                EntityItem entity_item = new EntityItem(world, pos.getX() + rx, pos.getY() + ry, pos.getZ() + rz,
+                ItemEntity entity_item = new ItemEntity(world, pos.getX() + rx, pos.getY() + ry, pos.getZ() + rz,
                         new ItemStack(item.getItem(), item.getCount(), item.getItemDamage()));
-                if (item.hasTagCompound())
+                if (item.hasTag())
                 {
-                    entity_item.getItem().setTagCompound(item.getTagCompound().copy());
+                    entity_item.getItem().setTag(item.getTag().copy());
                 }
                 float factor = 0.005F;
                 entity_item.motionX = rand.nextGaussian() * factor;
@@ -148,7 +148,7 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public BlockRenderLayer getBlockLayer()
     {

@@ -10,10 +10,10 @@ public class PathNavigateTrainer extends PathNavigateGround
 {
     private final EntityTrainer trainer;
 
-    public PathNavigateTrainer(EntityTrainer entitylivingIn, World worldIn)
+    public PathNavigateTrainer(EntityTrainer MobEntityIn, World worldIn)
     {
-        super(entitylivingIn, worldIn);
-        this.trainer = entitylivingIn;
+        super(MobEntityIn, worldIn);
+        this.trainer = MobEntityIn;
         this.setBreakDoors(true);
         this.setEnterDoors(true);
     }

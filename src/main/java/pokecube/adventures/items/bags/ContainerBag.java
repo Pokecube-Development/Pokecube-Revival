@@ -1,8 +1,8 @@
 package pokecube.adventures.items.bags;
 
 import invtweaks.api.container.ChestContainer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -49,17 +49,17 @@ public class ContainerBag extends Container
         invBag = InventoryBag.getBag(ivplay.player);
         invPlayer = ivplay;
         bindInventories();
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.DEDICATED_SERVER)
         {
             PacketBag packet = new PacketBag(PacketBag.ONOPEN);
             packet.data.setInteger("N", invBag.boxes.length);
             packet.data.setInteger("S", InventoryBag.PAGECOUNT);
-            packet.data.setBoolean("A", HOLDALL);
+            packet.data.putBoolean("A", HOLDALL);
             for (int i = 0; i < invBag.boxes.length; i++)
             {
-                packet.data.setString("N" + i, invBag.boxes[i]);
+                packet.data.putString("N" + i, invBag.boxes[i]);
             }
-            PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) ivplay.player);
+            PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) ivplay.player);
         }
     }
 
@@ -121,7 +121,7 @@ public class ContainerBag extends Container
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer entityplayer)
+    public boolean canInteractWith(PlayerEntity PlayerEntity)
     {
         return true;
     }
@@ -129,10 +129,10 @@ public class ContainerBag extends Container
     public void changeName(String name)
     {
         invBag.boxes[invBag.getPage()] = name;
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PacketBag packet = new PacketBag(PacketBag.RENAME);
-            packet.data.setString("N", name);
+            packet.data.putString("N", name);
             PokecubeMod.packetPipeline.sendToServer(packet);
         }
     }
@@ -142,7 +142,7 @@ public class ContainerBag extends Container
         this.inventorySlots.clear();
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public String getPage()
     {
         if (invBag.getPage() < 0)
@@ -153,7 +153,7 @@ public class ContainerBag extends Container
         return invBag.boxes[invBag.getPage()];
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public String getPageNb()
     {
         return Integer.toString(invBag.getPage() + 1);
@@ -169,7 +169,7 @@ public class ContainerBag extends Container
     {
         if (page - 1 == invBag.getPage()) return;
         invBag.setPage(page - 1);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PacketBag packet = new PacketBag(PacketBag.SETPAGE);
             packet.data.setInteger("P", page);
@@ -180,7 +180,7 @@ public class ContainerBag extends Container
     }
 
     @Override
-    public void onContainerClosed(EntityPlayer player)
+    public void onContainerClosed(PlayerEntity player)
     {
         super.onContainerClosed(player);
         invBag.closeInventory(player);
@@ -194,7 +194,7 @@ public class ContainerBag extends Container
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int index)
+    public ItemStack transferStackInSlot(PlayerEntity player, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);

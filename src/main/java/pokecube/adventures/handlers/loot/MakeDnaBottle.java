@@ -15,7 +15,7 @@ import com.google.gson.JsonSerializationContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootFunction;
@@ -72,7 +72,7 @@ public class MakeDnaBottle extends LootFunction
                     }
                     else
                     {
-                        NBTTagCompound tag = JsonToNBT.getTagFromJson(val);
+                        CompoundNBT tag = JsonToNBT.getTagFromJson(val);
                         alleles.load(tag);
                     }
                     genes.getAlleles().put(loc, alleles);

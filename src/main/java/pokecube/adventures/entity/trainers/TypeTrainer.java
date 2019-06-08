@@ -15,7 +15,7 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.merchant.villager.VillagerProfession;
 import net.minecraft.entity.passive.EntityVillager;
@@ -115,12 +115,12 @@ public class TypeTrainer
 
     public static interface ITypeMapper
     {
-        /** Mapping of EntityLivingBase to a TypeTrainer. EntityTrainers set
+        /** Mapping of LivingEntity to a TypeTrainer. EntityTrainers set
          * this on spawn, so it isn't needed for them. <br>
          * <br>
          * if forSpawn, it means this is being initialized, otherwise it is
          * during the check for whether this mob should have trainers. */
-        default TypeTrainer getType(EntityLivingBase mob, boolean forSpawn)
+        default TypeTrainer getType(LivingEntity mob, boolean forSpawn)
         {
             if (!SpawnHandler.canSpawnInWorld(mob.getEntityWorld())) return null;
             if (!forSpawn)
@@ -148,7 +148,7 @@ public class TypeTrainer
         /** Should the IHasPokemobs for this mob sync the values to client? if
          * not, it will use a server-side list of mobs instead of datamanager
          * values. */
-        default boolean shouldSync(EntityLivingBase mob)
+        default boolean shouldSync(LivingEntity mob)
         {
             return mob instanceof EntityTrainer;
         }
@@ -174,7 +174,7 @@ public class TypeTrainer
         typeMap.put(name, type);
     }
 
-    public static void getRandomTeam(IHasPokemobs trainer, EntityLivingBase owner, int level, World world)
+    public static void getRandomTeam(IHasPokemobs trainer, LivingEntity owner, int level, World world)
     {
         TypeTrainer type = trainer.getType();
 
@@ -223,7 +223,7 @@ public class TypeTrainer
         return ret;
     }
 
-    public static ItemStack makeStack(PokedexEntry entry, EntityLivingBase trainer, World world, int level)
+    public static ItemStack makeStack(PokedexEntry entry, LivingEntity trainer, World world, int level)
     {
         int num = entry.getPokedexNb();
         if (Pokedex.getInstance().getEntry(num) == null) return ItemStack.EMPTY;
@@ -320,7 +320,7 @@ public class TypeTrainer
         addTrainer(name, this);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public ResourceLocation getTexture(EntityTrainer trainer)
     {
         if (texture == null && (genders == 1 || genders == 2))
@@ -416,12 +416,12 @@ public class TypeTrainer
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private boolean texExists(ResourceLocation texture)
     {
         try
         {
-            IResource res = Minecraft.getMinecraft().getResourceManager().getResource(texture);
+            IResource res = Minecraft.getInstance().getResourceManager().getResource(texture);
             res.close();
             return true;
         }

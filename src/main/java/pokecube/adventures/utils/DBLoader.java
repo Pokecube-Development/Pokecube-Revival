@@ -17,7 +17,7 @@ import java.util.logging.Level;
 
 import com.google.common.collect.Lists;
 
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLCommonSetupEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.entity.trainers.TypeTrainer;
 import pokecube.core.database.Database;
@@ -36,7 +36,7 @@ public class DBLoader
     public static List<String> trainerDatabases = Lists.newArrayList("villagers.xml");
     public static List<String> tradeDatabases   = Lists.newArrayList();
 
-    public static void checkConfigFiles(FMLPreInitializationEvent evt)
+    public static void checkConfigFiles(FMLCommonSetupEvent evt)
     {
         File file = evt.getSuggestedConfigurationFile();
         String seperator = System.getProperty("file.separator");
@@ -140,7 +140,7 @@ public class DBLoader
         return rows;
     }
 
-    public static void preInit(FMLPreInitializationEvent evt)
+    public static void preInit(FMLCommonSetupEvent evt)
     {
         checkConfigFiles(evt);
     }

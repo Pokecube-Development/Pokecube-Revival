@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.network.ManagedEnvironment;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pokecube.core.blocks.pc.InventoryPC;
@@ -20,7 +20,7 @@ public class TMMachineDriver extends DriverBase
     }
 
     @Override
-    public ManagedEnvironment createEnvironment(World world, BlockPos pos, EnumFacing side)
+    public ManagedEnvironment createEnvironment(World world, BlockPos pos, Direction side)
     {
         TileEntityTMMachine pc = (TileEntityTMMachine) world.getTileEntity(pos);
         return new Environment(pc, getComponentName());

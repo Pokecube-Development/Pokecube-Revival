@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.container;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import pokecube.adventures.blocks.cloner.crafting.CraftMatrix;
@@ -53,7 +53,7 @@ public class ContainerGeneExtractor extends ContainerBase
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer playerIn)
+    public boolean canInteractWith(PlayerEntity playerIn)
     {
         return true;
     }

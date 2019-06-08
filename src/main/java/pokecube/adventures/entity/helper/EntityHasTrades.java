@@ -10,11 +10,11 @@ import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.merchant.IMerchant;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ContainerMerchant;
 import net.minecraft.inventory.InventoryMerchant;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +31,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     protected boolean            clear         = false;
     protected boolean            shouldrefresh = false;
     /** This villager's current customer. */
-    protected EntityPlayer       buyingPlayer;
+    protected PlayerEntity       buyingPlayer;
     /** Initialises the MerchantRecipeList.java */
     protected MerchantRecipeList tradeList;
     /** Initialises the MerchantRecipeList.java */
@@ -45,7 +45,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     @Override
     public void writeSpawnData(ByteBuf buffer)
     {
-        NBTTagCompound tag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
         this.writeToNBT(tag);
         new PacketBuffer(buffer).writeCompoundTag(tag);
     }
@@ -55,7 +55,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     {
         try
         {
-            NBTTagCompound tag = new PacketBuffer(additionalData).readCompoundTag();
+            CompoundNBT tag = new PacketBuffer(additionalData).readCompoundTag();
             this.readFromNBT(tag);
         }
         catch (IOException e)
@@ -65,20 +65,20 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     }
 
     @Override
-    public void setCustomer(EntityPlayer player)
+    public void setCustomer(PlayerEntity player)
     {
         tradeList = null;
         this.buyingPlayer = player;
     }
 
     @Override
-    public EntityPlayer getCustomer()
+    public PlayerEntity getCustomer()
     {
         return buyingPlayer;
     }
 
     @Override
-    public MerchantRecipeList getRecipes(EntityPlayer player)
+    public MerchantRecipeList getRecipes(PlayerEntity player)
     {
         if (player.openContainer instanceof ContainerMerchant)
         {
@@ -135,7 +135,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
         }
     }
 
-    public abstract void populateBuyingList(EntityPlayer player);
+    public abstract void populateBuyingList(PlayerEntity player);
 
     protected abstract void addRandomTrades();
 
@@ -165,7 +165,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound nbt)
+    public void writeEntityToNBT(CompoundNBT nbt)
     {
         super.writeEntityToNBT(nbt);
         nbt.setInteger("version", VERSION);
@@ -177,13 +177,13 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     }
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound nbt)
+    public void readEntityFromNBT(CompoundNBT nbt)
     {
         super.readEntityFromNBT(nbt);
         if (nbt.hasKey("Offers", 10) && nbt.getInteger("version") == VERSION)
         {
-            NBTTagCompound nbttagcompound = nbt.getCompoundTag("Offers");
-            this.itemList = new MerchantRecipeList(nbttagcompound);
+            CompoundNBT CompoundNBT = nbt.getCompound("Offers");
+            this.itemList = new MerchantRecipeList(CompoundNBT);
         }
         checkTradeIntegrity();
     }

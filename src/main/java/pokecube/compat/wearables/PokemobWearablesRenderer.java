@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
@@ -40,10 +40,10 @@ import thut.wearables.inventory.PlayerWearables;
 public class PokemobWearablesRenderer
 {
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private static class ArmourRenderWrapper extends X3dObject
     {
-        public EntityLivingBase wearer;
+        public LivingEntity wearer;
         public ModelBiped       model;
         public ResourceLocation tex;
 
@@ -103,7 +103,7 @@ public class PokemobWearablesRenderer
         @Override
         public void addForRender()
         {
-            Minecraft.getMinecraft().getTextureManager().bindTexture(tex);
+            Minecraft.getInstance().getTextureManager().bindTexture(tex);
             model.render(wearer, 0, 0, 0, 0, 0, 1);
         }
 
@@ -127,12 +127,12 @@ public class PokemobWearablesRenderer
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private static class WearableRenderWrapper extends X3dObject
     {
         public IWearable        wrapped;
         public EnumWearable     slot;
-        public EntityLivingBase wearer;
+        public LivingEntity wearer;
         public ItemStack        stack;
 
         // TODO make this take offsets from XML stuff
@@ -238,7 +238,7 @@ public class PokemobWearablesRenderer
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Method(modid = "thut_wearables")
     @CompatClass(phase = Phase.PRE)
     public static void preInitWearables()
@@ -291,7 +291,7 @@ public class PokemobWearablesRenderer
         }
     }
 
-    public static WornOffsets getPartParent(EntityLivingBase wearer, IModelRenderer<?> renderer, IModel imodel,
+    public static WornOffsets getPartParent(LivingEntity wearer, IModelRenderer<?> renderer, IModel imodel,
             String identifier)
     {
         IAnimationChanger temp = renderer.getAnimationChanger();
@@ -300,7 +300,7 @@ public class PokemobWearablesRenderer
         return null;
     }
 
-    public static void applyWearables(EntityLivingBase wearer, IModelRenderer<?> renderer, IModel imodel)
+    public static void applyWearables(LivingEntity wearer, IModelRenderer<?> renderer, IModel imodel)
     {
         // No Render invisible.
         if (wearer.getActivePotionEffect(MobEffects.INVISIBILITY) != null) return;

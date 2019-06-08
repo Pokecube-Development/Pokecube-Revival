@@ -14,7 +14,7 @@ import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import pokecube.core.database.Database;
@@ -44,7 +44,7 @@ public class TheOneProbeCompat implements IProbeInfoProvider, IProbeInfoEntityPr
             entry = Database.getEntry(buffer.readString(20));
         }
 
-        public Element(IPokemob pokemob, EntityPlayer player)
+        public Element(IPokemob pokemob, PlayerEntity player)
         {
             entry = pokemob.getPokedexEntry();
             int caught = CaptureStats.getTotalNumberOfPokemobCaughtBy(player.getUniqueID(), pokemob.getPokedexEntry());
@@ -75,22 +75,22 @@ public class TheOneProbeCompat implements IProbeInfoProvider, IProbeInfoEntityPr
         public void render(int x, int y)
         {
             if (entry == null) return;
-            Minecraft.getMinecraft().fontRenderer.drawString(PokeType.getTranslatedName(entry.getType1()), x, y,
+            Minecraft.getInstance().fontRenderer.drawString(PokeType.getTranslatedName(entry.getType1()), x, y,
                     entry.getType1().colour, true);
             if (PokeType.unknown != entry.getType2() && entry.getType2() != null)
             {
-                int l = Minecraft.getMinecraft().fontRenderer
+                int l = Minecraft.getInstance().fontRenderer
                         .getStringWidth(PokeType.getTranslatedName(entry.getType1()));
-                Minecraft.getMinecraft().fontRenderer.drawString(PokeType.getTranslatedName(entry.getType2()),
+                Minecraft.getInstance().fontRenderer.drawString(PokeType.getTranslatedName(entry.getType2()),
                         l + 2 + x, y, entry.getType2().colour, true);
             }
 
             int l = 0;
-            Minecraft.getMinecraft().fontRenderer.drawString(have + "", l + x, y + 10, PokeType.getType("grass").colour, true);
-            l += Minecraft.getMinecraft().fontRenderer.getStringWidth(have + "");
-            Minecraft.getMinecraft().fontRenderer.drawString("/", l + x, y + 10, PokeType.getType("normal").colour, true);
-            l += Minecraft.getMinecraft().fontRenderer.getStringWidth("/");
-            Minecraft.getMinecraft().fontRenderer.drawString(killed + "", l + x, y + 10, PokeType.getType("fighting").colour,
+            Minecraft.getInstance().fontRenderer.drawString(have + "", l + x, y + 10, PokeType.getType("grass").colour, true);
+            l += Minecraft.getInstance().fontRenderer.getStringWidth(have + "");
+            Minecraft.getInstance().fontRenderer.drawString("/", l + x, y + 10, PokeType.getType("normal").colour, true);
+            l += Minecraft.getInstance().fontRenderer.getStringWidth("/");
+            Minecraft.getInstance().fontRenderer.drawString(killed + "", l + x, y + 10, PokeType.getType("fighting").colour,
                     true);
 
         }
@@ -136,7 +136,7 @@ public class TheOneProbeCompat implements IProbeInfoProvider, IProbeInfoEntityPr
     }
 
     @Override
-    public void addProbeEntityInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world,
+    public void addProbeEntityInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world,
             Entity entity, IProbeHitEntityData data)
     {
         IPokemob mob = CapabilityPokemob.getPokemobFor(entity);
@@ -144,7 +144,7 @@ public class TheOneProbeCompat implements IProbeInfoProvider, IProbeInfoEntityPr
     }
 
     @Override
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world,
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world,
             IBlockState blockState, IProbeHitData data)
     {
         // TODO Auto-generated method stub

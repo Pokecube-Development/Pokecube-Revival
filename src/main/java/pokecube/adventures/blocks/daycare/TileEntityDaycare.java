@@ -3,19 +3,19 @@ package pokecube.adventures.blocks.daycare;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import pokecube.adventures.commands.Config;
@@ -180,37 +180,37 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
     @Override
     public ITextComponent getDisplayName()
     {
-        return new TextComponentString("daycare");
+        return new StringTextComponent("daycare");
     }
 
     /** Overriden in a sign to provide the text. */
     @Override
     public SPacketUpdateTileEntity getUpdatePacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
-        this.writeToNBT(nbttagcompound);
-        return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
+        this.writeToNBT(CompoundNBT);
+        return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
     }
 
     @Override
-    public NBTTagCompound getUpdateTag()
+    public CompoundNBT getUpdateTag()
     {
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         return writeToNBT(nbt);
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
+    public void readFromNBT(CompoundNBT nbt)
     {
         super.readFromNBT(nbt);
-        NBTBase temp = nbt.getTag("Inventory");
-        if (temp instanceof NBTTagList)
+        INBT temp = nbt.getTag("Inventory");
+        if (temp instanceof ListNBT)
         {
-            NBTTagList tagList = (NBTTagList) temp;
-            for (int i = 0; i < tagList.tagCount(); i++)
+            ListNBT tagList = (ListNBT) temp;
+            for (int i = 0; i < tagList.size(); i++)
             {
-                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+                CompoundNBT tag = tagList.getCompound(i);
                 byte slot = tag.getByte("Slot");
 
                 if (slot >= 0 && slot < inventory.size())
@@ -225,16 +225,16 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+    public CompoundNBT writeToNBT(CompoundNBT nbt)
     {
         super.writeToNBT(nbt);
-        NBTTagList itemList = new NBTTagList();
+        ListNBT itemList = new ListNBT();
         for (int i = 0; i < inventory.size(); i++)
         {
             ItemStack stack;
             if (CompatWrapper.isValid(stack = inventory.get(i)))
             {
-                NBTTagCompound tag = new NBTTagCompound();
+                CompoundNBT tag = new CompoundNBT();
                 tag.setByte("Slot", (byte) i);
                 stack.writeToNBT(tag);
                 itemList.appendTag(tag);
@@ -308,18 +308,18 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
     }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player)
+    public boolean isUsableByPlayer(PlayerEntity player)
     {
         return player.getUniqueID().equals(placer);
     }
 
     @Override
-    public void openInventory(EntityPlayer player)
+    public void openInventory(PlayerEntity player)
     {
     }
 
     @Override
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(PlayerEntity player)
     {
     }
 
@@ -362,10 +362,10 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
     {
         if (world == null || tick++ < Config.instance.daycareTicks) return;
         tick = 0;
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) { return; }
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT) { return; }
         if (box == null) box = new AxisAlignedBB(getPos()).grow(range + 2);
-        List<EntityLiving> mobs = world.getEntitiesWithinAABB(EntityLiving.class, box);
-        for (EntityLiving entity : mobs)
+        List<MobEntity> mobs = world.getEntitiesWithinAABB(MobEntity.class, box);
+        for (MobEntity entity : mobs)
         {
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(entity);
             if (pokemob != null)

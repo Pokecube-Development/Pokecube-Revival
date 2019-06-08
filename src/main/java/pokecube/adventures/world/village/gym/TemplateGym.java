@@ -1,6 +1,6 @@
 package pokecube.adventures.world.village.gym;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import pokecube.core.world.gen.template.PokecubeTemplates;
 import pokecube.core.world.gen.village.buildings.TemplateStructure;
@@ -15,7 +15,7 @@ public class TemplateGym extends TemplateStructure
         setOffset(-2);
     }
 
-    public TemplateGym(BlockPos pos, EnumFacing dir)
+    public TemplateGym(BlockPos pos, Direction dir)
     {
         super(GYM_GENERAL, pos, dir);
     }

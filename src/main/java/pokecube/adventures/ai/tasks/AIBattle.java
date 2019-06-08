@@ -3,8 +3,8 @@ package pokecube.adventures.ai.tasks;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -30,12 +30,12 @@ public class AIBattle extends AITrainerBase
     private boolean  canPath   = true;
     private BlockPos battleLoc = null;
 
-    public AIBattle(EntityLivingBase trainer)
+    public AIBattle(LivingEntity trainer)
     {
         super(trainer);
     }
 
-    public AIBattle(EntityLivingBase trainer, boolean canPath)
+    public AIBattle(LivingEntity trainer, boolean canPath)
     {
         super(trainer);
         this.canPath = canPath;
@@ -104,9 +104,9 @@ public class AIBattle extends AITrainerBase
     {
         // Check if we are being targetted by the enemies pokemob, if so, we
         // will make it be passive for now.
-        if (entity instanceof EntityLiving)
+        if (entity instanceof MobEntity)
         {
-            EntityLiving living = (EntityLiving) entity;
+            MobEntity living = (MobEntity) entity;
             Entity target = living.getAttackTarget();
             IPokemob tarMob = CapabilityPokemob.getPokemobFor(target);
             if (tarMob != null)
@@ -234,11 +234,11 @@ public class AIBattle extends AITrainerBase
         }
 
         // Stop trainer from pathing if it shouldn't do so during battle
-        if (!canPath && entity instanceof EntityLiving)
+        if (!canPath && entity instanceof MobEntity)
         {
             if (battleLoc == null) battleLoc = entity.getPosition();
-            ((EntityLiving) entity).getNavigator()
-                    .setPath(((EntityLiving) entity).getNavigator().getPathToPos(battleLoc), 0.75);
+            ((MobEntity) entity).getNavigator()
+                    .setPath(((MobEntity) entity).getNavigator().getPathToPos(battleLoc), 0.75);
         }
 
         // If target is no longer visbile, forget about it and reset.

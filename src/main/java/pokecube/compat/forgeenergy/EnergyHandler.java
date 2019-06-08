@@ -6,9 +6,9 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
@@ -40,16 +40,16 @@ public class EnergyHandler
         if (tile.getWorld() == null || power == 0) return 0;
         Vector3 v = Vector3.getNewVector().set(tile);
         AxisAlignedBB box = (tile.box != null) ? tile.box : (tile.box = v.getAABB().grow(10, 10, 10));
-        List<EntityLiving> l = tile.mobs;
-        if (tile.updateTime == -1 || tile.updateTime < tile.getWorld().getTotalWorldTime())
+        List<MobEntity> l = tile.mobs;
+        if (tile.updateTime == -1 || tile.updateTime < tile.getWorld().getGameTime())
         {
             l.clear();
-            l = tile.mobs = tile.getWorld().getEntitiesWithinAABB(EntityLiving.class, box);
-            tile.updateTime = tile.getWorld().getTotalWorldTime() + TileEntitySiphon.UPDATERATE;
+            l = tile.mobs = tile.getWorld().getEntitiesWithinAABB(MobEntity.class, box);
+            tile.updateTime = tile.getWorld().getGameTime() + TileEntitySiphon.UPDATERATE;
         }
         int ret = 0;
         power = Math.min(power, PokecubeAdv.conf.maxOutput);
-        for (EntityLiving living : l)
+        for (MobEntity living : l)
         {
             if (living != null && living.addedToChunk)
             {
@@ -83,7 +83,7 @@ public class EnergyHandler
         IEnergyStorage producer = event.getTile().getCapability(CapabilityEnergy.ENERGY, null);
         Integer start = output;
         Vector3 v = Vector3.getNewVector().set(event.getTile());
-        for (EnumFacing side : EnumFacing.values())
+        for (Direction side : Direction.values())
         {
             TileEntity te = v.getTileEntity(event.getTile().getWorld(), side);
             IEnergyStorage cap;
@@ -164,13 +164,13 @@ public class EnergyHandler
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == CapabilityEnergy.ENERGY;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return (capability == CapabilityEnergy.ENERGY) ? CapabilityEnergy.ENERGY.cast(this) : null;
         }
@@ -206,13 +206,13 @@ public class EnergyHandler
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == CapabilityEnergy.ENERGY;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return (capability == CapabilityEnergy.ENERGY) ? CapabilityEnergy.ENERGY.cast(this) : null;
         }
@@ -241,13 +241,13 @@ public class EnergyHandler
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == CapabilityEnergy.ENERGY;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return (capability == CapabilityEnergy.ENERGY) ? CapabilityEnergy.ENERGY.cast(this) : null;
         }
@@ -276,13 +276,13 @@ public class EnergyHandler
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == CapabilityEnergy.ENERGY;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return (capability == CapabilityEnergy.ENERGY) ? CapabilityEnergy.ENERGY.cast(this) : null;
         }
@@ -299,13 +299,13 @@ public class EnergyHandler
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == CapabilityEnergy.ENERGY;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return (capability == CapabilityEnergy.ENERGY) ? CapabilityEnergy.ENERGY.cast(this) : null;
         }
@@ -320,14 +320,14 @@ public class EnergyHandler
         public int extractEnergy(int power, boolean simulate)
         {
             if (!canExtract()) return 0;
-            EntityLiving living = pokemob.getEntity();
+            MobEntity living = pokemob.getEntity();
             int spAtk = pokemob.getStat(Stats.SPATTACK, true);
             int atk = pokemob.getStat(Stats.ATTACK, true);
             int level = pokemob.getLevel();
             int maxEnergy = TileEntitySiphon.getMaxEnergy(level, spAtk, atk, pokemob.getPokedexEntry());
             int pokeEnergy = maxEnergy;
             int dE;
-            long energyTime = living.getEntityWorld().getTotalWorldTime();
+            long energyTime = living.getEntityWorld().getGameTime();
             if (living.getEntityData().hasKey("energyRemaining"))
             {
                 long time = living.getEntityData().getLong("energyTime");
@@ -344,7 +344,7 @@ public class EnergyHandler
             dE = Math.min(dE, power);
             if (!simulate)
             {
-                living.getEntityData().setLong("energyTime", energyTime);
+                living.getEntityData().putLong("energyTime", energyTime);
                 living.getEntityData().setInteger("energyRemaining", pokeEnergy - dE);
                 int drain = 0;
                 if (pokeEnergy - dE < 0)

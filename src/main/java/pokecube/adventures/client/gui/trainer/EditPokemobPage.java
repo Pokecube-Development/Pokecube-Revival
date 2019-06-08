@@ -13,11 +13,11 @@ import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBT;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import pokecube.adventures.client.gui.trainer.GuiEditTrainer.Page;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
 import pokecube.adventures.network.packets.PacketTrainer;
@@ -387,7 +387,7 @@ public class EditPokemobPage extends Page
         case 1:
             // Delete the mob
             pokemob = null;
-            mess = new TextComponentTranslation("traineredit.info.deletemob");
+            mess = new TranslationTextComponent("traineredit.info.deletemob");
             parent.mc.player.sendStatusMessage(mess, true);
             sendUpdate();
             break;
@@ -565,13 +565,13 @@ public class EditPokemobPage extends Page
         ITextComponent mess;
         if (ability != null)
         {
-            mess = new TextComponentTranslation("traineredit.set.ability", I18n.format(ability.getName()));
+            mess = new TranslationTextComponent("traineredit.set.ability", I18n.format(ability.getName()));
             pokemob.setAbility(ability);
             sendUpdate();
         }
         else
         {
-            mess = new TextComponentTranslation("traineredit.info.invalidability", value);
+            mess = new TranslationTextComponent("traineredit.info.invalidability", value);
         }
         parent.mc.player.sendStatusMessage(mess, true);
     }
@@ -581,7 +581,7 @@ public class EditPokemobPage extends Page
         float size = value.isEmpty() ? 0.01f : Float.parseFloat(value);
         size = Math.max(0.01f, size);
         pokemob.setSize(size);
-        ITextComponent mess = new TextComponentTranslation("traineredit.set.size", pokemob.getSize());
+        ITextComponent mess = new TranslationTextComponent("traineredit.set.size", pokemob.getSize());
         sendUpdate();
         parent.mc.player.sendStatusMessage(mess, true);
     }
@@ -593,13 +593,13 @@ public class EditPokemobPage extends Page
         try
         {
             nature = Nature.valueOf(value.toUpperCase(Locale.ENGLISH));
-            mess = new TextComponentTranslation("traineredit.set.nature", nature);
+            mess = new TranslationTextComponent("traineredit.set.nature", nature);
             pokemob.setNature(nature);
             sendUpdate();
         }
         catch (Exception e)
         {
-            mess = new TextComponentTranslation("traineredit.info.invalidnature", value);
+            mess = new TranslationTextComponent("traineredit.info.invalidnature", value);
         }
         parent.mc.player.sendStatusMessage(mess, true);
     }
@@ -616,7 +616,7 @@ public class EditPokemobPage extends Page
             int level = Integer.parseInt(value);
             int exp = Tools.levelToXp(pokemob.getExperienceMode(), level);
             pokemob.setExp(exp, false);
-            ITextComponent mess = new TextComponentTranslation("traineredit.set.level", pokemob.getLevel());
+            ITextComponent mess = new TranslationTextComponent("traineredit.set.level", pokemob.getLevel());
             sendUpdate();
             parent.mc.player.sendStatusMessage(mess, true);
         }
@@ -635,7 +635,7 @@ public class EditPokemobPage extends Page
             iv = Math.max(0, iv);
             iv = Math.min(31, iv);
             pokemob.getIVs()[index] = (byte) iv;
-            ITextComponent mess = new TextComponentTranslation("traineredit.set.ivs");
+            ITextComponent mess = new TranslationTextComponent("traineredit.set.ivs");
             sendUpdate();
             parent.mc.player.sendStatusMessage(mess, true);
             value = pokemob.getIVs()[index] + "";
@@ -656,7 +656,7 @@ public class EditPokemobPage extends Page
             ev = Math.max(0, ev);
             ev = Math.min(255, ev);
             pokemob.getEVs()[index] = (byte) (ev + Byte.MIN_VALUE);
-            ITextComponent mess = new TextComponentTranslation("traineredit.set.evs");
+            ITextComponent mess = new TranslationTextComponent("traineredit.set.evs");
             sendUpdate();
             parent.mc.player.sendStatusMessage(mess, true);
             value = (pokemob.getEVs()[index] - Byte.MIN_VALUE) + "";
@@ -670,7 +670,7 @@ public class EditPokemobPage extends Page
         ITextComponent mess;
         if (attack == null && !move.isEmpty())
         {
-            mess = new TextComponentTranslation("traineredit.info.invalidmove", move);
+            mess = new TranslationTextComponent("traineredit.info.invalidmove", move);
         }
         else
         {
@@ -679,8 +679,8 @@ public class EditPokemobPage extends Page
             moves[index] = attack == null ? null : attack.name;
             pokemob.setMoves(moves);
             if (attack != null)
-                mess = new TextComponentTranslation("traineredit.set.move", MovesUtils.getMoveName(attack.name));
-            else if (move != null) mess = new TextComponentTranslation("traineredit.set.removemove", move);
+                mess = new TranslationTextComponent("traineredit.set.move", MovesUtils.getMoveName(attack.name));
+            else if (move != null) mess = new TranslationTextComponent("traineredit.set.removemove", move);
             else return;
             sendUpdate();
         }
@@ -697,12 +697,12 @@ public class EditPokemobPage extends Page
         ITextComponent mess;
         if (entry == null)
         {
-            mess = new TextComponentTranslation("traineredit.info.invalidentry", value);
+            mess = new TranslationTextComponent("traineredit.info.invalidentry", value);
         }
         else
         {
             pokemob = CapabilityPokemob.getPokemobFor(PokecubeMod.core.createPokemob(entry, parent.mc.world));
-            mess = new TextComponentTranslation("traineredit.set.entry", I18n.format(entry.getUnlocalizedName()));
+            mess = new TranslationTextComponent("traineredit.set.entry", I18n.format(entry.getUnlocalizedName()));
             sendUpdate();
         }
         parent.mc.player.sendStatusMessage(mess, true);
@@ -713,7 +713,7 @@ public class EditPokemobPage extends Page
         this.onPageClosed();
         if (pokemob != null)
         {
-            pokemob.setPokemonOwner((EntityLivingBase) parent.entity);
+            pokemob.setPokemonOwner((LivingEntity) parent.entity);
             ItemStack stack = PokecubeManager.pokemobToItem(pokemob);
             PokecubeManager.heal(stack);
             parent.trainer.setPokemob(pokemobIndex, stack);
@@ -723,7 +723,7 @@ public class EditPokemobPage extends Page
             parent.trainer.setPokemob(pokemobIndex, ItemStack.EMPTY);
         }
         PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-        NBTBase tag = CapabilityHasPokemobs.storage.writeNBT(CapabilityHasPokemobs.HASPOKEMOBS_CAP, parent.trainer,
+        INBT tag = CapabilityHasPokemobs.storage.writeNBT(CapabilityHasPokemobs.HASPOKEMOBS_CAP, parent.trainer,
                 null);
         if (tag != null)
         {

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -43,7 +43,7 @@ public class ELNInterfacer
             location = cableLoc;
         }
 
-        public double getDistance(EntityLiving entity)
+        public double getDistance(MobEntity entity)
         {
             return location.distToEntity(entity);
         }
@@ -104,9 +104,9 @@ public class ELNInterfacer
 
     static Method                                        connectTo;
 
-    static HashMap<EntityLiving, ArrayList<CablePacket>> mobEffects = new HashMap<EntityLiving, ArrayList<CablePacket>>();
+    static HashMap<MobEntity, ArrayList<CablePacket>> mobEffects = new HashMap<MobEntity, ArrayList<CablePacket>>();
 
-    static void addCableEffect(EntityLiving entity, CablePacket cable)
+    static void addCableEffect(MobEntity entity, CablePacket cable)
     {
         ArrayList<CablePacket> effects = mobEffects.get(entity);
         if (effects == null)
@@ -156,7 +156,7 @@ public class ELNInterfacer
         disconnect.invoke(cable);
     }
 
-    public static void doELNInterference(EntityLiving entity, int currentRadius, int statFactor, TileEntity tile)
+    public static void doELNInterference(MobEntity entity, int currentRadius, int statFactor, TileEntity tile)
             throws Exception
     {
         currentRadius = Math.max(1, currentRadius);
@@ -289,7 +289,7 @@ public class ELNInterfacer
         reconnect.invoke(cable);
     }
 
-    static void refreshCableEffects(EntityLiving entity)
+    static void refreshCableEffects(MobEntity entity)
     {
         ArrayList<CablePacket> effects = mobEffects.get(entity);
         if (effects != null)
@@ -317,7 +317,7 @@ public class ELNInterfacer
         }
     }
 
-    static void resetCableEffects(EntityLiving entity)
+    static void resetCableEffects(MobEntity entity)
     {
         ArrayList<CablePacket> effects = mobEffects.get(entity);
         if (effects != null)
@@ -388,34 +388,34 @@ public class ELNInterfacer
     }
 
     @SubscribeEvent
-    public void EntityLivingDeath(LivingDeathEvent evt)
+    public void MobEntityDeath(LivingDeathEvent evt)
     {
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(evt.getEntityLiving());
-        if (pokemob != null && evt.getEntityLiving() instanceof EntityLiving)
+        IPokemob pokemob = CapabilityPokemob.getPokemobFor(evt.getMobEntity());
+        if (pokemob != null && evt.getMobEntity() instanceof MobEntity)
         {
-            resetCableEffects((EntityLiving) evt.getEntityLiving());
+            resetCableEffects((MobEntity) evt.getMobEntity());
         }
     }
 
     @SubscribeEvent
-    public void EntityLivingUpdate(LivingUpdateEvent evt)
+    public void MobEntityUpdate(LivingUpdateEvent evt)
     {
-        IPokemob pokemob = CapabilityPokemob.getPokemobFor(evt.getEntityLiving());
-        if (pokemob != null && evt.getEntityLiving() instanceof EntityLiving)
+        IPokemob pokemob = CapabilityPokemob.getPokemobFor(evt.getMobEntity());
+        if (pokemob != null && evt.getMobEntity() instanceof MobEntity)
         {
-            refreshCableEffects((EntityLiving) evt.getEntityLiving());
+            refreshCableEffects((MobEntity) evt.getMobEntity());
         }
     }
 
     @SubscribeEvent
     public void PokemobDespawn(SpawnEvent.Despawn evt)
     {
-        resetCableEffects((EntityLiving) evt.pokemob);
+        resetCableEffects((MobEntity) evt.pokemob);
     }
 
     @SubscribeEvent
     public void PokemobRecall(RecallEvent evt)
     {
-        resetCableEffects((EntityLiving) evt.recalled);
+        resetCableEffects((MobEntity) evt.recalled);
     }
 }

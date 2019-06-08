@@ -15,7 +15,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import pokecube.adventures.commands.Config;
 import pokecube.core.PokecubeCore;
 import pokecube.core.database.PokedexEntry;
@@ -40,7 +40,7 @@ public class PokedexEntryIngredientRenderer implements IIngredientRenderer<Poked
             GL11.glTranslated(x + 8, y + 17, 10);
             double scale = 1.1;
             GL11.glScaled(scale, scale, scale);
-            EntityLiving entity = pokemob.getEntity();
+            MobEntity entity = pokemob.getEntity();
             float size = 0;
             float mobScale = pokemob.getSize();
             Vector3f dims = pokemob.getPokedexEntry().getModelSize();
@@ -56,7 +56,7 @@ public class PokedexEntryIngredientRenderer implements IIngredientRenderer<Poked
             int j1 = i % 65536;
             int k1 = i / 65536;
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j1 / 1.0F, k1 / 1.0F);
-            Minecraft.getMinecraft().getRenderManager().renderEntity(entity, 0, 0, 0, 0, 1.5F, false);
+            Minecraft.getInstance().getRenderManager().renderEntity(entity, 0, 0, 0, 0, 1.5F, false);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableRescaleNormal();
             GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);

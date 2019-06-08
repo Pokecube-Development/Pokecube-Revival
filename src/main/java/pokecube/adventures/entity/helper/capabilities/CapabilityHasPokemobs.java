@@ -9,14 +9,14 @@ import java.util.UUID;
 import com.google.common.collect.Sets;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -60,7 +60,7 @@ public class CapabilityHasPokemobs
 
     public static interface ITargetWatcher
     {
-        boolean validTargetSet(EntityLivingBase target);
+        boolean validTargetSet(LivingEntity target);
 
         default void onAdded(IHasPokemobs pokemobs)
         {
@@ -99,11 +99,11 @@ public class CapabilityHasPokemobs
             long uuidLeast = 0;
             long uuidMost = 0;
 
-            if (mob.hasTagCompound())
+            if (mob.hasTag())
             {
-                if (mob.getTagCompound().hasKey("Pokemob"))
+                if (mob.getTag().hasKey("Pokemob"))
                 {
-                    NBTTagCompound nbt = mob.getTagCompound().getCompoundTag("Pokemob");
+                    CompoundNBT nbt = mob.getTag().getCompound("Pokemob");
                     uuidLeast = nbt.getLong("UUIDLeast");
                     uuidMost = nbt.getLong("UUIDMost");
                 }
@@ -116,11 +116,11 @@ public class CapabilityHasPokemobs
             {
                 if (CompatWrapper.isValid(getPokemob(i)))
                 {
-                    if (getPokemob(i).hasTagCompound())
+                    if (getPokemob(i).hasTag())
                     {
-                        if (getPokemob(i).getTagCompound().hasKey("Pokemob"))
+                        if (getPokemob(i).getTag().hasKey("Pokemob"))
                         {
-                            NBTTagCompound nbt = getPokemob(i).getTagCompound().getCompoundTag("Pokemob");
+                            CompoundNBT nbt = getPokemob(i).getTag().getCompound("Pokemob");
                             uuidLeastTest = nbt.getLong("UUIDLeast");
                             uuidMostTest = nbt.getLong("UUIDMost");
                             if (uuidLeast == uuidLeastTest && uuidMost == uuidMostTest)
@@ -230,13 +230,13 @@ public class CapabilityHasPokemobs
             return ret;
         }
 
-        EntityLivingBase getTarget();
+        LivingEntity getTarget();
 
         void lowerCooldowns();
 
         void throwCubeAt(Entity target);
 
-        void setTarget(EntityLivingBase target);
+        void setTarget(LivingEntity target);
 
         TypeTrainer getType();
 
@@ -285,7 +285,7 @@ public class CapabilityHasPokemobs
         }
 
         /** If we are agressive, is this a valid target? */
-        boolean canBattle(EntityLivingBase target);
+        boolean canBattle(LivingEntity target);
 
         /** 1 = male 2= female */
         byte getGender();
@@ -320,7 +320,7 @@ public class CapabilityHasPokemobs
     {
 
         @Override
-        public NBTBase writeNBT(Capability<IHasPokemobs> capability, IHasPokemobs instance, EnumFacing side)
+        public INBT writeNBT(Capability<IHasPokemobs> capability, IHasPokemobs instance, Direction side)
         {
             if (instance instanceof INBTSerializable<?>) return ((INBTSerializable<?>) instance).serializeNBT();
             return null;
@@ -328,18 +328,18 @@ public class CapabilityHasPokemobs
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         @Override
-        public void readNBT(Capability<IHasPokemobs> capability, IHasPokemobs instance, EnumFacing side, NBTBase base)
+        public void readNBT(Capability<IHasPokemobs> capability, IHasPokemobs instance, Direction side, INBT base)
         {
             if (instance instanceof INBTSerializable) ((INBTSerializable) instance).deserializeNBT(base);
         }
 
     }
 
-    public static class DefaultPokemobs implements IHasPokemobs, ICapabilitySerializable<NBTTagCompound>
+    public static class DefaultPokemobs implements IHasPokemobs, ICapabilitySerializable<CompoundNBT>
     {
         public static class DefeatEntry implements Comparable<DefeatEntry>
         {
-            public static DefeatEntry createFromNBT(NBTTagCompound nbt)
+            public static DefeatEntry createFromNBT(CompoundNBT nbt)
             {
                 String defeater = nbt.getString("player");
                 long time = nbt.getLong("time");
@@ -355,10 +355,10 @@ public class CapabilityHasPokemobs
                 this.defeatTime = time;
             }
 
-            void writeToNBT(NBTTagCompound nbt)
+            void writeToNBT(CompoundNBT nbt)
             {
-                nbt.setString("player", defeater);
-                nbt.setLong("time", defeatTime);
+                nbt.putString("player", defeater);
+                nbt.putLong("time", defeatTime);
             }
 
             @Override
@@ -397,7 +397,7 @@ public class CapabilityHasPokemobs
         // This is the reference cooldown.
         public int                    battleCooldown   = -1;
         private byte                  gender           = 1;
-        private EntityLivingBase      user;
+        private LivingEntity      user;
         private IHasNPCAIStates       aiStates;
         private IHasMessages          messages;
         private IHasRewards           rewards;
@@ -408,7 +408,7 @@ public class CapabilityHasPokemobs
         private long                  cooldown         = 0;
         private int                   sight            = -1;
         private TypeTrainer           type;
-        private EntityLivingBase      target;
+        private LivingEntity      target;
         private UUID                  outID;
         private boolean               canMegaEvolve    = false;
         private IPokemob              outMob;
@@ -419,7 +419,7 @@ public class CapabilityHasPokemobs
         public final DataParamHolder  holder           = new DataParamHolder();
         public DataSync               datasync;
 
-        public void init(EntityLivingBase user, IHasNPCAIStates aiStates, IHasMessages messages, IHasRewards rewards)
+        public void init(LivingEntity user, IHasNPCAIStates aiStates, IHasMessages messages, IHasRewards rewards)
         {
             this.user = user;
             this.aiStates = aiStates;
@@ -462,7 +462,7 @@ public class CapabilityHasPokemobs
                     // If this is the case, then this mob is not re-battleable.
                     if (resetTime <= 0) return true;
                     // Otherwise check the diff.
-                    long diff = user.getEntityWorld().getTotalWorldTime() - s.defeatTime;
+                    long diff = user.getEntityWorld().getGameTime() - s.defeatTime;
                     if (diff > resetTime) { return false; }
                     return true;
                 }
@@ -505,7 +505,7 @@ public class CapabilityHasPokemobs
         }
 
         @Override
-        public EntityLivingBase getTarget()
+        public LivingEntity getTarget()
         {
             return target;
         }
@@ -537,7 +537,7 @@ public class CapabilityHasPokemobs
         }
 
         @Override
-        public void setTarget(EntityLivingBase target)
+        public void setTarget(LivingEntity target)
         {
             Set<ITargetWatcher> watchers = getTargetWatchers();
             if (target != null && !watchers.isEmpty())
@@ -602,11 +602,11 @@ public class CapabilityHasPokemobs
         public void onDefeated(Entity defeater)
         {
             // Get this cleanup stuff done first.
-            if (defeater instanceof EntityPlayer)
+            if (defeater instanceof PlayerEntity)
             {
-                setCooldown(user.getEntityWorld().getTotalWorldTime() + battleCooldown);
+                setCooldown(user.getEntityWorld().getGameTime() + battleCooldown);
             }
-            else setCooldown(user.getEntityWorld().getTotalWorldTime() + 10);
+            else setCooldown(user.getEntityWorld().getGameTime() + 10);
             this.setTarget(null);
 
             // Then parse if rewards and actions should be dealt with.
@@ -615,10 +615,10 @@ public class CapabilityHasPokemobs
             // TODO possible have alternate message for invalid defeat?
             if (!reward) return;
 
-            if (defeater instanceof EntityPlayer)
+            if (defeater instanceof PlayerEntity)
             {
                 DefeatEntry entry = new DefeatEntry(defeater.getCachedUniqueIdString(),
-                        user.getEntityWorld().getTotalWorldTime());
+                        user.getEntityWorld().getGameTime());
                 if (defeaters.contains(entry))
                 {
                     defeaters.get(defeaters.indexOf(entry)).defeatTime = entry.defeatTime;
@@ -629,7 +629,7 @@ public class CapabilityHasPokemobs
                 }
                 if (rewards.getRewards() != null)
                 {
-                    EntityPlayer player = (EntityPlayer) defeater;
+                    PlayerEntity player = (PlayerEntity) defeater;
                     rewards.giveReward(player, user);
                     checkDefeatAchievement(player);
                 }
@@ -637,24 +637,24 @@ public class CapabilityHasPokemobs
             if (defeater != null)
             {
                 messages.sendMessage(MessageState.DEFEAT, defeater, user.getDisplayName(), defeater.getDisplayName());
-                if (notifyDefeat && defeater instanceof EntityPlayerMP)
+                if (notifyDefeat && defeater instanceof ServerPlayerEntity)
                 {
                     PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGENOTIFYDEFEAT);
                     packet.data.setInteger("I", user.getEntityId());
-                    packet.data.setLong("L", user.getEntityWorld().getTotalWorldTime() + resetTime);
-                    PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) defeater);
+                    packet.data.putLong("L", user.getEntityWorld().getGameTime() + resetTime);
+                    PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) defeater);
                 }
-                if (defeater instanceof EntityLivingBase)
-                    messages.doAction(MessageState.DEFEAT, (EntityLivingBase) defeater);
+                if (defeater instanceof LivingEntity)
+                    messages.doAction(MessageState.DEFEAT, (LivingEntity) defeater);
             }
         }
 
-        public void checkDefeatAchievement(EntityPlayer player)
+        public void checkDefeatAchievement(PlayerEntity player)
         {
             if (!(user instanceof EntityTrainer)) return;
             boolean leader = user instanceof EntityLeader;
-            if (leader) Triggers.BEATLEADER.trigger((EntityPlayerMP) player, (EntityTrainer) user);
-            else Triggers.BEATTRAINER.trigger((EntityPlayerMP) player, (EntityTrainer) user);
+            if (leader) Triggers.BEATLEADER.trigger((ServerPlayerEntity) player, (EntityTrainer) user);
+            else Triggers.BEATTRAINER.trigger((ServerPlayerEntity) player, (EntityTrainer) user);
         }
 
         @Override
@@ -666,7 +666,7 @@ public class CapabilityHasPokemobs
             aiStates.setAIState(IHasNPCAIStates.INBATTLE, false);
             if (getOutMob() == null && !aiStates.getAIState(IHasNPCAIStates.THROWING))
             {
-                if (getCooldown() <= user.getEntityWorld().getTotalWorldTime())
+                if (getCooldown() <= user.getEntityWorld().getGameTime())
                 {
                     onDefeated(getTarget());
                     setNextSlot(0);
@@ -691,8 +691,8 @@ public class CapabilityHasPokemobs
                 attackCooldown = Config.instance.trainerSendOutDelay;
                 messages.sendMessage(MessageState.SENDOUT, target, user.getDisplayName(), i.getDisplayName(),
                         target.getDisplayName());
-                if (target instanceof EntityLivingBase)
-                    messages.doAction(MessageState.SENDOUT, (EntityLivingBase) target);
+                if (target instanceof LivingEntity)
+                    messages.doAction(MessageState.SENDOUT, (LivingEntity) target);
                 nextSlot++;
                 if (nextSlot >= getMaxPokemobCount() || getNextPokemob() == null) nextSlot = -1;
                 return;
@@ -765,74 +765,74 @@ public class CapabilityHasPokemobs
         }
 
         @Override
-        public boolean canBattle(EntityLivingBase target)
+        public boolean canBattle(LivingEntity target)
         {
             return !hasDefeated(target);
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == HASPOKEMOBS_CAP;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return hasCapability(capability, facing) ? HASPOKEMOBS_CAP.cast(this) : null;
         }
 
         @Override
-        public NBTTagCompound serializeNBT()
+        public CompoundNBT serializeNBT()
         {
-            NBTTagCompound nbt = new NBTTagCompound();
-            NBTTagList nbttaglist = new NBTTagList();
+            CompoundNBT nbt = new CompoundNBT();
+            ListNBT ListNBT = new ListNBT();
             for (int index = 0; index < getMaxPokemobCount(); index++)
             {
                 ItemStack i = this.getPokemob(index);
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                CompoundNBT CompoundNBT = new CompoundNBT();
                 if (CompatWrapper.isValid(i))
                 {
-                    i.writeToNBT(nbttagcompound);
+                    i.writeToNBT(CompoundNBT);
                 }
-                nbttaglist.appendTag(nbttagcompound);
+                ListNBT.appendTag(CompoundNBT);
             }
-            nbt.setTag("pokemobs", nbttaglist);
+            nbt.setTag("pokemobs", ListNBT);
             nbt.setInteger("nextSlot", this.getNextSlot());
-            if (this.getOutID() != null) nbt.setString("outPokemob", this.getOutID().toString());
-            if (this.getType() != null) nbt.setString("type", this.getType().name);
-            nbt.setLong("nextBattle", this.getCooldown());
+            if (this.getOutID() != null) nbt.putString("outPokemob", this.getOutID().toString());
+            if (this.getType() != null) nbt.putString("type", this.getType().name);
+            nbt.putLong("nextBattle", this.getCooldown());
             nbt.setByte("gender", this.getGender());
 
             if (this.battleCooldown < 0) this.battleCooldown = Config.instance.trainerCooldown;
             nbt.setInteger("battleCD", this.battleCooldown);
-            nbttaglist = new NBTTagList();
+            ListNBT = new ListNBT();
             for (DefeatEntry entry : this.defeaters)
             {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                entry.writeToNBT(nbttagcompound);
-                nbttaglist.appendTag(nbttagcompound);
+                CompoundNBT CompoundNBT = new CompoundNBT();
+                entry.writeToNBT(CompoundNBT);
+                ListNBT.appendTag(CompoundNBT);
             }
-            nbt.setTag("DefeatList", nbttaglist);
-            nbt.setBoolean("notifyDefeat", this.notifyDefeat);
-            nbt.setLong("resetTime", this.resetTime);
+            nbt.setTag("DefeatList", ListNBT);
+            nbt.putBoolean("notifyDefeat", this.notifyDefeat);
+            nbt.putLong("resetTime", this.resetTime);
             if (this.sight != -1) nbt.setInteger("sight", this.sight);
             nbt.setInteger("friendly", this.friendlyCooldown);
-            nbt.setString("levelMode", getLevelMode().name());
+            nbt.putString("levelMode", getLevelMode().name());
             return nbt;
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound nbt)
+        public void deserializeNBT(CompoundNBT nbt)
         {
             if (nbt.hasKey("pokemobs", 9))
             {
                 if (clearOnLoad()) this.clear();
-                NBTTagList nbttaglist = nbt.getTagList("pokemobs", 10);
-                if (nbttaglist.tagCount() != 0)
-                    for (int i = 0; i < Math.min(nbttaglist.tagCount(), getMaxPokemobCount()); ++i)
+                ListNBT ListNBT = nbt.getTagList("pokemobs", 10);
+                if (ListNBT.size() != 0)
+                    for (int i = 0; i < Math.min(ListNBT.size(), getMaxPokemobCount()); ++i)
                     {
-                    this.setPokemob(i, new ItemStack(nbttaglist.getCompoundTagAt(i)));
+                    this.setPokemob(i, new ItemStack(ListNBT.getCompound(i)));
                     }
             }
             this.setType(TypeTrainer.getTrainer(nbt.getString("type")));
@@ -853,9 +853,9 @@ public class CapabilityHasPokemobs
             if (nbt.hasKey("resetTime")) this.resetTime = nbt.getLong("resetTime");
             if (nbt.hasKey("DefeatList", 9))
             {
-                NBTTagList nbttaglist = nbt.getTagList("DefeatList", 10);
-                for (int i = 0; i < nbttaglist.tagCount(); i++)
-                    this.defeaters.add(DefeatEntry.createFromNBT(nbttaglist.getCompoundTagAt(i)));
+                ListNBT ListNBT = nbt.getTagList("DefeatList", 10);
+                for (int i = 0; i < ListNBT.size(); i++)
+                    this.defeaters.add(DefeatEntry.createFromNBT(ListNBT.getCompound(i)));
             }
             this.notifyDefeat = nbt.getBoolean("notifyDefeat");
             this.friendlyCooldown = nbt.getInteger("friendly");

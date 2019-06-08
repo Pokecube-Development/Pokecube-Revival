@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionInstance;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.entity.trainers.EntityLeader;
@@ -30,7 +30,7 @@ public class BeatLeaderTrigger implements ICriterionTrigger<BeatLeaderTrigger.In
             super(ID);
         }
 
-        public boolean test(EntityPlayerMP player, EntityTrainer defeated)
+        public boolean test(ServerPlayerEntity player, EntityTrainer defeated)
         {
             return (defeated instanceof EntityLeader);
         }
@@ -62,7 +62,7 @@ public class BeatLeaderTrigger implements ICriterionTrigger<BeatLeaderTrigger.In
             this.listeners.remove(listener);
         }
 
-        public void trigger(EntityPlayerMP player, EntityTrainer defeated)
+        public void trigger(ServerPlayerEntity player, EntityTrainer defeated)
         {
             List<ICriterionTrigger.Listener<BeatLeaderTrigger.Instance>> list = null;
 
@@ -146,7 +146,7 @@ public class BeatLeaderTrigger implements ICriterionTrigger<BeatLeaderTrigger.In
         return new BeatLeaderTrigger.Instance();
     }
 
-    public void trigger(EntityPlayerMP player, EntityTrainer defeated)
+    public void trigger(ServerPlayerEntity player, EntityTrainer defeated)
     {
         BeatLeaderTrigger.Listeners bredanimalstrigger$listeners = this.listeners.get(player.getAdvancements());
         if (bredanimalstrigger$listeners != null)

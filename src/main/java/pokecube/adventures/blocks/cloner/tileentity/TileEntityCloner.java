@@ -2,12 +2,12 @@ package pokecube.adventures.blocks.cloner.tileentity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.oredict.OreDictionary;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.blocks.cloner.block.BlockReanimator;
@@ -25,8 +25,8 @@ public class TileEntityCloner extends TileClonerBase
         /** 1 slot for output, 1 slot for gene input, 1 slot for egg input and 7
          * slots for supporting item input. */
         super(10, 9);
-        sidedSlots[EnumFacing.WEST.ordinal()] = new int[] { 0 };
-        sidedSlots[EnumFacing.NORTH.ordinal()] = new int[] { 1 };
+        sidedSlots[Direction.WEST.ordinal()] = new int[] { 0 };
+        sidedSlots[Direction.NORTH.ordinal()] = new int[] { 1 };
         for (int i = 0; i < 6; i++)
         {
             if (sidedSlots[i] == null)
@@ -37,13 +37,13 @@ public class TileEntityCloner extends TileClonerBase
     }
 
     @Override
-    public int[] getSlotsForFace(EnumFacing side)
+    public int[] getSlotsForFace(Direction side)
     {
         IBlockState state = getWorld().getBlockState(getPos());
         if (state.getBlock() instanceof BlockRotatable)
         {
-            EnumFacing dir = state.getValue(BlockRotatable.FACING);
-            if (dir == EnumFacing.EAST || dir == EnumFacing.WEST) dir = dir.getOpposite();
+            Direction dir = state.getValue(BlockRotatable.FACING);
+            if (dir == Direction.EAST || dir == Direction.WEST) dir = dir.getOpposite();
             int index = dir.getHorizontalIndex();
             for (int i = 0; i < index; i++)
                 side = side.rotateAround(Axis.Y);
@@ -54,7 +54,7 @@ public class TileEntityCloner extends TileClonerBase
     @Override
     public ITextComponent getDisplayName()
     {
-        return new TextComponentString("cloner");
+        return new StringTextComponent("cloner");
     }
 
     @Override
@@ -67,14 +67,14 @@ public class TileEntityCloner extends TileClonerBase
     @Override
     public SPacketUpdateTileEntity getUpdatePacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
-        this.writeToNBT(nbttagcompound);
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
+        this.writeToNBT(CompoundNBT);
         if (getCraftMatrix() != null && getCraftMatrix().eventHandler != null)
         {
             getCraftMatrix().eventHandler.onCraftMatrixChanged(getCraftMatrix());
         }
-        return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
+        return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class TileEntityCloner extends TileClonerBase
     {
         if (world.isRemote)
         {
-            NBTTagCompound nbt = pkt.getNbtCompound();
+            CompoundNBT nbt = pkt.getNbtCompound();
             readFromNBT(nbt);
             if (getCraftMatrix() != null && getCraftMatrix().eventHandler != null)
             {
@@ -121,9 +121,9 @@ public class TileEntityCloner extends TileClonerBase
     }
 
     @Override
-    public NBTTagCompound getUpdateTag()
+    public CompoundNBT getUpdateTag()
     {
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         return writeToNBT(nbt);
     }
 

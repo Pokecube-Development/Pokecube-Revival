@@ -6,21 +6,21 @@ import java.util.Random;
 import org.nfunk.jep.JEP;
 
 import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -96,7 +96,7 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     }
 
     @Override
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(PlayerEntity player)
     {
     }
 
@@ -131,7 +131,7 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     @Override
     public ITextComponent getDisplayName()
     {
-        return new TextComponentString("Ability Field Amplifier");
+        return new StringTextComponent("Ability Field Amplifier");
     }
 
     @Override
@@ -159,7 +159,7 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
         return 64;
     }
 
-    public int getMaxEnergyStored(EnumFacing facing)
+    public int getMaxEnergyStored(Direction facing)
     {
         return Config.instance.afaMaxEnergy;
     }
@@ -171,7 +171,7 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public AxisAlignedBB getRenderBoundingBox()
     {
         AxisAlignedBB bb = INFINITE_EXTENT_AABB;
@@ -194,16 +194,16 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     @Override
     public SPacketUpdateTileEntity getUpdatePacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
-        this.writeToNBT(nbttagcompound);
-        return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        if (world.isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
+        this.writeToNBT(CompoundNBT);
+        return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
     }
 
     @Override
-    public NBTTagCompound getUpdateTag()
+    public CompoundNBT getUpdateTag()
     {
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         return writeToNBT(nbt);
     }
 
@@ -229,7 +229,7 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player)
+    public boolean isUsableByPlayer(PlayerEntity player)
     {
         return true;
     }
@@ -248,27 +248,27 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     {
         if (world.isRemote)
         {
-            NBTTagCompound nbt = pkt.getNbtCompound();
+            CompoundNBT nbt = pkt.getNbtCompound();
             readFromNBT(nbt);
         }
     }
 
     @Override
-    public void openInventory(EntityPlayer player)
+    public void openInventory(PlayerEntity player)
     {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
+    public void readFromNBT(CompoundNBT nbt)
     {
         super.readFromNBT(nbt);
-        NBTBase temp = nbt.getTag("Inventory");
-        if (temp instanceof NBTTagList)
+        INBT temp = nbt.getTag("Inventory");
+        if (temp instanceof ListNBT)
         {
-            NBTTagList tagList = (NBTTagList) temp;
-            for (int i = 0; i < tagList.tagCount(); i++)
+            ListNBT tagList = (ListNBT) temp;
+            for (int i = 0; i < tagList.size(); i++)
             {
-                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+                CompoundNBT tag = tagList.getCompound(i);
                 byte slot = tag.getByte("Slot");
 
                 if (slot >= 0 && slot < inventory.size())
@@ -291,7 +291,7 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
         shiny = Tools.isStack(inventory.get(0), "shiny_charm");
     }
 
-    public int receiveEnergy(EnumFacing facing, int maxReceive, boolean simulate)
+    public int receiveEnergy(Direction facing, int maxReceive, boolean simulate)
     {
         int receive = Math.min(maxReceive, getMaxEnergyStored(facing) - energy);
         if (!simulate && receive > 0)
@@ -458,33 +458,33 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+    public CompoundNBT writeToNBT(CompoundNBT nbt)
     {
         super.writeToNBT(nbt);
-        NBTTagList itemList = new NBTTagList();
+        ListNBT itemList = new ListNBT();
         for (int i = 0; i < inventory.size(); i++)
         {
             ItemStack stack;
             if (CompatWrapper.isValid(stack = inventory.get(i)))
             {
-                NBTTagCompound tag = new NBTTagCompound();
+                CompoundNBT tag = new CompoundNBT();
                 tag.setByte("Slot", (byte) i);
                 stack.writeToNBT(tag);
                 itemList.appendTag(tag);
             }
         }
-        nbt.setIntArray("shift", shift);
+        nbt.putIntArray("shift", shift);
         nbt.setInteger("scale", scale);
         nbt.setTag("Inventory", itemList);
         nbt.setInteger("distance", distance);
-        nbt.setBoolean("noEnergy", noEnergy);
-        nbt.setFloat("angle", angle);
-        nbt.setBoolean("rotates", rotates);
+        nbt.putBoolean("noEnergy", noEnergy);
+        nbt.putFloat("angle", angle);
+        nbt.putBoolean("rotates", rotates);
         nbt.setInteger("transparency", transparency);
         nbt.setInteger("energy", energy);
-        nbt.setBoolean("frozen", frozen);
-        nbt.setFloat("animTime", animationTime);
-        nbt.setString("animation", animation);
+        nbt.putBoolean("frozen", frozen);
+        nbt.putFloat("animTime", animationTime);
+        nbt.putString("animation", animation);
         return nbt;
     }
 

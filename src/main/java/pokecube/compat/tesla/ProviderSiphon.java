@@ -1,7 +1,7 @@
 package pokecube.compat.tesla;
 
 import net.darkhax.tesla.api.ITeslaProducer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pokecube.adventures.blocks.siphon.TileEntitySiphon;
@@ -16,13 +16,13 @@ public class ProviderSiphon implements ITeslaProducer, ICapabilityProvider
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, Direction facing)
     {
         return capability == TeslaHandler.TESLA_PRODUCER;
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, Direction facing)
     {
         return (capability == TeslaHandler.TESLA_PRODUCER) ? TeslaHandler.TESLA_PRODUCER.cast(this) : null;
     }

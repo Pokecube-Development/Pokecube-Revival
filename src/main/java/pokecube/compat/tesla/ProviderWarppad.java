@@ -1,7 +1,7 @@
 package pokecube.compat.tesla;
 
 import net.darkhax.tesla.api.ITeslaConsumer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pokecube.adventures.blocks.warppad.TileEntityWarpPad;
@@ -22,13 +22,13 @@ public class ProviderWarppad implements ITeslaConsumer, ICapabilityProvider
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, Direction facing)
     {
         return capability == TeslaHandler.TESLA_CONSUMER;
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, Direction facing)
     {
         return (capability == TeslaHandler.TESLA_CONSUMER) ? TeslaHandler.TESLA_CONSUMER.cast(this) : null;
     }

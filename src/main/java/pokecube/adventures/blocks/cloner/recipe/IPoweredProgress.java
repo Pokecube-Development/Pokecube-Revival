@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.recipe;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import pokecube.adventures.blocks.cloner.crafting.CraftMatrix;
 import pokecube.adventures.blocks.cloner.crafting.PoweredProcess;
 import thut.core.common.blocks.DefaultInventory;
@@ -15,7 +15,7 @@ public interface IPoweredProgress extends DefaultInventory
 
     void setCraftMatrix(CraftMatrix matrix);
 
-    EntityPlayer getUser();
+    PlayerEntity getUser();
 
     PoweredProcess getProcess();
 

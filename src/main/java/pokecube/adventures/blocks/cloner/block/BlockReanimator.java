@@ -9,11 +9,11 @@ import javax.vecmath.Vector3f;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
@@ -37,8 +37,8 @@ public class BlockReanimator extends BlockBase
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
-            EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn,
+            Hand hand, Direction side, float hitX, float hitY, float hitZ)
     {
         playerIn.openGui(PokecubeAdv.instance, PokecubeAdv.GUICLONER_ID, worldIn, pos.getX(), pos.getY(), pos.getZ());
         return true;
@@ -180,9 +180,9 @@ public class BlockReanimator extends BlockBase
                 entity.move(MoverType.SELF, temp1.x, temp1.y, temp1.z);
             }
             // Extra stuff to do with players.
-            if (entity instanceof EntityPlayer)
+            if (entity instanceof PlayerEntity)
             {
-                EntityPlayer player = (EntityPlayer) entity;
+                PlayerEntity player = (PlayerEntity) entity;
                 if (Math.abs(player.motionY) < 0.1 && !player.capabilities.isFlying)
                 {
                     entity.onGround = true;
@@ -192,8 +192,8 @@ public class BlockReanimator extends BlockBase
                 // flying.
                 if (!player.capabilities.isCreativeMode && !player.getEntityWorld().isRemote)
                 {
-                    EntityPlayerMP entityplayer = (EntityPlayerMP) player;
-                    if (collidedY) entityplayer.connection.floatingTickCount = 0;
+                    ServerPlayerEntity PlayerEntity = (ServerPlayerEntity) player;
+                    if (collidedY) PlayerEntity.connection.floatingTickCount = 0;
                 }
                 else if (player.getEntityWorld().isRemote)
                 {

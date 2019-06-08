@@ -1,15 +1,15 @@
 package pokecube.adventures.entity.trainers;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.EntityAIOpenDoor;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityAIWatchClosest2;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Hand;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards.Reward;
 import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
@@ -42,8 +42,8 @@ public class EntityLeader extends EntityTrainer
         this.setSize(0.6F, 1.8F);
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(4, new EntityAIOpenDoor(this, true));
-        this.tasks.addTask(9, new EntityAIWatchClosest2(this, EntityPlayer.class, 3.0F, 1.0F));
-        this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
+        this.tasks.addTask(9, new EntityAIWatchClosest2(this, PlayerEntity.class, 3.0F, 1.0F));
+        this.tasks.addTask(10, new EntityAIWatchClosest(this, MobEntity.class, 8.0F));
         if (location != null)
         {
             location.moveEntity(this);
@@ -59,9 +59,9 @@ public class EntityLeader extends EntityTrainer
     }
 
     @Override
-    public boolean processInteract(EntityPlayer player, EnumHand hand, ItemStack stack)
+    public boolean processInteract(PlayerEntity player, Hand hand, ItemStack stack)
     {
-        if (!player.capabilities.isCreativeMode || hand == EnumHand.OFF_HAND) return false;
+        if (!player.capabilities.isCreativeMode || hand == Hand.OFF_HAND) return false;
 
         if (ItemBadge.isBadge(player.getHeldItem(hand)))
         {
@@ -69,21 +69,21 @@ public class EntityLeader extends EntityTrainer
                 rewardsCap.getRewards().set(0, new Reward(player.getHeldItem(hand).copy()));
             else rewardsCap.getRewards().add(new Reward(player.getHeldItem(hand).copy()));
             if (!getEntityWorld().isRemote) player
-                    .sendMessage(new TextComponentString("Badge set to " + player.getHeldItem(hand).getDisplayName()));
-            this.setHeldItem(EnumHand.OFF_HAND, rewardsCap.getRewards().get(0).stack);
+                    .sendMessage(new StringTextComponent("Badge set to " + player.getHeldItem(hand).getDisplayName()));
+            this.setHeldItem(Hand.OFF_HAND, rewardsCap.getRewards().get(0).stack);
         }
         return super.processInteract(player, hand, stack);
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound nbt)
+    public void writeEntityToNBT(CompoundNBT nbt)
     {
         super.writeEntityToNBT(nbt);
-        nbt.setBoolean("randomBadge", randomBadge);
+        nbt.putBoolean("randomBadge", randomBadge);
     }
 
     @Override
-    public void readEntityFromNBT(NBTTagCompound nbt)
+    public void readEntityFromNBT(CompoundNBT nbt)
     {
         super.readEntityFromNBT(nbt);
         randomBadge = nbt.getBoolean("randomBadge");

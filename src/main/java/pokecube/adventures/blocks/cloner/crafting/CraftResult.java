@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.crafting;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.item.ItemStack;
@@ -23,7 +23,7 @@ public class CraftResult extends InventoryCraftResult
     }
 
     @Override
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(PlayerEntity player)
     {
     }
 
@@ -81,7 +81,7 @@ public class CraftResult extends InventoryCraftResult
     /** Do not make give this method the name canInteractWith because it clashes
      * with Container */
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player)
+    public boolean isUsableByPlayer(PlayerEntity player)
     {
         return true;
     }
@@ -94,7 +94,7 @@ public class CraftResult extends InventoryCraftResult
     }
 
     @Override
-    public void openInventory(EntityPlayer player)
+    public void openInventory(PlayerEntity player)
     {
     }
 

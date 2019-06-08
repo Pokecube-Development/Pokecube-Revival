@@ -1,7 +1,7 @@
 package pokecube.adventures.blocks.cloner.tileentity;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.blocks.cloner.crafting.CraftMatrix;
 import pokecube.adventures.blocks.cloner.recipe.IPoweredRecipe;
@@ -30,7 +30,7 @@ public class TileEntityGeneExtractor extends TileClonerBase
     }
 
     @Override
-    public int[] getSlotsForFace(EnumFacing side)
+    public int[] getSlotsForFace(Direction side)
     {
         return sidedSlots[side.ordinal()];
     }

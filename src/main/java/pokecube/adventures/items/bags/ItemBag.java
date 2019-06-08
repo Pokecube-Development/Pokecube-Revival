@@ -6,12 +6,12 @@ import javax.annotation.Nullable;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -28,13 +28,13 @@ public class ItemBag extends Item
 
     /** allows items to add custom lines of information to the mouseover
      * description */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void addInformation(ItemStack stack, @Nullable World playerIn, List<String> list, ITooltipFlag advanced)
     {
-        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("dyeColour"))
+        if (stack.hasTag() && stack.getTag().hasKey("dyeColour"))
         {
-            int damage = stack.getTagCompound().getInteger("dyeColour");
+            int damage = stack.getTag().getInteger("dyeColour");
             EnumDyeColor colour = EnumDyeColor.byDyeDamage(damage);
             String s = I18n.format(colour.getUnlocalizedName());
             list.add(s);
@@ -50,7 +50,7 @@ public class ItemBag extends Item
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
     {
         if (!world.isRemote) PacketBag.OpenBag(player);
         return super.onItemRightClick(world, player, hand);

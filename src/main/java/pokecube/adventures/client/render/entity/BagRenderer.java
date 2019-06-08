@@ -9,7 +9,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
@@ -19,7 +19,7 @@ import pokecube.adventures.items.bags.ItemBag;
 import thut.core.client.render.model.IExtendedModelPart;
 import thut.core.client.render.x3d.X3dModel;
 
-public class BagRenderer implements LayerRenderer<EntityLivingBase>
+public class BagRenderer implements LayerRenderer<LivingEntity>
 {
     public static class BagChecker
     {
@@ -30,13 +30,13 @@ public class BagRenderer implements LayerRenderer<EntityLivingBase>
             this.defaults = defaults;
         }
 
-        public ItemStack getBag(EntityLivingBase player)
+        public ItemStack getBag(LivingEntity player)
         {
             ItemStack armour = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
             if (armour != null)
             {
                 if (armour.getItem() instanceof ItemBag) return armour;
-                if (armour.hasTagCompound() && armour.getTagCompound().getBoolean("isapokebag")) return armour;
+                if (armour.hasTag() && armour.getTag().getBoolean("isapokebag")) return armour;
             }
             return null;
         }
@@ -44,24 +44,24 @@ public class BagRenderer implements LayerRenderer<EntityLivingBase>
         public EnumDyeColor getBagColour(ItemStack bag)
         {
             EnumDyeColor ret = EnumDyeColor.YELLOW;
-            if (bag.hasTagCompound() && bag.getTagCompound().hasKey("dyeColour"))
+            if (bag.hasTag() && bag.getTag().hasKey("dyeColour"))
             {
-                int damage = bag.getTagCompound().getInteger("dyeColour");
+                int damage = bag.getTag().getInteger("dyeColour");
                 ret = EnumDyeColor.byDyeDamage(damage);
             }
             return ret;
         }
 
-        protected boolean hasBag(EntityLivingBase player)
+        protected boolean hasBag(LivingEntity player)
         {
             ItemStack armour = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
             if (armour != null) return armour.getItem() instanceof ItemBag
-                    || (armour.hasTagCompound() && armour.getTagCompound().getBoolean("isapokebag"));
+                    || (armour.hasTag() && armour.getTag().getBoolean("isapokebag"));
             
             return false;
         }
 
-        public boolean isWearingBag(EntityLivingBase player)
+        public boolean isWearingBag(LivingEntity player)
         {
             boolean ret;
             if (!(ret = hasBag(player)) && defaults != null) return defaults.isWearingBag(player);
@@ -99,7 +99,7 @@ public class BagRenderer implements LayerRenderer<EntityLivingBase>
     }
 
     @Override
-    public void doRenderLayer(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float partialTicks,
+    public void doRenderLayer(LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks,
             float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         boolean bag = getChecker().isWearingBag(entity);

@@ -11,7 +11,7 @@ import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBT;
 import pokecube.adventures.entity.helper.Action;
 import pokecube.adventures.entity.helper.MessageState;
 import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages;
@@ -112,7 +112,7 @@ public class EditMessagesPage extends ListPage
             parent.parent.messages.setAction(state, new Action(action.getText()));
             parent.onPageClosed();
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            NBTBase tag = CapabilityNPCMessages.storage.writeNBT(CapabilityNPCMessages.MESSAGES_CAP,
+            INBT tag = CapabilityNPCMessages.storage.writeNBT(CapabilityNPCMessages.MESSAGES_CAP,
                     parent.parent.messages, null);
             packet.data.setTag("T", tag);
             packet.data.setByte("V", (byte) 2);

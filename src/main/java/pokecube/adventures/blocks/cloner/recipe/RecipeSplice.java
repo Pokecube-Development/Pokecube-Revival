@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
@@ -88,7 +88,7 @@ public class RecipeSplice implements IPoweredRecipe
             if (entry == null) entry = ClonerHelper.getFromGenes(egg);
             if (entry == null) return false;
             egg = egg.copy();
-            if (egg.getTagCompound() == null) egg.setTagCompound(new NBTTagCompound());
+            if (egg.getTag() == null) egg.setTag(new CompoundNBT());
             ClonerHelper.spliceGenes(ClonerHelper.getGenes(dna), egg, new ItemBasedSelector(selector));
             egg.setCount(1);
             output = egg;

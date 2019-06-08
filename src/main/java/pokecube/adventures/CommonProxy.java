@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -27,24 +27,24 @@ public class CommonProxy implements IGuiHandler
     public static Map<Integer, IGuiHandler> custom_client_handlers = Maps.newHashMap();
 
     @Override
-    public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
+    public Object getClientGuiElement(int guiID, PlayerEntity player, World world, int x, int y, int z)
     {
         return null;
     }
 
-    public EntityPlayer getPlayer()
+    public PlayerEntity getPlayer()
     {
         return null;
     }
 
-    public EntityPlayer getPlayer(String playerName)
+    public PlayerEntity getPlayer(String playerName)
     {
         if (playerName != null) { return getWorld().getPlayerEntityByName(playerName); }
         return null;
     }
 
     @Override
-    public Object getServerGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
+    public Object getServerGuiElement(int guiID, PlayerEntity player, World world, int x, int y, int z)
     {
         if (guiID == PokecubeAdv.GUIBAG_ID)
         {

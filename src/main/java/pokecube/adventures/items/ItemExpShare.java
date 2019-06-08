@@ -22,7 +22,7 @@ public class ItemExpShare extends Item
 
     /** allows items to add custom lines of information to the mouseover
      * description */
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void addInformation(ItemStack stack, @Nullable World playerIn, List<String> list, ITooltipFlag advanced)
     {

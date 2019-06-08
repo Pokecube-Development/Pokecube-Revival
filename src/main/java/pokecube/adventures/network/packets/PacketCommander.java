@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import javax.xml.ws.handler.MessageContext;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
@@ -23,7 +23,7 @@ import thut.api.network.PacketHandler;
 
 public class PacketCommander implements IMessage, IMessageHandler<PacketCommander, IMessage>
 {
-    public NBTTagCompound data = new NBTTagCompound();
+    public CompoundNBT data = new CompoundNBT();
 
     public PacketCommander()
     {

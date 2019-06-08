@@ -23,7 +23,7 @@ import jeresources.compatibility.CompatBase;
 import jeresources.util.LootTableHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -78,7 +78,7 @@ public class JERCompat
                                                                   }
                                                               };
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Optional.Method(modid = "jeresources")
     @CompatClass(phase = Phase.POSTPOST)
     public static void JERInit()
@@ -191,7 +191,7 @@ public class JERCompat
             {
                 pokemob.setShiny(false);
                 pokemob.setSize(1);
-                JERAPI.getMobRegistry().register((EntityLivingBase) poke, getLightLevel(e), getSpawns(e), drops);
+                JERAPI.getMobRegistry().register((LivingEntity) poke, getLightLevel(e), getSpawns(e), drops);
                 JERAPI.getMobRegistry().registerRenderHook(PokecubeMod.core.getEntityClassForEntry(e), POKEMOB);
             }
         }

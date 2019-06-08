@@ -1,7 +1,7 @@
 package pokecube.adventures.blocks.cloner.tileentity;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.blocks.cloner.crafting.CraftMatrix;
 import pokecube.adventures.blocks.cloner.recipe.IPoweredRecipe;
@@ -18,8 +18,8 @@ public class TileEntitySplicer extends TileClonerBase
         /** 1 slot for egg, 1 slot for gene container,1 slot for output, 1 slot
          * for stabiliser. */
         super(4, 3);
-        sidedSlots[EnumFacing.UP.ordinal()] = new int[] { 0 };
-        for (EnumFacing side : EnumFacing.HORIZONTALS)
+        sidedSlots[Direction.UP.ordinal()] = new int[] { 0 };
+        for (Direction side : Direction.HORIZONTALS)
         {
             sidedSlots[side.ordinal()] = new int[] { 1, 2 };
         }
@@ -33,7 +33,7 @@ public class TileEntitySplicer extends TileClonerBase
     }
 
     @Override
-    public int[] getSlotsForFace(EnumFacing side)
+    public int[] getSlotsForFace(Direction side)
     {
         return sidedSlots[side.ordinal()];
     }

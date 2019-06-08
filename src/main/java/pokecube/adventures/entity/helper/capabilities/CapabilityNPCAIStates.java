@@ -1,9 +1,9 @@
 package pokecube.adventures.entity.helper.capabilities;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -55,22 +55,22 @@ public class CapabilityNPCAIStates
     {
 
         @Override
-        public NBTBase writeNBT(Capability<IHasNPCAIStates> capability, IHasNPCAIStates instance, EnumFacing side)
+        public INBT writeNBT(Capability<IHasNPCAIStates> capability, IHasNPCAIStates instance, Direction side)
         {
-            NBTTagCompound tag = new NBTTagCompound();
+            CompoundNBT tag = new CompoundNBT();
             tag.setInteger("AI", instance.getTotalState());
-            tag.setFloat("D", instance.getDirection());
+            tag.putFloat("D", instance.getDirection());
             return tag;
         }
 
         @Override
-        public void readNBT(Capability<IHasNPCAIStates> capability, IHasNPCAIStates instance, EnumFacing side,
-                NBTBase nbt)
+        public void readNBT(Capability<IHasNPCAIStates> capability, IHasNPCAIStates instance, Direction side,
+                INBT nbt)
         {
             if (nbt instanceof NBTTagInt) instance.setTotalState(((NBTTagInt) nbt).getInt());
-            else if (nbt instanceof NBTTagCompound)
+            else if (nbt instanceof CompoundNBT)
             {
-                NBTTagCompound tag = (NBTTagCompound) nbt;
+                CompoundNBT tag = (CompoundNBT) nbt;
                 instance.setTotalState(tag.getInteger("AI"));
                 instance.setDirection(tag.getFloat("D"));
             }
@@ -78,7 +78,7 @@ public class CapabilityNPCAIStates
 
     }
 
-    public static class DefaultAIStates implements IHasNPCAIStates, ICapabilitySerializable<NBTBase>
+    public static class DefaultAIStates implements IHasNPCAIStates, ICapabilitySerializable<INBT>
     {
         int   state = 0;
         float direction;
@@ -119,25 +119,25 @@ public class CapabilityNPCAIStates
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == AISTATES_CAP;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return hasCapability(capability, facing) ? AISTATES_CAP.cast(this) : null;
         }
 
         @Override
-        public NBTBase serializeNBT()
+        public INBT serializeNBT()
         {
             return storage.writeNBT(AISTATES_CAP, this, null);
         }
 
         @Override
-        public void deserializeNBT(NBTBase nbt)
+        public void deserializeNBT(INBT nbt)
         {
             storage.readNBT(AISTATES_CAP, this, null, nbt);
         }

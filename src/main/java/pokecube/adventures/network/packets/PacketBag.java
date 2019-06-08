@@ -5,9 +5,9 @@ import java.io.IOException;
 import javax.xml.ws.handler.MessageContext;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -26,9 +26,9 @@ public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
     public static final byte OPEN    = 3;
 
     byte                     message;
-    public NBTTagCompound    data    = new NBTTagCompound();
+    public CompoundNBT    data    = new CompoundNBT();
 
-    public static void OpenBag(EntityPlayer playerIn)
+    public static void OpenBag(PlayerEntity playerIn)
     {
         InventoryBag inv = InventoryBag.getBag(playerIn);
         PacketBag packet = new PacketBag(PacketBag.ONOPEN);
@@ -36,14 +36,14 @@ public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
         packet.data.setInteger("S", InventoryBag.PAGECOUNT);
         for (int i = 0; i < inv.boxes.length; i++)
         {
-            packet.data.setString("N" + i, inv.boxes[i]);
+            packet.data.putString("N" + i, inv.boxes[i]);
         }
-        PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) playerIn);
+        PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) playerIn);
         for (int i = 0; i < inv.boxes.length; i++)
         {
             packet = new PacketBag(PacketBag.OPEN);
             packet.data = inv.serializeBox(i);
-            PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) playerIn);
+            PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) playerIn);
         }
         playerIn.openGui(PokecubeAdv.instance, PokecubeAdv.GUIBAG_ID, playerIn.getEntityWorld(),
                 InventoryBag.getBag(playerIn).getPage() + 1, 0, 0);
@@ -97,8 +97,8 @@ public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
 
     void processMessage(MessageContext ctx, PacketBag message)
     {
-        EntityPlayer player;
-        if (ctx.side == Side.CLIENT)
+        PlayerEntity player;
+        if (ctx.side == Dist.CLIENT)
         {
             player = PokecubeCore.getPlayer(null);
         }
@@ -123,12 +123,12 @@ public class PacketBag implements IMessage, IMessageHandler<PacketBag, IMessage>
                 container.changeName(name);
             }
         }
-        if (message.message == OPEN && ctx.side == Side.CLIENT)
+        if (message.message == OPEN && ctx.side == Dist.CLIENT)
         {
             InventoryBag inv = InventoryBag.getBag(player);
             inv.deserializeBox(message.data);
         }
-        if (message.message == ONOPEN && ctx.side == Side.CLIENT)
+        if (message.message == ONOPEN && ctx.side == Dist.CLIENT)
         {
             InventoryBag.blank = new InventoryBag(InventoryBag.blankID);
             InventoryBag bag = InventoryBag.getBag(player);

@@ -11,9 +11,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector;
@@ -62,27 +62,27 @@ public class ClonerHelper
 
     public static IMobGenetics getGenes(ItemStack stack)
     {
-        if (!CompatWrapper.isValid(stack) || !stack.hasTagCompound()) return null;
-        NBTTagCompound nbt = stack.getTagCompound();
+        if (!CompatWrapper.isValid(stack) || !stack.hasTag()) return null;
+        CompoundNBT nbt = stack.getTag();
         if (!nbt.hasKey(GeneticsManager.GENES))
         {
             if (PokecubeManager.isFilled(stack))
             {
-                NBTTagCompound poketag = nbt.getCompoundTag(TagNames.POKEMOB);
-                if (!poketag.getCompoundTag("ForgeCaps").hasKey(GeneticsManager.POKECUBEGENETICS.toString()))
+                CompoundNBT poketag = nbt.getCompound(TagNames.POKEMOB);
+                if (!poketag.getCompound("ForgeCaps").hasKey(GeneticsManager.POKECUBEGENETICS.toString()))
                     return null;
-                if (!poketag.getCompoundTag("ForgeCaps").getCompoundTag(GeneticsManager.POKECUBEGENETICS.toString())
+                if (!poketag.getCompound("ForgeCaps").getCompound(GeneticsManager.POKECUBEGENETICS.toString())
                         .hasKey("V"))
                     return null;
-                NBTBase genes = poketag.getCompoundTag("ForgeCaps")
-                        .getCompoundTag(GeneticsManager.POKECUBEGENETICS.toString()).getTag("V");
+                INBT genes = poketag.getCompound("ForgeCaps")
+                        .getCompound(GeneticsManager.POKECUBEGENETICS.toString()).getTag("V");
                 IMobGenetics eggs = IMobGenetics.GENETICS_CAP.getDefaultInstance();
                 IMobGenetics.GENETICS_CAP.getStorage().readNBT(IMobGenetics.GENETICS_CAP, eggs, null, genes);
                 return eggs;
             }
             return null;
         }
-        NBTBase genes = nbt.getTag(GeneticsManager.GENES);
+        INBT genes = nbt.getTag(GeneticsManager.GENES);
         IMobGenetics eggs = IMobGenetics.GENETICS_CAP.getDefaultInstance();
         IMobGenetics.GENETICS_CAP.getStorage().readNBT(IMobGenetics.GENETICS_CAP, eggs, null, genes);
         return eggs;
@@ -90,13 +90,13 @@ public class ClonerHelper
 
     public static void setGenes(ItemStack stack, IMobGenetics genes)
     {
-        if (!CompatWrapper.isValid(stack) || !stack.hasTagCompound()) return;
-        NBTTagCompound nbt = stack.getTagCompound();
-        NBTBase geneTag = IMobGenetics.GENETICS_CAP.getStorage().writeNBT(IMobGenetics.GENETICS_CAP, genes, null);
+        if (!CompatWrapper.isValid(stack) || !stack.hasTag()) return;
+        CompoundNBT nbt = stack.getTag();
+        INBT geneTag = IMobGenetics.GENETICS_CAP.getStorage().writeNBT(IMobGenetics.GENETICS_CAP, genes, null);
         if (PokecubeManager.isFilled(stack))
         {
-            NBTTagCompound poketag = nbt.getCompoundTag(TagNames.POKEMOB);
-            poketag.getCompoundTag("ForgeCaps").getCompoundTag(GeneticsManager.POKECUBEGENETICS.toString()).setTag("V",
+            CompoundNBT poketag = nbt.getCompound(TagNames.POKEMOB);
+            poketag.getCompound("ForgeCaps").getCompound(GeneticsManager.POKECUBEGENETICS.toString()).setTag("V",
                     geneTag);
         }
         else
@@ -120,26 +120,26 @@ public class ClonerHelper
 
     public static boolean isDNAContainer(ItemStack stack)
     {
-        if (!CompatWrapper.isValid(stack) || !stack.hasTagCompound()) return false;
-        String potion = stack.getTagCompound().getString("Potion");
+        if (!CompatWrapper.isValid(stack) || !stack.hasTag()) return false;
+        String potion = stack.getTag().getString("Potion");
         return potion.equals("minecraft:water") || potion.equals("minecraft:mundane");
     }
 
     public static SelectorValue getSelectorValue(ItemStack selector)
     {
         SelectorValue def = RecipeSelector.getSelectorValue(selector);
-        if (!CompatWrapper.isValid(selector) || !selector.hasTagCompound()) return def;
-        NBTTagCompound selectorTag = selector.getTagCompound().getCompoundTag(SELECTORTAG);
+        if (!CompatWrapper.isValid(selector) || !selector.hasTag()) return def;
+        CompoundNBT selectorTag = selector.getTag().getCompound(SELECTORTAG);
         return SelectorValue.load(selectorTag);
     }
 
     public static int getIndex(ItemStack stack)
     {
-        if (!CompatWrapper.isValid(stack) || !stack.hasTagCompound()) return -1;
+        if (!CompatWrapper.isValid(stack) || !stack.hasTag()) return -1;
         if (!stack.getDisplayName().startsWith("Selector")) return -1;
-        if (stack.getTagCompound().hasKey("pages") && stack.getTagCompound().getTag("pages") instanceof NBTTagList)
+        if (stack.getTag().hasKey("pages") && stack.getTag().getTag("pages") instanceof ListNBT)
         {
-            NBTTagList pages = (NBTTagList) stack.getTagCompound().getTag("pages");
+            ListNBT pages = (ListNBT) stack.getTag().getTag("pages");
             try
             {
                 ITextComponent comp = ITextComponent.Serializer.jsonToComponent(pages.getStringTagAt(0));
@@ -152,7 +152,7 @@ public class ClonerHelper
             }
             catch (Exception e)
             {
-                PokecubeMod.log(Level.WARNING, "Error checking index for " + stack + " " + stack.getTagCompound(), e);
+                PokecubeMod.log(Level.WARNING, "Error checking index for " + stack + " " + stack.getTag(), e);
             }
         }
         return -1;
@@ -161,11 +161,11 @@ public class ClonerHelper
     public static Set<Class<? extends Gene>> getGeneSelectors(ItemStack stack)
     {
         Set<Class<? extends Gene>> ret = Sets.newHashSet();
-        if (!CompatWrapper.isValid(stack) || !stack.hasTagCompound()) return ret;
+        if (!CompatWrapper.isValid(stack) || !stack.hasTag()) return ret;
         if (!stack.getDisplayName().startsWith("Selector")) return ret;
-        if (stack.getTagCompound().hasKey("pages") && stack.getTagCompound().getTag("pages") instanceof NBTTagList)
+        if (stack.getTag().hasKey("pages") && stack.getTag().getTag("pages") instanceof ListNBT)
         {
-            NBTTagList pages = (NBTTagList) stack.getTagCompound().getTag("pages");
+            ListNBT pages = (ListNBT) stack.getTag().getTag("pages");
             try
             {
                 ITextComponent comp = ITextComponent.Serializer.jsonToComponent(pages.getStringTagAt(0));
@@ -185,7 +185,7 @@ public class ClonerHelper
             }
             catch (Exception e)
             {
-                PokecubeMod.log(Level.WARNING, "Error locating selectors for " + stack + " " + stack.getTagCompound(),
+                PokecubeMod.log(Level.WARNING, "Error locating selectors for " + stack + " " + stack.getTag(),
                         e);
             }
         }

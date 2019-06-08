@@ -6,7 +6,7 @@ import java.util.UUID;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.network.ManagedEnvironment;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -28,7 +28,7 @@ public class CommanderDriver extends DriverBase
     }
 
     @Override
-    public ManagedEnvironment createEnvironment(World world, BlockPos pos, EnumFacing side)
+    public ManagedEnvironment createEnvironment(World world, BlockPos pos, Direction side)
     {
         TileEntityCommander pc = (TileEntityCommander) world.getTileEntity(pos);
         return new Environment(pc, getComponentName());

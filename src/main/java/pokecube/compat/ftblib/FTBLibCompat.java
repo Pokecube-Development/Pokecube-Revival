@@ -12,7 +12,7 @@ import com.feed_the_beast.ftbl.api.IUniverse;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import pokecube.core.handlers.TeamManager;
 import pokecube.core.handlers.TeamManager.ITeamProvider;
 import pokecube.core.interfaces.PokecubeMod;
@@ -30,7 +30,7 @@ public class FTBLibCompat implements IFTBLibPlugin
             this.defaults = defaults;
         }
 
-        private String getPlayerTeam(EntityPlayer player)
+        private String getPlayerTeam(PlayerEntity player)
         {
             return getPlayerTeam(player.getUniqueID());
         }
@@ -49,7 +49,7 @@ public class FTBLibCompat implements IFTBLibPlugin
         @Override
         public String getTeam(Entity entityIn)
         {
-            if (entityIn instanceof EntityPlayer) return getPlayerTeam((EntityPlayer) entityIn);
+            if (entityIn instanceof PlayerEntity) return getPlayerTeam((PlayerEntity) entityIn);
             if (entityIn instanceof IEntityOwnable)
             {
                 IEntityOwnable pokemob = (IEntityOwnable) entityIn;
@@ -71,11 +71,11 @@ public class FTBLibCompat implements IFTBLibPlugin
             if (universe == null) return false;
             IForgeTeam aTeam = universe.getTeam(team);
             if (aTeam == null) return false;
-            EntityPlayer player = null;
-            if (target instanceof EntityPlayer) player = (EntityPlayer) target;
-            else if (target instanceof IEntityOwnable && ((IEntityOwnable) target).getOwner() instanceof EntityPlayer)
+            PlayerEntity player = null;
+            if (target instanceof PlayerEntity) player = (PlayerEntity) target;
+            else if (target instanceof IEntityOwnable && ((IEntityOwnable) target).getOwner() instanceof PlayerEntity)
             {
-                player = (EntityPlayer) ((IEntityOwnable) target).getOwner();
+                player = (PlayerEntity) ((IEntityOwnable) target).getOwner();
             }
             if (player != null)
             {

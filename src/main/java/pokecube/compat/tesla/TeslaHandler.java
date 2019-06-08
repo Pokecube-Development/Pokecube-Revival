@@ -9,9 +9,9 @@ import net.darkhax.tesla.api.ITeslaConsumer;
 import net.darkhax.tesla.api.ITeslaHolder;
 import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.MinecraftForge;
@@ -120,7 +120,7 @@ public class TeslaHandler
         event.getTile().currentOutput = 0;
         long start = output;
         Vector3 v = Vector3.getNewVector().set(event.getTile());
-        for (EnumFacing side : EnumFacing.values())
+        for (Direction side : Direction.values())
         {
             TileEntity te = v.getTileEntity(event.getTile().getWorld(), side);
             ITeslaConsumer cap;
@@ -176,10 +176,10 @@ public class TeslaHandler
         if (tile.getWorld() == null || power == 0) return 0;
         Vector3 v = Vector3.getNewVector().set(tile);
         AxisAlignedBB box = v.getAABB().grow(10, 10, 10);
-        List<EntityLiving> l = tile.getWorld().getEntitiesWithinAABB(EntityLiving.class, box);
+        List<MobEntity> l = tile.getWorld().getEntitiesWithinAABB(MobEntity.class, box);
         long ret = 0;
         power = Math.min(power, PokecubeAdv.conf.maxOutput);
-        for (EntityLiving living : l)
+        for (MobEntity living : l)
         {
             if (living != null)
             {

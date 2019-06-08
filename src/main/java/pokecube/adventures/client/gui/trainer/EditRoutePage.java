@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import pokecube.adventures.network.packets.PacketTrainer;
 import pokecube.core.ai.properties.IGuardAICapability;
 import pokecube.core.client.gui.helper.RouteEditHelper;
@@ -48,10 +48,10 @@ public class EditRoutePage extends ListPage
         {
             this.height = parent.height;
             this.width = parent.width;
-            Function<NBTTagCompound, NBTTagCompound> function = new Function<NBTTagCompound, NBTTagCompound>()
+            Function<CompoundNBT, CompoundNBT> function = new Function<CompoundNBT, CompoundNBT>()
             {
                 @Override
-                public NBTTagCompound apply(NBTTagCompound t)
+                public CompoundNBT apply(CompoundNBT t)
                 {
                     PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
                     packet.data = t;

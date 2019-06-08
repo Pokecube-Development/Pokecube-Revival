@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Random;
 import java.util.logging.Level;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import pokecube.core.interfaces.PokecubeMod;
 import thut.api.entity.genetics.Alleles;
 import thut.api.entity.genetics.Gene;
@@ -14,7 +14,7 @@ public interface IGeneSelector
 {
     public static Gene copy(Gene geneIn) throws Exception
     {
-        NBTTagCompound tag = GeneRegistry.save(geneIn);
+        CompoundNBT tag = GeneRegistry.save(geneIn);
         return GeneRegistry.load(tag);
     }
 

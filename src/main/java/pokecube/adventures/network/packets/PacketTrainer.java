@@ -6,18 +6,18 @@ import javax.xml.ws.handler.MessageContext;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.merchant.IMerchant;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
@@ -78,27 +78,27 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
     }
 
     byte                  message;
-    public NBTTagCompound data = new NBTTagCompound();
+    public CompoundNBT data = new CompoundNBT();
 
-    public static void sendEditOpenPacket(Entity target, EntityPlayerMP editor)
+    public static void sendEditOpenPacket(Entity target, ServerPlayerEntity editor)
     {
         String node = target == editor || target == null ? editor.isSneaking() ? EDITSELF : SPAWNTRAINER
-                : target instanceof EntityPlayer ? EDITOTHER
+                : target instanceof PlayerEntity ? EDITOTHER
                         : CapabilityHasPokemobs.getHasPokemobs(target) != null ? EDITTRAINER : EDITMOB;
         boolean canEdit = !editor.getServer().isDedicatedServer() || PermissionAPI.hasPermission(editor, node);
 
         if (!canEdit)
         {
-            editor.sendMessage(new TextComponentString(TextFormatting.RED + "You are not allowed to do that."));
+            editor.sendMessage(new StringTextComponent(TextFormatting.RED + "You are not allowed to do that."));
             return;
         }
         PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-        packet.data.setBoolean("O", true);
+        packet.data.putBoolean("O", true);
         packet.data.setInteger("I", target == null ? -1 : target.getEntityId());
 
         if (target != null)
         {
-            NBTTagCompound tag = new NBTTagCompound();
+            CompoundNBT tag = new CompoundNBT();
             IHasNPCAIStates ai = CapabilityNPCAIStates.getNPCAIStates(target);
             IGuardAICapability guard = target.getCapability(EventsHandler.GUARDAI_CAP, null);
             IHasPokemobs pokemobs = CapabilityHasPokemobs.getHasPokemobs(target);
@@ -160,8 +160,8 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
 
     void processMessage(MessageContext ctx, PacketTrainer message)
     {
-        EntityPlayer player;
-        if (ctx.side == Side.CLIENT)
+        PlayerEntity player;
+        if (ctx.side == Dist.CLIENT)
         {
             player = PokecubeCore.getPlayer(null);
         }
@@ -179,7 +179,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
             {
                 if (mob != null && message.data.hasKey("C"))
                 {
-                    NBTTagCompound nbt = message.data.getCompoundTag("C");
+                    CompoundNBT nbt = message.data.getCompound("C");
                     IHasNPCAIStates ai = CapabilityNPCAIStates.getNPCAIStates(mob);
                     IGuardAICapability guard = mob.getCapability(EventsHandler.GUARDAI_CAP, null);
                     IHasPokemobs pokemobs = CapabilityHasPokemobs.getHasPokemobs(mob);
@@ -222,22 +222,22 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
                 return;
             }
 
-            NBTBase tag = message.data.getTag("T");
-            if (tag instanceof NBTTagCompound && ((NBTTagCompound) tag).hasKey("GU") && guard != null)
+            INBT tag = message.data.getTag("T");
+            if (tag instanceof CompoundNBT && ((CompoundNBT) tag).hasKey("GU") && guard != null)
             {
                 RouteEditHelper.applyServerPacket(tag, mob, guard);
                 return;
             }
-            if (tag instanceof NBTTagCompound && ((NBTTagCompound) tag).hasKey("TR") && mob instanceof IMerchant)
+            if (tag instanceof CompoundNBT && ((CompoundNBT) tag).hasKey("TR") && mob instanceof IMerchant)
             {
-                NBTTagCompound nbt = ((NBTTagCompound) tag);
+                CompoundNBT nbt = ((CompoundNBT) tag);
                 int index = nbt.getInteger("I");
-                NBTTagCompound tag2 = new NBTTagCompound();
+                CompoundNBT tag2 = new CompoundNBT();
                 mob.writeToNBT(tag2);
-                MerchantRecipeList list = new MerchantRecipeList(tag2.getCompoundTag("Offers"));
+                MerchantRecipeList list = new MerchantRecipeList(tag2.getCompound("Offers"));
                 if (nbt.hasKey("R"))
                 {
-                    MerchantRecipe recipe = new MerchantRecipe(nbt.getCompoundTag("R"));
+                    MerchantRecipe recipe = new MerchantRecipe(nbt.getCompound("R"));
                     if (index < list.size()) list.set(index, recipe);
                     else list.add(recipe);
                 }
@@ -269,7 +269,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
                 if (message.data.hasKey("X"))
                 {
                     cap.setGender(message.data.getByte("X"));
-                    mess = new TextComponentTranslation("traineredit.set.gender." + message.data.getByte("X"));
+                    mess = new TranslationTextComponent("traineredit.set.gender." + message.data.getByte("X"));
                     player.sendStatusMessage(mess, true);
                 }
                 if (message.data.hasKey("K"))
@@ -285,7 +285,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
                         }
                         mob.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, type.held.copy());
                         mob.setItemStackToSlot(EntityEquipmentSlot.CHEST, type.bag.copy());
-                        mess = new TextComponentTranslation("traineredit.set.type", type.name);
+                        mess = new TranslationTextComponent("traineredit.set.type", type.name);
                         cap.setType(type);
                     }
                 }
@@ -296,7 +296,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
                     {
                         ((EntityTrainer) mob).name = mob.getCustomNameTag().replaceFirst(cap.getType() + " ", "");
                     }
-                    mess = new TextComponentTranslation("traineredit.set.name", message.data.getString("N"));
+                    mess = new TranslationTextComponent("traineredit.set.name", message.data.getString("N"));
                 }
                 if (mob instanceof EntityTrainer)
                 {
@@ -342,19 +342,19 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         }
         if (message.message == MESSAGEUPDATEMOB)
         {
-            NBTBase tag = message.data.getTag("T");
+            INBT tag = message.data.getTag("T");
             int id = message.data.getInteger("I");
             Entity mob = player.getEntityWorld().getEntityByID(id);
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(mob);
             if (pokemob != null)
             {
-                IPokemob newPokemob = PokecubeManager.itemToPokemob(new ItemStack((NBTTagCompound) tag),
+                IPokemob newPokemob = PokecubeManager.itemToPokemob(new ItemStack((CompoundNBT) tag),
                         mob.getEntityWorld());
                 if (message.data.getBoolean("D"))
                 {
                     mob.setDead();
                 }
-                else mob.readFromNBT(newPokemob.getEntity().writeToNBT(new NBTTagCompound()));
+                else mob.readFromNBT(newPokemob.getEntity().writeToNBT(new CompoundNBT()));
                 pokemob.readPokemobData(newPokemob.writePokemobData());
                 pokemob.onGenesChanged();
                 PacketHandler.sendEntityUpdate(mob);
@@ -389,7 +389,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
                     Vector3 pos = Vector3.getNewVector().set(player).addTo(look.x, 1, look.z);
                     pos.moveEntity(trainer);
                     player.getEntityWorld().spawnEntity(trainer);
-                    sendEditOpenPacket(trainer, (EntityPlayerMP) player);
+                    sendEditOpenPacket(trainer, (ServerPlayerEntity) player);
                 }
             }
             return;
@@ -397,7 +397,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         if (message.message == MESSAGENOTIFYDEFEAT)
         {
             int id = message.data.getInteger("I");
-            EntityLivingBase mob = (EntityLivingBase) player.getEntityWorld().getEntityByID(id);
+            LivingEntity mob = (LivingEntity) player.getEntityWorld().getEntityByID(id);
             if (mob instanceof EntityTrainer) ((EntityTrainer) mob).visibleTime = message.data.getLong("L");
             return;
         }

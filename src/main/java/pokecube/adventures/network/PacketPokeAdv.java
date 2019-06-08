@@ -6,9 +6,9 @@ import javax.xml.ws.handler.MessageContext;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
@@ -38,7 +38,7 @@ public class PacketPokeAdv
 
         public static class MessageHandlerClient implements IMessageHandler<MessageClient, MessageServer>
         {
-            public void handleClientSide(EntityPlayer player, PacketBuffer buffer)
+            public void handleClientSide(PlayerEntity player, PacketBuffer buffer)
             {
                 byte channel = buffer.readByte();
                 byte[] message = new byte[buffer.array().length - 1];
@@ -50,9 +50,9 @@ public class PacketPokeAdv
                 {
                     try
                     {
-                        NBTTagCompound tag = buffer.readCompoundTag();
+                        CompoundNBT tag = buffer.readCompoundTag();
                         if (tag == null) return;
-                        NBTTagList list = (NBTTagList) tag.getTag("pc");
+                        ListNBT list = (ListNBT) tag.getTag("pc");
                         InventoryPC.loadFromNBT(list, true);
                     }
                     catch (Exception e)
@@ -78,7 +78,7 @@ public class PacketPokeAdv
                     ContainerAFA cont = (ContainerAFA) player.openContainer;
                     TileEntityAFA tile = cont.tile;
                     int energy = buffer.readInt();
-                    // System.out.println(tile.getEnergyStored(EnumFacing.DOWN)+"
+                    // System.out.println(tile.getEnergyStored(Direction.DOWN)+"
                     // "+energy);
                     tile.setField(0, energy);
                 }
@@ -101,7 +101,7 @@ public class PacketPokeAdv
         {
         }
 
-        public MessageClient(byte channel, NBTTagCompound nbt)
+        public MessageClient(byte channel, CompoundNBT nbt)
         {
             this.buffer = new PacketBuffer(Unpooled.buffer());
             buffer.writeByte(channel);
@@ -146,7 +146,7 @@ public class PacketPokeAdv
     {
         public static class MessageHandlerServer implements IMessageHandler<MessageServer, IMessage>
         {
-            public IMessage handleServerSide(EntityPlayer player, PacketBuffer buffer)
+            public IMessage handleServerSide(PlayerEntity player, PacketBuffer buffer)
             {
                 byte channel = buffer.readByte();
                 byte[] message = new byte[buffer.array().length - 1];
@@ -158,12 +158,12 @@ public class PacketPokeAdv
                 {
                     try
                     {
-                        NBTTagCompound tag = buffer.readCompoundTag();
+                        CompoundNBT tag = buffer.readCompoundTag();
                         String biome = tag.getString("biome");
                         if (player.getHeldItemMainhand() != null
                                 && player.getHeldItemMainhand().getItem() instanceof ItemSubbiomeSetter)
                         {
-                            player.getHeldItemMainhand().setTagCompound(tag);
+                            player.getHeldItemMainhand().setTag(tag);
                             BiomeType type = BiomeType.getBiome(biome);
                             player.getHeldItemMainhand().setStackDisplayName(type.readableName + " Setter");
                         }
@@ -179,7 +179,7 @@ public class PacketPokeAdv
             @Override
             public IMessage onMessage(MessageServer message, MessageContext ctx)
             {
-                EntityPlayer player = ctx.getServerHandler().player;
+                PlayerEntity player = ctx.getServerHandler().player;
 
                 return handleServerSide(player, message.buffer);
             }
@@ -194,7 +194,7 @@ public class PacketPokeAdv
         {
         }
 
-        public MessageServer(byte channel, NBTTagCompound nbt)
+        public MessageServer(byte channel, CompoundNBT nbt)
         {
             this.buffer = new PacketBuffer(Unpooled.buffer());
             buffer.writeByte(channel);
@@ -243,20 +243,20 @@ public class PacketPokeAdv
     public static void init()
     {
         PokecubeMod.packetPipeline.registerMessage(PacketBag.class, PacketBag.class, PokecubeCore.getMessageID(),
-                Side.CLIENT);
+                Dist.CLIENT);
         PokecubeMod.packetPipeline.registerMessage(PacketBag.class, PacketBag.class, PokecubeCore.getMessageID(),
-                Side.SERVER);
+                Dist.DEDICATED_SERVER);
         PokecubeMod.packetPipeline.registerMessage(PacketTrainer.class, PacketTrainer.class,
-                PokecubeCore.getMessageID(), Side.CLIENT);
+                PokecubeCore.getMessageID(), Dist.CLIENT);
         PokecubeMod.packetPipeline.registerMessage(PacketTrainer.class, PacketTrainer.class,
-                PokecubeCore.getMessageID(), Side.SERVER);
+                PokecubeCore.getMessageID(), Dist.DEDICATED_SERVER);
         PokecubeMod.packetPipeline.registerMessage(PacketAFA.class, PacketAFA.class, PokecubeCore.getMessageID(),
-                Side.CLIENT);
+                Dist.CLIENT);
         PokecubeMod.packetPipeline.registerMessage(PacketAFA.class, PacketAFA.class, PokecubeCore.getMessageID(),
-                Side.SERVER);
+                Dist.DEDICATED_SERVER);
 
         PokecubeMod.packetPipeline.registerMessage(PacketCommander.class, PacketCommander.class,
-                PokecubeCore.getMessageID(), Side.SERVER);
+                PokecubeCore.getMessageID(), Dist.DEDICATED_SERVER);
     }
 
     public static MessageClient makeClientPacket(byte channel, byte[] data)

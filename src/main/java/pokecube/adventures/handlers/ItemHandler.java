@@ -55,7 +55,7 @@ public class ItemHandler
         {
             Item badge = new ItemBadge(type).setCreativeTab(creativeTabPokecube);
             register(badge, registry);
-            if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+            if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
             {
                 String name = type.name.equals("???") ? "unknown" : type.name;
                 registerItemTexture(badge, 0,
@@ -74,7 +74,7 @@ public class ItemHandler
         expshare.setCreativeTab(creativeTabPokecube);
         register(expshare, registry);
         PokecubeItems.addSpecificItemStack("exp_share", new ItemStack(expshare));
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(expshare, 0,
                     new ModelResourceLocation("pokecube_adventures:exp_share", "inventory"));
@@ -86,7 +86,7 @@ public class ItemHandler
         register(mewHair, registry);
         PokecubeItems.addGeneric("mewhair", mewHair);
 
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(mewHair, 0,
                     new ModelResourceLocation("pokecube_adventures:mewhair", "inventory"));
@@ -95,7 +95,7 @@ public class ItemHandler
         Item target = new ItemTarget().setRegistryName(PokecubeAdv.ID, "target").setUnlocalizedName("target")
                 .setCreativeTab(creativeTabPokecube);
         register(target, registry);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(target, 0,
                     new ModelResourceLocation(target.getRegistryName().toString(), "inventory"));
@@ -103,7 +103,7 @@ public class ItemHandler
         target = new ItemLinker().setRegistryName(PokecubeAdv.ID, "linker").setUnlocalizedName("linker")
                 .setCreativeTab(creativeTabPokecube);
         register(target, registry);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(target, 0,
                     new ModelResourceLocation(target.getRegistryName().toString(), "inventory"));
@@ -111,7 +111,7 @@ public class ItemHandler
         target = new ItemSubbiomeSetter().setRegistryName(PokecubeAdv.ID, "biome_setter")
                 .setUnlocalizedName("biome_setter").setCreativeTab(creativeTabPokecube);
         register(target, registry);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(target, 0,
                     new ModelResourceLocation(target.getRegistryName().toString(), "inventory"));
@@ -119,7 +119,7 @@ public class ItemHandler
         Item trainer = new ItemTrainer().setUnlocalizedName("trainerspawner")
                 .setRegistryName(PokecubeAdv.ID, "trainerspawner").setCreativeTab(creativeTabPokecube);
         register(trainer, registry);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(trainer, 0,
                     new ModelResourceLocation(trainer.getRegistryName().toString(), "inventory"));
@@ -127,7 +127,7 @@ public class ItemHandler
         Item bag = new ItemBag().setUnlocalizedName("pokecubebag").setRegistryName(PokecubeAdv.ID, "pokecubebag")
                 .setCreativeTab(creativeTabPokecube);
         register(bag, registry);
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PokecubeItems.registerItemTexture(bag, 0,
                     new ModelResourceLocation(bag.getRegistryName().toString(), "inventory"));
@@ -165,7 +165,7 @@ public class ItemHandler
         {
             ItemBlock item = new ItemBlockGeneric(block);
             register(item, registry);
-            if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+            if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
                 registerItemTexture(item, 0, new ModelResourceLocation(item.getRegistryName().toString(), "inventory"));
         }
     }

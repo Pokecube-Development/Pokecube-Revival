@@ -7,14 +7,14 @@ import javax.annotation.Nullable;
 import org.nfunk.jep.JEP;
 
 import net.minecraft.client.renderer.texture.ITickable;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -49,14 +49,14 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     private int            total          = 0;
     private PoweredProcess currentProcess = null;
     protected CraftMatrix  craftMatrix;
-    private EntityPlayer   user;
+    private PlayerEntity   user;
     IItemHandler[]         wrappers       = new IItemHandler[6];
 
     public TileClonerBase(int size, int output)
     {
         inventory = NonNullList.<ItemStack> withSize(size, ItemStack.EMPTY);
         this.outputSlot = output;
-        for (EnumFacing side : EnumFacing.VALUES)
+        for (Direction side : Direction.VALUES)
         {
             wrappers[side.ordinal()] = new SidedInvWrapper(this, side);
         }
@@ -69,19 +69,19 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     }
 
     @Override
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(PlayerEntity player)
     {
         if (user == player) user = null;
     }
 
     @Override
-    public void openInventory(EntityPlayer player)
+    public void openInventory(PlayerEntity player)
     {
         if (user == null) user = player;
     }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player)
+    public boolean isUsableByPlayer(PlayerEntity player)
     {
         return user == null || user == player;
     }
@@ -125,7 +125,7 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     }
 
     @Override
-    public EntityPlayer getUser()
+    public PlayerEntity getUser()
     {
         return user;
     }
@@ -162,16 +162,16 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
+    public void readFromNBT(CompoundNBT nbt)
     {
         super.readFromNBT(nbt);
-        NBTBase temp = nbt.getTag("Inventory");
-        if (temp instanceof NBTTagList)
+        INBT temp = nbt.getTag("Inventory");
+        if (temp instanceof ListNBT)
         {
-            NBTTagList tagList = (NBTTagList) temp;
-            for (int i = 0; i < tagList.tagCount(); i++)
+            ListNBT tagList = (ListNBT) temp;
+            for (int i = 0; i < tagList.size(); i++)
             {
-                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+                CompoundNBT tag = tagList.getCompound(i);
                 byte slot = tag.getByte("Slot");
 
                 if (slot >= 0 && slot < inventory.size())
@@ -182,7 +182,7 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
         }
         if (nbt.hasKey("progress"))
         {
-            NBTTagCompound tag = nbt.getCompoundTag("progress");
+            CompoundNBT tag = nbt.getCompound("progress");
             setProcess(PoweredProcess.load(tag, this));
             if (getProcess() != null)
             {
@@ -230,16 +230,16 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+    public CompoundNBT writeToNBT(CompoundNBT nbt)
     {
         super.writeToNBT(nbt);
-        NBTTagList itemList = new NBTTagList();
+        ListNBT itemList = new ListNBT();
         for (int i = 0; i < inventory.size(); i++)
         {
             ItemStack stack;
             if (CompatWrapper.isValid(stack = inventory.get(i)))
             {
-                NBTTagCompound tag = new NBTTagCompound();
+                CompoundNBT tag = new CompoundNBT();
                 tag.setByte("Slot", (byte) i);
                 stack.writeToNBT(tag);
                 itemList.appendTag(tag);
@@ -271,7 +271,7 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     int[] slots;
 
     @Override
-    public int[] getSlotsForFace(EnumFacing side)
+    public int[] getSlotsForFace(Direction side)
     {
         if (slots == null)
         {
@@ -285,7 +285,7 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     @Override
     /** Returns true if automation can insert the given item in the given slot
      * from the given side. */
-    public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction)
+    public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction)
     {
         return isItemValidForSlot(index, itemStackIn);
     }
@@ -293,13 +293,13 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     @Override
     /** Returns true if automation can extract the given item in the given slot
      * from the given side. */
-    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
+    public boolean canExtractItem(int index, ItemStack stack, Direction direction)
     {
         return !isItemValidForSlot(index, stack);
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+    public <T> T getCapability(Capability<T> capability, Direction facing)
     {
         if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(wrappers[facing.ordinal()]);
@@ -307,7 +307,7 @@ public abstract class TileClonerBase extends TileEntity implements IPoweredProgr
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
+    public boolean hasCapability(Capability<?> capability, @Nullable Direction facing)
     {
         if (facing != null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return true;
         return super.hasCapability(capability, facing);

@@ -9,10 +9,10 @@ import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.network.ManagedEnvironment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -35,7 +35,7 @@ public class ExtractorDriver extends DriverBase
     }
 
     @Override
-    public ManagedEnvironment createEnvironment(World world, BlockPos pos, EnumFacing side)
+    public ManagedEnvironment createEnvironment(World world, BlockPos pos, Direction side)
     {
         TileEntityGeneExtractor pc = (TileEntityGeneExtractor) world.getTileEntity(pos);
         return new Environment(pc, getComponentName());
@@ -113,13 +113,13 @@ public class ExtractorDriver extends DriverBase
             if (values.isEmpty()) throw new Exception("You need to specify some genes");
             RecipeExtract fixed = new RecipeExtract(true);
             ItemStack newSelector = new ItemStack(Items.WRITTEN_BOOK);
-            newSelector.setTagCompound(new NBTTagCompound());
-            NBTTagList pages = new NBTTagList();
+            newSelector.setTag(new CompoundNBT());
+            ListNBT pages = new ListNBT();
             for (String s : values)
                 pages.appendTag(new NBTTagString(String.format("{\"text\":\"%s\"}", s)));
-            newSelector.getTagCompound().setTag("pages", pages);
+            newSelector.getTag().setTag("pages", pages);
             SelectorValue value = RecipeSelector.getSelectorValue(tileEntity.getStackInSlot(1));
-            newSelector.getTagCompound().setTag(ClonerHelper.SELECTORTAG, value.save());
+            newSelector.getTag().setTag(ClonerHelper.SELECTORTAG, value.save());
             newSelector.setStackDisplayName("Selector");
             fixed.setSelector(newSelector);
             tileEntity.setProcess(new PoweredProcess());

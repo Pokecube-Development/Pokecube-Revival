@@ -7,12 +7,12 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -209,7 +209,7 @@ public class RecipeFossilRevive implements IPoweredRecipe
         tile.setInventorySlotContents(tile.getOutputSlot(), getRecipeOutput());
         World world = ((TileEntity) tile).getWorld();
         BlockPos pos = ((TileEntity) tile).getPos();
-        EntityLiving entity = (EntityLiving) PokecubeMod.core.createPokemob(getPokedexEntry(), world);
+        MobEntity entity = (MobEntity) PokecubeMod.core.createPokemob(getPokedexEntry(), world);
         if (entity != null)
         {
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(entity);
@@ -220,10 +220,10 @@ public class RecipeFossilRevive implements IPoweredRecipe
             // You can give him more XP if you want
             entity = (pokemob = pokemob.setForSpawn(exp)).getEntity();
             if (tile.getUser() != null && tame) pokemob.setPokemonOwner(tile.getUser());
-            EnumFacing dir = world.getBlockState(pos).getValue(BlockRotatable.FACING);
+            Direction dir = world.getBlockState(pos).getValue(BlockRotatable.FACING);
             entity.setLocationAndAngles(pos.getX() + 0.5 + dir.getFrontOffsetX(), pos.getY() + 1,
                     pos.getZ() + 0.5 + dir.getFrontOffsetZ(), world.rand.nextFloat() * 360F, 0.0F);
-            entity.getEntityData().setBoolean("cloned", true);
+            entity.getEntityData().putBoolean("cloned", true);
             world.spawnEntity(entity);
             IMobGenetics genes = ClonerHelper.getGenes(dnaSource);
             if (genes != null)

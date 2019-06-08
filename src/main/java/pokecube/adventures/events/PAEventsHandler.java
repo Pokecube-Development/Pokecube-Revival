@@ -5,19 +5,19 @@ import java.util.logging.Level;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.ICommandSource;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -111,7 +111,7 @@ public class PAEventsHandler
                     ItemStack badge = new ItemStack(item);
                     if (!rewardsCap.getRewards().isEmpty()) rewardsCap.getRewards().set(0, new Reward(badge));
                     else rewardsCap.getRewards().add(new Reward(badge));
-                    ((EntityLeader) trainer).setHeldItem(EnumHand.OFF_HAND, rewardsCap.getRewards().get(0).stack);
+                    ((EntityLeader) trainer).setHeldItem(Hand.OFF_HAND, rewardsCap.getRewards().get(0).stack);
                 }
             }
         }
@@ -133,7 +133,7 @@ public class PAEventsHandler
             if (genders == 1) mobs.setGender((byte) 1);
             if (genders == 2) mobs.setGender((byte) 2);
             if (genders == 3) mobs.setGender((byte) (Math.random() < 0.5 ? 1 : 2));
-            TypeTrainer.getRandomTeam(mobs, (EntityLivingBase) trainer, level, trainer.getEntityWorld());
+            TypeTrainer.getRandomTeam(mobs, (LivingEntity) trainer, level, trainer.getEntityWorld());
         }
     }
 
@@ -145,7 +145,7 @@ public class PAEventsHandler
     public void BookCloneRecipeHandle(ItemCraftedEvent event)
     {
         // Not a selector, we do nothing.
-        if (!RecipeSelector.isSelector(event.crafting) || !event.crafting.hasTagCompound()) return;
+        if (!RecipeSelector.isSelector(event.crafting) || !event.crafting.hasTag()) return;
         SelectorValue value = ClonerHelper.getSelectorValue(event.crafting);
         for (int i = 0; i < event.craftMatrix.getSizeInventory(); i++)
         {
@@ -160,7 +160,7 @@ public class PAEventsHandler
                 if (value2.dnaDestructChance == value.dnaDestructChance
                         && value2.selectorDestructChance == value.selectorDestructChance)
                 {
-                    event.crafting.getTagCompound().removeTag(ClonerHelper.SELECTORTAG);
+                    event.crafting.getTag().remove(ClonerHelper.SELECTORTAG);
                 }
                 return;
             }
@@ -186,7 +186,7 @@ public class PAEventsHandler
     public void TrainerRecallEvent(pokecube.core.events.pokemob.RecallEvent evt)
     {
         IPokemob recalled = evt.recalled;
-        EntityLivingBase owner = recalled.getPokemonOwner();
+        LivingEntity owner = recalled.getPokemonOwner();
         if (owner == null) return;
         IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(owner);
         if (pokemobHolder != null)
@@ -262,8 +262,8 @@ public class PAEventsHandler
     public void TrainerSendOutEvent(SendOut.Post evt)
     {
         IPokemob sent = evt.pokemob;
-        EntityLivingBase owner = sent.getPokemonOwner();
-        if (owner == null || owner instanceof EntityPlayer) return;
+        LivingEntity owner = sent.getPokemonOwner();
+        if (owner == null || owner instanceof PlayerEntity) return;
         IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(owner);
         if (pokemobHolder != null)
         {
@@ -288,26 +288,26 @@ public class PAEventsHandler
      * @param evt */
     public void livingHurtEvent(LivingHurtEvent evt)
     {
-        IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(evt.getEntityLiving());
-        IHasMessages messages = CapabilityNPCMessages.getMessages(evt.getEntityLiving());
+        IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(evt.getMobEntity());
+        IHasMessages messages = CapabilityNPCMessages.getMessages(evt.getMobEntity());
 
-        if (evt.getEntityLiving() instanceof INpc && !Config.instance.pokemobsHarmNPCs
+        if (evt.getMobEntity() instanceof INpc && !Config.instance.pokemobsHarmNPCs
                 && (evt.getSource() instanceof PokemobDamageSource || evt.getSource() instanceof TerrainDamageSource))
         {
             evt.setAmount(0);
         }
 
-        if (evt.getSource().getTrueSource() instanceof EntityLivingBase)
+        if (evt.getSource().getTrueSource() instanceof LivingEntity)
         {
             if (messages != null)
             {
                 messages.sendMessage(MessageState.HURT, evt.getSource().getTrueSource(),
-                        evt.getEntityLiving().getDisplayName(), evt.getSource().getTrueSource().getDisplayName());
-                messages.doAction(MessageState.HURT, (EntityLivingBase) evt.getSource().getTrueSource());
+                        evt.getMobEntity().getDisplayName(), evt.getSource().getTrueSource().getDisplayName());
+                messages.doAction(MessageState.HURT, (LivingEntity) evt.getSource().getTrueSource());
             }
             if (pokemobHolder != null && pokemobHolder.getTarget() == null)
             {
-                pokemobHolder.setTarget((EntityLivingBase) evt.getSource().getTrueSource());
+                pokemobHolder.setTarget((LivingEntity) evt.getSource().getTrueSource());
             }
         }
     }
@@ -318,12 +318,12 @@ public class PAEventsHandler
     @SubscribeEvent
     public void interactWithPokemob(InteractEvent event)
     {
-        EntityPlayer player = event.player;
-        EnumHand hand = event.event.getHand();
+        PlayerEntity player = event.player;
+        Hand hand = event.event.getHand();
         ItemStack held = player.getHeldItem(hand);
         if (held.getItem() instanceof ItemTrainer)
         {
-            PacketTrainer.sendEditOpenPacket(event.pokemob.getEntity(), (EntityPlayerMP) player);
+            PacketTrainer.sendEditOpenPacket(event.pokemob.getEntity(), (ServerPlayerEntity) player);
             event.setResult(Result.DENY);
         }
     }
@@ -337,9 +337,9 @@ public class PAEventsHandler
         if (evt.getWorld().isRemote) return;
         String ID = "LastSuccessInteractEvent";
         long time = evt.getTarget().getEntityData().getLong(ID);
-        if (time == evt.getTarget().getEntityWorld().getTotalWorldTime()) return;
+        if (time == evt.getTarget().getEntityWorld().getGameTime()) return;
         processInteract(evt, evt.getTarget());
-        evt.getTarget().getEntityData().setLong(ID, evt.getTarget().getEntityWorld().getTotalWorldTime());
+        evt.getTarget().getEntityData().putLong(ID, evt.getTarget().getEntityWorld().getGameTime());
     }
 
     @SubscribeEvent
@@ -351,9 +351,9 @@ public class PAEventsHandler
         if (evt.getWorld().isRemote) return;
         String ID = "LastSuccessInteractEvent";
         long time = evt.getTarget().getEntityData().getLong(ID);
-        if (time == evt.getTarget().getEntityWorld().getTotalWorldTime()) return;
+        if (time == evt.getTarget().getEntityWorld().getGameTime()) return;
         processInteract(evt, evt.getTarget());
-        evt.getTarget().getEntityData().setLong(ID, evt.getTarget().getEntityWorld().getTotalWorldTime());
+        evt.getTarget().getEntityData().putLong(ID, evt.getTarget().getEntityWorld().getGameTime());
     }
 
     /** This deals with the interaction logic for trainers. It sends the
@@ -370,22 +370,22 @@ public class PAEventsHandler
         if (!target.isSneaking() && pokemobs != null && evt.getItemStack().getItem() instanceof ItemTrainer)
         {
             evt.setCanceled(true);
-            if (evt.getEntityPlayer() instanceof EntityPlayerMP)
+            if (evt.getPlayerEntity() instanceof ServerPlayerEntity)
             {
-                PacketTrainer.sendEditOpenPacket(target, (EntityPlayerMP) evt.getEntityPlayer());
+                PacketTrainer.sendEditOpenPacket(target, (ServerPlayerEntity) evt.getPlayerEntity());
             }
             return;
         }
         if (messages != null)
         {
-            messages.sendMessage(MessageState.INTERACT, evt.getEntityPlayer(), target.getDisplayName(),
-                    evt.getEntityPlayer().getDisplayName());
-            messages.doAction(MessageState.INTERACT, evt.getEntityPlayer());
+            messages.sendMessage(MessageState.INTERACT, evt.getPlayerEntity(), target.getDisplayName(),
+                    evt.getPlayerEntity().getDisplayName());
+            messages.doAction(MessageState.INTERACT, evt.getPlayerEntity());
         }
     }
 
     @SubscribeEvent
-    /** Ensures the IHasPokemobs object has synced target with the EntityLiving
+    /** Ensures the IHasPokemobs object has synced target with the MobEntity
      * object.
      * 
      * @param evt */
@@ -395,7 +395,7 @@ public class PAEventsHandler
         IHasPokemobs pokemobHolder = CapabilityHasPokemobs.getHasPokemobs(evt.getTarget());
         if (pokemobHolder != null && pokemobHolder.getTarget() == null)
         {
-            pokemobHolder.setTarget(evt.getEntityLiving());
+            pokemobHolder.setTarget(evt.getMobEntity());
         }
     }
 
@@ -410,15 +410,15 @@ public class PAEventsHandler
         IHasPokemobs mobs = CapabilityHasPokemobs.getHasPokemobs(event.getEntity());
         if (!(mobs instanceof DefaultPokemobs)) return;
         DefaultPokemobs pokemobs = (DefaultPokemobs) mobs;
-        if (event.getEntityPlayer() instanceof EntityPlayerMP)
+        if (event.getPlayerEntity() instanceof ServerPlayerEntity)
         {
             EntityTrainer trainer = (EntityTrainer) event.getTarget();
             if (pokemobs.notifyDefeat)
             {
                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGENOTIFYDEFEAT);
                 packet.data.setInteger("I", trainer.getEntityId());
-                packet.data.setBoolean("V", pokemobs.hasDefeated(event.getEntityPlayer()));
-                PokecubeMod.packetPipeline.sendTo(packet, (EntityPlayerMP) event.getEntityPlayer());
+                packet.data.putBoolean("V", pokemobs.hasDefeated(event.getPlayerEntity()));
+                PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) event.getPlayerEntity());
             }
         }
     }
@@ -429,8 +429,8 @@ public class PAEventsHandler
      * @param event */
     public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
     {
-        if (!(event.getObject() instanceof EntityLiving) || event.getObject().getEntityWorld() == null
-                || TypeTrainer.mobTypeMapper.getType((EntityLivingBase) event.getObject(), false) == null)
+        if (!(event.getObject() instanceof MobEntity) || event.getObject().getEntityWorld() == null
+                || TypeTrainer.mobTypeMapper.getType((LivingEntity) event.getObject(), false) == null)
             return;
         if (hasCap(event)) return;
         DefaultPokemobs mobs = new DefaultPokemobs();
@@ -448,7 +448,7 @@ public class PAEventsHandler
         if (!stack.isEmpty()) rewards.getRewards().add(new Reward(stack));
         DefaultAIStates aiStates = new DefaultAIStates();
         DefaultMessager messages = new DefaultMessager();
-        mobs.init((EntityLivingBase) event.getObject(), aiStates, messages, rewards);
+        mobs.init((LivingEntity) event.getObject(), aiStates, messages, rewards);
         event.addCapability(POKEMOBSCAP, mobs);
         event.addCapability(AICAP, aiStates);
         event.addCapability(MESSAGECAP, messages);
@@ -472,7 +472,7 @@ public class PAEventsHandler
         {
             if (p.hasCapability(IAIMob.THUTMOBAI, null)) return;
         }
-        AIStuffHolder aiHolder = new AIStuffHolder((EntityLiving) event.getObject());
+        AIStuffHolder aiHolder = new AIStuffHolder((MobEntity) event.getObject());
         event.addCapability(AISTUFFCAP, aiHolder);
     }
 
@@ -501,17 +501,17 @@ public class PAEventsHandler
      * @param event */
     public void onJoinWorld(EntityJoinWorldEvent event)
     {
-        if (!(event.getEntity() instanceof EntityLivingBase)) return;
-        EntityLivingBase npc = (EntityLivingBase) event.getEntity();
+        if (!(event.getEntity() instanceof LivingEntity)) return;
+        LivingEntity npc = (LivingEntity) event.getEntity();
         IHasPokemobs mobs = CapabilityHasPokemobs.getHasPokemobs(npc);
         if (mobs == null || !npc.hasCapability(IAIMob.THUTMOBAI, null)) return;
         IAIMob mob = npc.getCapability(IAIMob.THUTMOBAI, null);
 
         // Wrap it as a fake vanilla AI
-        if (npc instanceof EntityLiving)
+        if (npc instanceof MobEntity)
         {
             mob.setWrapped(true);
-            EntityLiving living = (EntityLiving) npc;
+            MobEntity living = (MobEntity) npc;
             living.tasks.addTask(0, new EntityAIBaseManager(mob, npc));
         }
 
@@ -523,7 +523,7 @@ public class PAEventsHandler
         // Only trainers specifically target players.
         if (npc instanceof EntityTrainerBase)
         {
-            mob.getAI().addAITask(new AIFindTarget(npc, EntityPlayer.class).setPriority(10));
+            mob.getAI().addAITask(new AIFindTarget(npc, PlayerEntity.class).setPriority(10));
             mob.getAI().addAITask(new AIMate(npc, ((EntityTrainerBase) npc).getClass()));
         }
         // 5% chance of battling a random nearby pokemob if they see it.
@@ -542,7 +542,7 @@ public class PAEventsHandler
         TypeTrainer.getRandomTeam(mobs, npc, level, npc.getEntityWorld());
     }
 
-    public static ItemStack fromString(String arg, ICommandSender sender) throws CommandException
+    public static ItemStack fromString(String arg, ICommandSource sender) throws CommandException
     {
         String[] args = arg.split(" ");
         Item item = CommandBase.getItemByText(sender, args[0]);
@@ -555,7 +555,7 @@ public class PAEventsHandler
 
             try
             {
-                itemstack.setTagCompound(JsonToNBT.getTagFromJson(s));
+                itemstack.setTag(JsonToNBT.getTagFromJson(s));
             }
             catch (NBTException nbtexception)
             {

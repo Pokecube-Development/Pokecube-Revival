@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
@@ -71,8 +71,8 @@ public class RecipeBag implements IDefaultRecipe
             if (dye && bag)
             {
                 output = bagStack.copy();
-                if (!output.hasTagCompound()) output.setTagCompound(new NBTTagCompound());
-                output.getTagCompound().setInteger("dyeColour", dyeStack.getItemDamage());
+                if (!output.hasTag()) output.setTag(new CompoundNBT());
+                output.getTag().setInteger("dyeColour", dyeStack.getItemDamage());
             }
             return CompatWrapper.isValid(output);
         }

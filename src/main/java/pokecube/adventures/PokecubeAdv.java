@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLCommonSetupEvent;
 import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -106,7 +106,7 @@ public class PokecubeAdv
 
     public static Config       conf;
 
-    public static void setTrainerConfig(FMLPreInitializationEvent evt)
+    public static void setTrainerConfig(FMLCommonSetupEvent evt)
     {
         File file = evt.getSuggestedConfigurationFile();
         String seperator = System.getProperty("file.separator");
@@ -135,9 +135,9 @@ public class PokecubeAdv
         WorldGenInits.init();
         PacketPokeAdv.init();
         PokecubeMod.packetPipeline.registerMessage(MessageHandlerClient.class, MessageClient.class,
-                PokecubeCore.getMessageID(), Side.CLIENT);
+                PokecubeCore.getMessageID(), Dist.CLIENT);
         PokecubeMod.packetPipeline.registerMessage(MessageHandlerServer.class, MessageServer.class,
-                PokecubeCore.getMessageID(), Side.SERVER);
+                PokecubeCore.getMessageID(), Dist.DEDICATED_SERVER);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
@@ -178,7 +178,7 @@ public class PokecubeAdv
     }
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent e)
+    public void preInit(FMLCommonSetupEvent e)
     {
         conf = new Config(PokecubeMod.core.getPokecubeConfig(e).getConfigFile());
         tesla = Loader.isModLoaded("tesla");

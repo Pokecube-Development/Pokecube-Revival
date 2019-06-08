@@ -21,7 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
@@ -82,7 +82,7 @@ public class EditTradesPage extends ListPage
             stacks = ItemStack.EMPTY;
             try
             {
-                NBTTagCompound tag = JsonToNBT.getTagFromJson(buy1.getText());
+                CompoundNBT tag = JsonToNBT.getTagFromJson(buy1.getText());
                 stack1 = new ItemStack(tag);
             }
             catch (NBTException e)
@@ -97,7 +97,7 @@ public class EditTradesPage extends ListPage
             }
             try
             {
-                NBTTagCompound tag = JsonToNBT.getTagFromJson(buy2.getText());
+                CompoundNBT tag = JsonToNBT.getTagFromJson(buy2.getText());
                 stack2 = new ItemStack(tag);
             }
             catch (NBTException e)
@@ -112,7 +112,7 @@ public class EditTradesPage extends ListPage
             }
             try
             {
-                NBTTagCompound tag = JsonToNBT.getTagFromJson(sell.getText());
+                CompoundNBT tag = JsonToNBT.getTagFromJson(sell.getText());
                 stacks = new ItemStack(tag);
             }
             catch (NBTException e)
@@ -311,15 +311,15 @@ public class EditTradesPage extends ListPage
         private void delete()
         {
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setBoolean("TR", true);
+            CompoundNBT tag = new CompoundNBT();
+            tag.putBoolean("TR", true);
             tag.setInteger("I", index);
             packet.data.setTag("T", tag);
             packet.data.setInteger("I", parent.parent.entity.getEntityId());
             Entity mob = parent.parent.entity;
-            NBTTagCompound tag2 = new NBTTagCompound();
+            CompoundNBT tag2 = new CompoundNBT();
             mob.writeToNBT(tag2);
-            MerchantRecipeList list = new MerchantRecipeList(tag2.getCompoundTag("Offers"));
+            MerchantRecipeList list = new MerchantRecipeList(tag2.getCompound("Offers"));
             if (index < list.size()) list.remove(index);
             tag2.setTag("Offers", list.getRecipiesAsTags());
             mob.readFromNBT(tag2);
@@ -332,16 +332,16 @@ public class EditTradesPage extends ListPage
         private void reOrder(int dir)
         {
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setBoolean("TR", true);
+            CompoundNBT tag = new CompoundNBT();
+            tag.putBoolean("TR", true);
             tag.setInteger("I", index);
             tag.setInteger("N", dir);
             packet.data.setTag("T", tag);
             packet.data.setInteger("I", parent.parent.entity.getEntityId());
             Entity mob = parent.parent.entity;
-            NBTTagCompound tag2 = new NBTTagCompound();
+            CompoundNBT tag2 = new CompoundNBT();
             mob.writeToNBT(tag2);
-            MerchantRecipeList list = new MerchantRecipeList(tag2.getCompoundTag("Offers"));
+            MerchantRecipeList list = new MerchantRecipeList(tag2.getCompound("Offers"));
             int index1 = tag.getInteger("I");
             int index2 = index1 + tag.getInteger("N");
             MerchantRecipe temp = list.get(index1);
@@ -359,8 +359,8 @@ public class EditTradesPage extends ListPage
         {
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
 
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setBoolean("TR", true);
+            CompoundNBT tag = new CompoundNBT();
+            tag.putBoolean("TR", true);
             tag.setInteger("I", index);
             // Delete in this case.
             if (buy1.getText().isEmpty())
@@ -375,7 +375,7 @@ public class EditTradesPage extends ListPage
                 if (!stack1.isEmpty() || stacks.isEmpty())
                 {
                     MerchantRecipe recipe = new MerchantRecipe(stack1, stack2, stacks, 0, 65);
-                    NBTTagCompound tag1 = recipe.writeToTags();
+                    CompoundNBT tag1 = recipe.writeToTags();
                     tag.setTag("R", tag1);
                 }
             }
@@ -384,12 +384,12 @@ public class EditTradesPage extends ListPage
                 packet.data.setTag("T", tag);
                 packet.data.setInteger("I", parent.parent.entity.getEntityId());
                 Entity mob = parent.parent.entity;
-                NBTTagCompound tag2 = new NBTTagCompound();
+                CompoundNBT tag2 = new CompoundNBT();
                 mob.writeToNBT(tag2);
-                MerchantRecipeList list = new MerchantRecipeList(tag2.getCompoundTag("Offers"));
+                MerchantRecipeList list = new MerchantRecipeList(tag2.getCompound("Offers"));
                 if (tag.hasKey("R"))
                 {
-                    MerchantRecipe recipe = new MerchantRecipe(tag.getCompoundTag("R"));
+                    MerchantRecipe recipe = new MerchantRecipe(tag.getCompound("R"));
                     if (index < list.size()) list.set(index, recipe);
                     else list.add(recipe);
                 }
@@ -418,9 +418,9 @@ public class EditTradesPage extends ListPage
     {
         List<IGuiListEntry> entries = Lists.newArrayList();
 
-        NBTTagCompound tag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
         this.parent.entity.writeToNBT(tag);
-        MerchantRecipeList recipes = new MerchantRecipeList(tag.getCompoundTag("Offers"));
+        MerchantRecipeList recipes = new MerchantRecipeList(tag.getCompound("Offers"));
         this.num = recipes.size();
         int num = 0;
         int width = 180;
@@ -436,26 +436,26 @@ public class EditTradesPage extends ListPage
                 sell.setMaxStringLength(Short.MAX_VALUE);
                 String value = recipe.getItemToBuy().getItem().getRegistryName() + " "
                         + recipe.getItemToBuy().getCount() + " " + recipe.getItemToBuy().getMetadata();
-                if (recipe.getItemToBuy().hasTagCompound())
+                if (recipe.getItemToBuy().hasTag())
                 {
-                    value = value + " " + recipe.getItemToBuy().getTagCompound().toString();
+                    value = value + " " + recipe.getItemToBuy().getTag().toString();
                 }
                 buy1.setText(value);
                 if (recipe.hasSecondItemToBuy())
                 {
                     ItemStack stack = recipe.getSecondItemToBuy();
                     value = stack.getItem().getRegistryName() + " " + stack.getCount() + " " + stack.getMetadata();
-                    if (stack.hasTagCompound())
+                    if (stack.hasTag())
                     {
-                        value = value + " " + stack.getTagCompound().toString();
+                        value = value + " " + stack.getTag().toString();
                     }
                     buy2.setText(value);
                 }
                 ItemStack stack = recipe.getItemToSell();
                 value = stack.getItem().getRegistryName() + " " + stack.getCount() + " " + stack.getMetadata();
-                if (stack.hasTagCompound())
+                if (stack.hasTag())
                 {
-                    value = value + " " + stack.getTagCompound().toString();
+                    value = value + " " + stack.getTag().toString();
                 }
                 sell.setText(value);
                 buy1.moveCursorBy(-buy1.getCursorPosition());

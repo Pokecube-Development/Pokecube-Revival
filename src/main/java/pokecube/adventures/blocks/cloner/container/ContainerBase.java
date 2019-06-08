@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.container;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.IContainerListener;
@@ -30,7 +30,7 @@ public abstract class ContainerBase extends Container
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer p)
+    public boolean canInteractWith(PlayerEntity p)
     {
         return true;
     }
@@ -58,7 +58,7 @@ public abstract class ContainerBase extends Container
 
     /** Called when the container is closed. */
     @Override
-    public void onContainerClosed(EntityPlayer playerIn)
+    public void onContainerClosed(PlayerEntity playerIn)
     {
         super.onContainerClosed(playerIn);
         tile.closeInventory(playerIn);
@@ -67,7 +67,7 @@ public abstract class ContainerBase extends Container
     @Override
     /** This is called on shift click Take a stack from the specified inventory
      * slot. */
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
@@ -106,7 +106,7 @@ public abstract class ContainerBase extends Container
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void updateProgressBar(int id, int data)
     {
         this.tile.setField(id, data);

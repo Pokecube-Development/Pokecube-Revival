@@ -19,7 +19,7 @@ import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import pokecube.adventures.entity.trainers.EntityTrainer;
 import pokecube.adventures.entity.trainers.TypeTrainer;
@@ -236,7 +236,7 @@ public class EditTrainerPage extends ListPage
             if (hasPrefix) name = parent.trainer.getType().name + " " + name;
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
             packet.data.setInteger("I", parent.entity.getEntityId());
-            packet.data.setString("N", name);
+            packet.data.putString("N", name);
             PokecubeMod.packetPipeline.sendToServer(packet);
         }
         if (textList.size() > 1 && keyCode == Keyboard.KEY_RETURN)
@@ -246,7 +246,7 @@ public class EditTrainerPage extends ListPage
                 String name = textList.get(1).getText();
                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
                 packet.data.setInteger("I", parent.entity.getEntityId());
-                packet.data.setString("U", name);
+                packet.data.putString("U", name);
                 PokecubeMod.packetPipeline.sendToServer(packet);
             }
             if (textList.get(2).isFocused())
@@ -254,7 +254,7 @@ public class EditTrainerPage extends ListPage
                 String name = textList.get(2).getText();
                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
                 packet.data.setInteger("I", parent.entity.getEntityId());
-                packet.data.setString("P", name);
+                packet.data.putString("P", name);
                 PokecubeMod.packetPipeline.sendToServer(packet);
             }
         }
@@ -320,7 +320,7 @@ public class EditTrainerPage extends ListPage
             if (!hasPrefix) name = parent.trainer.getType().name + " " + name;
             packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
             packet.data.setInteger("I", parent.entity.getEntityId());
-            packet.data.setString("N", name);
+            packet.data.putString("N", name);
             PokecubeMod.packetPipeline.sendToServer(packet);
             break;
         case KILL:
@@ -376,7 +376,7 @@ public class EditTrainerPage extends ListPage
             TypeTrainer type = types.get(index);
             packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
             packet.data.setInteger("I", parent.entity.getEntityId());
-            packet.data.setString("K", type.name);
+            packet.data.putString("K", type.name);
             PokecubeMod.packetPipeline.sendToServer(packet);
 
         }
@@ -393,7 +393,7 @@ public class EditTrainerPage extends ListPage
         GL11.glScalef(-zoom, zoom, zoom);
         GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
         GL11.glRotatef(135F, 0.0F, 1.0F, 0.0F);
-        EntityLivingBase entity = (EntityLivingBase) parent.entity;
+        LivingEntity entity = (LivingEntity) parent.entity;
         RenderHelper.enableStandardItemLighting();
         float turn = entity.ticksExisted + partialTicks - entity.renderYawOffset;
         GL11.glRotatef(turn, 0.0F, 1.0F, 0.0F);
@@ -401,7 +401,7 @@ public class EditTrainerPage extends ListPage
         double dy = -0.123;
         double dx = 0;
         double dz = 0;
-        Minecraft.getMinecraft().getRenderManager().renderEntity(entity, dx, dy, dz, 0, 1.5F, false);
+        Minecraft.getInstance().getRenderManager().renderEntity(entity, dx, dy, dz, 0, 1.5F, false);
         GL11.glPopMatrix();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableRescaleNormal();

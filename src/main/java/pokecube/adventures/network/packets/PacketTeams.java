@@ -5,8 +5,8 @@ import java.io.IOException;
 import javax.xml.ws.handler.MessageContext;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -17,7 +17,7 @@ public class PacketTeams implements IMessage, IMessageHandler<PacketTeams, IMess
 {
 
     byte                     message;
-    public NBTTagCompound    data      = new NBTTagCompound();
+    public CompoundNBT    data      = new CompoundNBT();
 
     public PacketTeams()
     {
@@ -67,8 +67,8 @@ public class PacketTeams implements IMessage, IMessageHandler<PacketTeams, IMess
 
     void processMessage(MessageContext ctx, PacketTeams message)
     {
-        EntityPlayer player;
-        if (ctx.side == Side.CLIENT)
+        PlayerEntity player;
+        if (ctx.side == Dist.CLIENT)
         {
             player = PokecubeCore.getPlayer(null);
         }

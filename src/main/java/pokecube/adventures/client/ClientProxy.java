@@ -11,9 +11,9 @@ import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +56,7 @@ import pokecube.adventures.items.bags.ContainerBag;
 public class ClientProxy extends CommonProxy
 {
     @Override
-    public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
+    public Object getClientGuiElement(int guiID, PlayerEntity player, World world, int x, int y, int z)
     {
         BlockPos pos = new BlockPos(x, y, z);
         if (guiID == PokecubeAdv.GUITRAINER_ID) { return new GuiEditTrainer(world.getEntityByID(x)); }
@@ -93,18 +93,18 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public EntityPlayer getPlayer()
+    public PlayerEntity getPlayer()
     {
         return getPlayer(null);
     }
 
     @Override
-    public EntityPlayer getPlayer(String playerName)
+    public PlayerEntity getPlayer(String playerName)
     {
         if (isOnClientSide())
         {
             if (playerName != null) { return getWorld().getPlayerEntityByName(playerName); }
-            return Minecraft.getMinecraft().player;
+            return Minecraft.getInstance().player;
         }
         return super.getPlayer(playerName);
     }
@@ -112,7 +112,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public World getWorld()
     {
-        if (isOnClientSide()) { return Minecraft.getMinecraft().world; }
+        if (isOnClientSide()) { return Minecraft.getInstance().world; }
         return super.getWorld();
     }
 
@@ -126,7 +126,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public boolean isOnClientSide()
     {
-        return FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT;
+        return FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT;
     }
 
     @Override
@@ -138,7 +138,7 @@ public class ClientProxy extends CommonProxy
     public void postinit()
     {
         Set<Render<? extends Entity>> added = Sets.newHashSet();
-        for (Render<? extends Entity> render : Minecraft.getMinecraft().getRenderManager().getSkinMap().values())
+        for (Render<? extends Entity> render : Minecraft.getInstance().getRenderManager().getSkinMap().values())
         {
             if (render instanceof RenderLivingBase<?>)
             {
@@ -149,7 +149,7 @@ public class ClientProxy extends CommonProxy
                 added.add(render);
             }
         }
-        for (Render<? extends Entity> render : Minecraft.getMinecraft().getRenderManager().entityRenderMap.values())
+        for (Render<? extends Entity> render : Minecraft.getInstance().getRenderManager().entityRenderMap.values())
         {
             /** Dont add twice to player renderer if it is in skinmap. */
             if (added.contains(render)) continue;
@@ -169,26 +169,26 @@ public class ClientProxy extends CommonProxy
         super.preinit();
         OBJLoader.INSTANCE.addDomain(PokecubeAdv.ID);
 
-        RenderingRegistry.registerEntityRenderingHandler(EntityTarget.class, new IRenderFactory<EntityLivingBase>()
+        RenderingRegistry.registerEntityRenderingHandler(EntityTarget.class, new IRenderFactory<LivingEntity>()
         {
             @Override
-            public Render<? super EntityLivingBase> createRenderFor(RenderManager manager)
+            public Render<? super LivingEntity> createRenderFor(RenderManager manager)
             {
                 return new RenderTarget<>(manager);
             }
         });
-        RenderingRegistry.registerEntityRenderingHandler(EntityTrainer.class, new IRenderFactory<EntityLiving>()
+        RenderingRegistry.registerEntityRenderingHandler(EntityTrainer.class, new IRenderFactory<MobEntity>()
         {
             @Override
-            public Render<? super EntityLiving> createRenderFor(RenderManager manager)
+            public Render<? super MobEntity> createRenderFor(RenderManager manager)
             {
                 return new RenderTrainer<>(manager);
             }
         });
-        RenderingRegistry.registerEntityRenderingHandler(EntityLeader.class, new IRenderFactory<EntityLiving>()
+        RenderingRegistry.registerEntityRenderingHandler(EntityLeader.class, new IRenderFactory<MobEntity>()
         {
             @Override
-            public Render<? super EntityLiving> createRenderFor(RenderManager manager)
+            public Render<? super MobEntity> createRenderFor(RenderManager manager)
             {
                 return new RenderTrainer<>(manager);
             }

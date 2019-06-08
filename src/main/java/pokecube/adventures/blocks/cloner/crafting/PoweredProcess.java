@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.crafting;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -101,14 +101,14 @@ public class PoweredProcess
         return ret;
     }
 
-    public NBTTagCompound save()
+    public CompoundNBT save()
     {
-        NBTTagCompound tag = new NBTTagCompound();
+        CompoundNBT tag = new CompoundNBT();
         // TODO save things here
         return tag;
     }
 
-    public static PoweredProcess load(NBTTagCompound tag, TileClonerBase tile)
+    public static PoweredProcess load(CompoundNBT tag, TileClonerBase tile)
     {
         // TODO load what is saved in save()
         return null;

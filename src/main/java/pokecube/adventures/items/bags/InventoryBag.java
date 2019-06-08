@@ -10,13 +10,13 @@ import java.util.UUID;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.api.distmarker.Dist;
@@ -35,16 +35,16 @@ public class InventoryBag implements IInventory
 
     public static void loadBag(UUID uuid)
     {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) return;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT) return;
         try
         {
             File file = PlayerDataHandler.getFileForUUID(uuid.toString(), FILEID);
             if (file != null && file.exists())
             {
                 FileInputStream fileinputstream = new FileInputStream(file);
-                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(fileinputstream);
+                CompoundNBT CompoundNBT = CompressedStreamTools.readCompressed(fileinputstream);
                 fileinputstream.close();
-                readBagFromNBT(nbttagcompound.getCompoundTag("Data"));
+                readBagFromNBT(CompoundNBT.getCompound("Data"));
             }
         }
         catch (FileNotFoundException e)
@@ -55,13 +55,13 @@ public class InventoryBag implements IInventory
         }
     }
 
-    public static void readBagFromNBT(NBTTagCompound nbt)
+    public static void readBagFromNBT(CompoundNBT nbt)
     {
         // Read PC Data from NBT
-        NBTBase temp = nbt.getTag("PC");
-        if (temp instanceof NBTTagList)
+        INBT temp = nbt.getTag("PC");
+        if (temp instanceof ListNBT)
         {
-            NBTTagList tagListPC = (NBTTagList) temp;
+            ListNBT tagListPC = (ListNBT) temp;
             InventoryBag.loadFromNBT(tagListPC);
         }
     }
@@ -75,12 +75,12 @@ public class InventoryBag implements IInventory
             File file = PlayerDataHandler.getFileForUUID(uuid, FILEID);
             if (file != null)
             {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                writeBagToNBT(nbttagcompound, uuid);
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setTag("Data", nbttagcompound);
+                CompoundNBT CompoundNBT = new CompoundNBT();
+                writeBagToNBT(CompoundNBT, uuid);
+                CompoundNBT CompoundNBT1 = new CompoundNBT();
+                CompoundNBT1.setTag("Data", CompoundNBT);
                 FileOutputStream fileoutputstream = new FileOutputStream(file);
-                CompressedStreamTools.writeCompressed(nbttagcompound1, fileoutputstream);
+                CompressedStreamTools.writeCompressed(CompoundNBT1, fileoutputstream);
                 fileoutputstream.close();
             }
         }
@@ -94,9 +94,9 @@ public class InventoryBag implements IInventory
         }
     }
 
-    public static void writeBagToNBT(NBTTagCompound nbt, String uuid)
+    public static void writeBagToNBT(CompoundNBT nbt, String uuid)
     {
-        NBTTagList tagsPC = InventoryBag.saveToNBT(uuid);
+        ListNBT tagsPC = InventoryBag.saveToNBT(uuid);
         nbt.setTag("PC", tagsPC);
     }
 
@@ -126,19 +126,19 @@ public class InventoryBag implements IInventory
         return getBag(defaultID);
     }
 
-    public static void loadFromNBT(NBTTagList nbt)
+    public static void loadFromNBT(ListNBT nbt)
     {
         loadFromNBT(nbt, true);
     }
 
-    public static void loadFromNBT(NBTTagList nbt, boolean replace)
+    public static void loadFromNBT(ListNBT nbt, boolean replace)
     {
         int i;
         tags:
-        for (i = 0; i < nbt.tagCount(); i++)
+        for (i = 0; i < nbt.size(); i++)
         {
-            NBTTagCompound items = nbt.getCompoundTagAt(i);
-            NBTTagCompound boxes = items.getCompoundTag("boxes");
+            CompoundNBT items = nbt.getCompound(i);
+            CompoundNBT boxes = items.getCompound("boxes");
             UUID uuid;
             try
             {
@@ -170,12 +170,12 @@ public class InventoryBag implements IInventory
             for (int k = 0; k < load.getSizeInventory(); k++)
             {
                 if (!items.hasKey("item" + k)) continue;
-                NBTTagCompound nbttagcompound = items.getCompoundTag("item" + k);
-                int j = nbttagcompound.getShort("Slot");
+                CompoundNBT CompoundNBT = items.getCompound("item" + k);
+                int j = CompoundNBT.getShort("Slot");
                 if (j >= 0 && j < load.getSizeInventory())
                 {
                     if (load.contents.containsKey(j)) continue;
-                    ItemStack itemstack = new ItemStack(nbttagcompound);
+                    ItemStack itemstack = new ItemStack(CompoundNBT);
                     load.setInventorySlotContents(j, itemstack);
                 }
             }
@@ -183,35 +183,35 @@ public class InventoryBag implements IInventory
         }
     }
 
-    public static NBTTagList saveToNBT(Entity owner)
+    public static ListNBT saveToNBT(Entity owner)
     {
         return saveToNBT(owner.getCachedUniqueIdString());
     }
 
-    public static NBTTagList saveToNBT(String uuid)
+    public static ListNBT saveToNBT(String uuid)
     {
-        NBTTagList nbttag = new NBTTagList();
+        ListNBT nbttag = new ListNBT();
         UUID player = UUID.fromString(uuid);
         if (map.get(player) == null || blankID.equals(player)) { return nbttag; }
-        NBTTagCompound items = new NBTTagCompound();
-        NBTTagCompound boxes = new NBTTagCompound();
-        boxes.setString("UUID", player.toString());
+        CompoundNBT items = new CompoundNBT();
+        CompoundNBT boxes = new CompoundNBT();
+        boxes.putString("UUID", player.toString());
         boxes.setInteger("page", map.get(player).page);
         for (int i = 0; i < PAGECOUNT; i++)
         {
-            boxes.setString("name" + i, map.get(player).boxes[i]);
+            boxes.putString("name" + i, map.get(player).boxes[i]);
         }
         items.setInteger("page", map.get(player).getPage());
         for (int i = 0; i < map.get(player).getSizeInventory(); i++)
         {
             ItemStack itemstack = map.get(player).getStackInSlot(i);
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            CompoundNBT CompoundNBT = new CompoundNBT();
 
             if (!itemstack.isEmpty())
             {
-                nbttagcompound.setShort("Slot", (short) i);
-                itemstack.writeToNBT(nbttagcompound);
-                items.setTag("item" + i, nbttagcompound);
+                CompoundNBT.setShort("Slot", (short) i);
+                itemstack.writeToNBT(CompoundNBT);
+                items.setTag("item" + i, CompoundNBT);
             }
         }
         items.setTag("boxes", boxes);
@@ -265,7 +265,7 @@ public class InventoryBag implements IInventory
     }
 
     @Override
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(PlayerEntity player)
     {
         saveBag(player.getCachedUniqueIdString());
     }
@@ -359,7 +359,7 @@ public class InventoryBag implements IInventory
     }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer entityplayer)
+    public boolean isUsableByPlayer(PlayerEntity PlayerEntity)
     {
         return true;
     }
@@ -371,7 +371,7 @@ public class InventoryBag implements IInventory
     }
 
     @Override
-    public void openInventory(EntityPlayer player)
+    public void openInventory(PlayerEntity player)
     {
     }
 
@@ -407,36 +407,36 @@ public class InventoryBag implements IInventory
         return true;
     }
 
-    public NBTTagCompound serializeBox(int box)
+    public CompoundNBT serializeBox(int box)
     {
-        NBTTagCompound items = new NBTTagCompound();
+        CompoundNBT items = new CompoundNBT();
         items.setInteger("box", box);
         int start = box * 54;
         for (int i = start; i < start + 54; i++)
         {
             ItemStack itemstack = map.get(owner).getStackInSlot(i);
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            CompoundNBT CompoundNBT = new CompoundNBT();
             if (!itemstack.isEmpty())
             {
-                nbttagcompound.setShort("Slot", (short) i);
-                itemstack.writeToNBT(nbttagcompound);
-                items.setTag("item" + i, nbttagcompound);
+                CompoundNBT.setShort("Slot", (short) i);
+                itemstack.writeToNBT(CompoundNBT);
+                items.setTag("item" + i, CompoundNBT);
             }
         }
         return items;
     }
 
-    public void deserializeBox(NBTTagCompound nbt)
+    public void deserializeBox(CompoundNBT nbt)
     {
         int start = nbt.getInteger("box") * 54;
         for (int i = start; i < start + 54; i++)
         {
             if (!nbt.hasKey("item" + i)) continue;
-            NBTTagCompound nbttagcompound = nbt.getCompoundTag("item" + i);
-            int j = nbttagcompound.getShort("Slot");
+            CompoundNBT CompoundNBT = nbt.getCompound("item" + i);
+            int j = CompoundNBT.getShort("Slot");
             if (j >= start && j < start + 54)
             {
-                ItemStack itemstack = new ItemStack(nbttagcompound);
+                ItemStack itemstack = new ItemStack(CompoundNBT);
                 this.setInventorySlotContents(j, itemstack);
             }
         }

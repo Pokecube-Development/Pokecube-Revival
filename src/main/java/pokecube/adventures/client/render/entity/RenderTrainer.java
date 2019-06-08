@@ -21,15 +21,15 @@ import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.ResourceLocation;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.entity.trainers.EntityTrainer;
 import pokecube.adventures.entity.trainers.TypeTrainer;
 
-public class RenderTrainer<T extends EntityLiving> extends RenderBiped<T>
+public class RenderTrainer<T extends MobEntity> extends RenderBiped<T>
 {
     private static Map<TypeTrainer, ResourceLocation> males    = Maps.newHashMap();
     private static Map<TypeTrainer, ResourceLocation> females  = Maps.newHashMap();
@@ -64,7 +64,7 @@ public class RenderTrainer<T extends EntityLiving> extends RenderBiped<T>
     @Override
     public void doRenderShadowAndFire(Entity entityIn, double x, double y, double z, float yaw, float partialTicks)
     {
-        long time = entityIn.getEntityWorld().getTotalWorldTime();
+        long time = entityIn.getEntityWorld().getGameTime();
         if (((EntityTrainer) entityIn).visibleTime > time) return;
         super.doRenderShadowAndFire(entityIn, x, y, z, yaw, partialTicks);
     }
@@ -72,7 +72,7 @@ public class RenderTrainer<T extends EntityLiving> extends RenderBiped<T>
     @Override
     public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
-        long time = entity.getEntityWorld().getTotalWorldTime();
+        long time = entity.getEntityWorld().getGameTime();
         if (((EntityTrainer) entity).visibleTime > time) return;
         if (((EntityTrainer) entity).pokemobsCap.getGender() == 1)
         {
@@ -100,7 +100,7 @@ public class RenderTrainer<T extends EntityLiving> extends RenderBiped<T>
             if (!trainer.playerName.isEmpty())
             {
                 if (players.containsKey(trainer.playerName)) return players.get(trainer.playerName);
-                Minecraft minecraft = Minecraft.getMinecraft();
+                Minecraft minecraft = Minecraft.getInstance();
                 GameProfile profile = new GameProfile((UUID) null, trainer.playerName);
                 profile = TileEntitySkull.updateGameprofile(profile);
                 Map<Type, MinecraftProfileTexture> map = minecraft.getSkinManager().loadSkinFromCache(profile);
@@ -111,7 +111,7 @@ public class RenderTrainer<T extends EntityLiving> extends RenderBiped<T>
                 }
                 else
                 {
-                    UUID uuid = EntityPlayer.getUUID(profile);
+                    UUID uuid = PlayerEntity.getUUID(profile);
                     resourcelocation = DefaultPlayerSkin.getDefaultSkin(uuid);
                 }
                 players.put(trainer.playerName, resourcelocation);
@@ -130,7 +130,7 @@ public class RenderTrainer<T extends EntityLiving> extends RenderBiped<T>
                         sb.append(String.format("%02x", b & 0xff));
                     }
                     ResourceLocation resourcelocation = new ResourceLocation("skins/" + sb.toString());
-                    TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
+                    TextureManager texturemanager = Minecraft.getInstance().getTextureManager();
                     ITextureObject object = new URLSkinTexture(null, trainer.urlSkin,
                             DefaultPlayerSkin.getDefaultSkinLegacy(), new URLSkinImageBuffer());
                     texturemanager.loadTexture(resourcelocation, object);

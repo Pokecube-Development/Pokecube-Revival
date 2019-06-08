@@ -126,7 +126,7 @@ public class IECompat
         {
             try
             {
-                stack.setTagCompound(JsonToNBT.getTagFromJson(tag));
+                stack.setTag(JsonToNBT.getTagFromJson(tag));
             }
             catch (NBTException e)
             {
@@ -397,21 +397,21 @@ public class IECompat
         }
 
         @Override
-        @SideOnly(Side.CLIENT)
+        @OnlyIn(Dist.CLIENT)
         public IBlockState[] getRenderedPlant(ItemStack seed, ItemStack soil, float growth, TileEntity tile)
         {
             return new IBlockState[0];
         }
 
         @Override
-        @SideOnly(Side.CLIENT)
+        @OnlyIn(Dist.CLIENT)
         public float getRenderSize(ItemStack seed, ItemStack soil, float growth, TileEntity tile)
         {
             return 1f;
         }
 
         @Override
-        @SideOnly(Side.CLIENT)
+        @OnlyIn(Dist.CLIENT)
         public boolean overrideRender(ItemStack seed, ItemStack soil, float growth, TileEntity tile,
                 BlockRendererDispatcher blockRenderer)
         {

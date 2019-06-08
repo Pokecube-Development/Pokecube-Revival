@@ -7,7 +7,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
 import pokecube.core.client.render.entity.RenderAdvancedPokemobModel;
@@ -35,9 +35,9 @@ public class RenderAFA extends TileEntitySpecialRenderer<TileEntityAFA>
         GL11.glTranslatef(0.405f, 0.645f, -0.5f);
         GL11.glScaled(0.15, 0.15, 0.15);
 
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        PlayerEntity player = Minecraft.getInstance().player;
         ItemStack item = te.getStackInSlot(0);
-        Minecraft.getMinecraft().getItemRenderer().renderItem(player, item, null);
+        Minecraft.getInstance().getItemRenderer().renderItem(player, item, null);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
 

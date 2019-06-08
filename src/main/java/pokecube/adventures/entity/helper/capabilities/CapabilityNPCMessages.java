@@ -5,12 +5,12 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -39,7 +39,7 @@ public class CapabilityNPCMessages
     {
         void sendMessage(MessageState state, Entity target, Object... args);
 
-        void doAction(MessageState state, EntityLivingBase target);
+        void doAction(MessageState state, LivingEntity target);
 
         void setMessage(MessageState state, String message);
 
@@ -54,18 +54,18 @@ public class CapabilityNPCMessages
     {
 
         @Override
-        public NBTBase writeNBT(Capability<IHasMessages> capability, IHasMessages instance, EnumFacing side)
+        public INBT writeNBT(Capability<IHasMessages> capability, IHasMessages instance, Direction side)
         {
-            NBTTagCompound nbt = new NBTTagCompound();
-            NBTTagCompound messTag = new NBTTagCompound();
-            NBTTagCompound actionTag = new NBTTagCompound();
+            CompoundNBT nbt = new CompoundNBT();
+            CompoundNBT messTag = new CompoundNBT();
+            CompoundNBT actionTag = new CompoundNBT();
             for (MessageState state : MessageState.values())
             {
                 String message = instance.getMessage(state);
-                if (message != null && !message.isEmpty()) messTag.setString(state.name(), message);
+                if (message != null && !message.isEmpty()) messTag.putString(state.name(), message);
                 Action action = instance.getAction(state);
                 if (action != null && !action.getCommand().isEmpty())
-                    actionTag.setString(state.name(), action.getCommand());
+                    actionTag.putString(state.name(), action.getCommand());
             }
             nbt.setTag("messages", messTag);
             nbt.setTag("actions", actionTag);
@@ -73,17 +73,17 @@ public class CapabilityNPCMessages
         }
 
         @Override
-        public void readNBT(Capability<IHasMessages> capability, IHasMessages instance, EnumFacing side, NBTBase base)
+        public void readNBT(Capability<IHasMessages> capability, IHasMessages instance, Direction side, INBT base)
         {
-            if (!(base instanceof NBTTagCompound)) return;
-            NBTTagCompound nbt = (NBTTagCompound) base;
+            if (!(base instanceof CompoundNBT)) return;
+            CompoundNBT nbt = (CompoundNBT) base;
             if (!nbt.hasKey("messages")) return;
-            NBTTagCompound messTag = nbt.getCompoundTag("messages");
+            CompoundNBT messTag = nbt.getCompound("messages");
             for (MessageState state : MessageState.values())
             {
                 if (messTag.hasKey(state.name())) instance.setMessage(state, messTag.getString(state.name()));
             }
-            NBTTagCompound actionTag = nbt.getCompoundTag("actions");
+            CompoundNBT actionTag = nbt.getCompound("actions");
             for (MessageState state : MessageState.values())
             {
                 if (actionTag.hasKey(state.name()))
@@ -92,7 +92,7 @@ public class CapabilityNPCMessages
         }
     }
 
-    public static class DefaultMessager implements IHasMessages, ICapabilitySerializable<NBTTagCompound>
+    public static class DefaultMessager implements IHasMessages, ICapabilitySerializable<CompoundNBT>
     {
         Map<MessageState, String> messages = Maps.newHashMap();
         Map<MessageState, Action> actions  = Maps.newHashMap();
@@ -112,16 +112,16 @@ public class CapabilityNPCMessages
         {
             if (target instanceof FakePlayer || messages.get(state) == null || messages.get(state).trim().isEmpty())
                 return;
-            target.sendMessage(new TextComponentTranslation(messages.get(state), args));
+            target.sendMessage(new TranslationTextComponent(messages.get(state), args));
             if (PokecubeMod.debug) PokecubeMod.log(state + ": " + messages.get(state));
         }
 
         @Override
-        public void doAction(MessageState state, EntityLivingBase target)
+        public void doAction(MessageState state, LivingEntity target)
         {
             if (target instanceof FakePlayer) return;
             Action action = actions.get(state);
-            if (action != null && target instanceof EntityPlayer) action.doAction((EntityPlayer) target);
+            if (action != null && target instanceof PlayerEntity) action.doAction((PlayerEntity) target);
         }
 
         @Override
@@ -149,25 +149,25 @@ public class CapabilityNPCMessages
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == MESSAGES_CAP;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return hasCapability(capability, facing) ? MESSAGES_CAP.cast(this) : null;
         }
 
         @Override
-        public NBTTagCompound serializeNBT()
+        public CompoundNBT serializeNBT()
         {
-            return (NBTTagCompound) storage.writeNBT(MESSAGES_CAP, this, null);
+            return (CompoundNBT) storage.writeNBT(MESSAGES_CAP, this, null);
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound nbt)
+        public void deserializeNBT(CompoundNBT nbt)
         {
             storage.readNBT(MESSAGES_CAP, this, null, nbt);
         }

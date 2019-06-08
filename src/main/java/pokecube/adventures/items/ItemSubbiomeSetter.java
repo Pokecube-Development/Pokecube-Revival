@@ -5,18 +5,18 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,26 +38,26 @@ public class ItemSubbiomeSetter extends Item
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void RenderBounds(DrawBlockHighlightEvent event)
     {
         ItemStack held;
-        EntityPlayer player = event.getPlayer();
+        PlayerEntity player = event.getPlayer();
         if ((held = player.getHeldItemMainhand()) != null || (held = player.getHeldItemOffhand()) != null)
         {
             BlockPos pos = event.getTarget().getBlockPos();
             if (pos == null) return;
             if (!player.getEntityWorld().getBlockState(pos).getMaterial().isSolid())
             {
-                Vec3d loc = player.getPositionVector().addVector(0, player.getEyeHeight(), 0)
+                Vec3d loc = player.getPositionVector().add(0, player.getEyeHeight(), 0)
                         .add(player.getLookVec().scale(2));
                 pos = new BlockPos(loc);
             }
 
-            if (held.getItem() == this && held.getTagCompound() != null && held.getTagCompound().hasKey("min"))
+            if (held.getItem() == this && held.getTag() != null && held.getTag().hasKey("min"))
             {
-                BlockPos min = Vector3.readFromNBT(held.getTagCompound().getCompoundTag("min"), "").getPos();
+                BlockPos min = Vector3.readFromNBT(held.getTag().getCompound("min"), "").getPos();
                 BlockPos max = pos;
                 AxisAlignedBB box = new AxisAlignedBB(min, max);
                 min = new BlockPos(box.minX, box.minY, box.minZ);
@@ -120,22 +120,22 @@ public class ItemSubbiomeSetter extends Item
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
     {
         ItemStack itemstack = player.getHeldItem(hand);
         if (world.isRemote && !player.isSneaking())
         {
             player.openGui(PokecubeAdv.instance, 5, player.getEntityWorld(), 0, 0, 0);
         }
-        else if (player.isSneaking() && itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("min"))
+        else if (player.isSneaking() && itemstack.hasTag() && itemstack.getTag().hasKey("min"))
         {
-            String s = itemstack.getTagCompound().getString("biome");
+            String s = itemstack.getTag().getString("biome");
             BiomeType type = BiomeType.getBiome(s);
             TerrainSegment t = TerrainManager.getInstance().getTerrainForEntity(player);
 
-            Vector3 pos1 = Vector3.readFromNBT(itemstack.getTagCompound().getCompoundTag("min"), "");
-            itemstack.getTagCompound().removeTag("min");
-            Vec3d loc = player.getPositionVector().addVector(0, player.getEyeHeight(), 0)
+            Vector3 pos1 = Vector3.readFromNBT(itemstack.getTag().getCompound("min"), "");
+            itemstack.getTag().remove("min");
+            Vec3d loc = player.getPositionVector().add(0, player.getEyeHeight(), 0)
                     .add(player.getLookVec().scale(2));
             Vector3 hit = Vector3.getNewVector().set(loc);
             Vector3 pos2 = hit;
@@ -169,7 +169,7 @@ public class ItemSubbiomeSetter extends Item
             try
             {
                 if (!world.isRemote) player.sendMessage(
-                        new TextComponentString("Second Position " + hit + ", setting all in between to " + s));
+                        new StringTextComponent("Second Position " + hit + ", setting all in between to " + s));
             }
             catch (Exception e1)
             {
@@ -181,29 +181,29 @@ public class ItemSubbiomeSetter extends Item
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand,
-            EnumFacing side, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand,
+            Direction side, float hitX, float hitY, float hitZ)
     {
         ItemStack stack = playerIn.getHeldItem(hand);
         Vector3 hit = Vector3.getNewVector().set(pos);
-        if (stack.hasTagCompound())
+        if (stack.hasTag())
         {
             if (!playerIn.isSneaking())
             {
-                NBTTagCompound minTag = new NBTTagCompound();
+                CompoundNBT minTag = new CompoundNBT();
                 hit.writeToNBT(minTag, "");
-                stack.getTagCompound().setTag("min", minTag);
+                stack.getTag().setTag("min", minTag);
                 if (!worldIn.isRemote)
-                    playerIn.sendMessage(new TextComponentString("First Position " + hit.set(hit.getPos())));
+                    playerIn.sendMessage(new StringTextComponent("First Position " + hit.set(hit.getPos())));
             }
-            else if (playerIn.isSneaking() && stack.getTagCompound().hasKey("min"))
+            else if (playerIn.isSneaking() && stack.getTag().hasKey("min"))
             {
-                String s = stack.getTagCompound().getString("biome");
+                String s = stack.getTag().getString("biome");
                 BiomeType type = BiomeType.getBiome(s);
                 TerrainSegment t = TerrainManager.getInstance().getTerrainForEntity(playerIn);
 
-                Vector3 pos1 = Vector3.readFromNBT(stack.getTagCompound().getCompoundTag("min"), "");
-                stack.getTagCompound().removeTag("min");
+                Vector3 pos1 = Vector3.readFromNBT(stack.getTag().getCompound("min"), "");
+                stack.getTag().remove("min");
                 Vector3 pos2 = hit;
 
                 double xMin = Math.min(pos1.x, pos2.x);
@@ -234,7 +234,7 @@ public class ItemSubbiomeSetter extends Item
                         }
                 try
                 {
-                    if (!worldIn.isRemote) playerIn.sendMessage(new TextComponentString(
+                    if (!worldIn.isRemote) playerIn.sendMessage(new StringTextComponent(
                             "Second Position " + hit.set(hit.getPos()) + ", setting all in between to " + s));
                 }
                 catch (Exception e)

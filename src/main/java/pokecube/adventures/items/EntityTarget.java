@@ -1,11 +1,11 @@
 package pokecube.adventures.items;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
-public class EntityTarget extends EntityLiving
+public class EntityTarget extends MobEntity
 {
 
     int time = 0;
@@ -17,16 +17,16 @@ public class EntityTarget extends EntityLiving
         this.setAlwaysRenderNameTag(false);
     }
 
-    /** Deals damage to the entity. If its a EntityPlayer then will take damage
+    /** Deals damage to the entity. If its a PlayerEntity then will take damage
      * from the armor first and then health second with the reduced value. Args:
      * damageAmount */
     @Override
     protected void damageEntity(DamageSource par1DamageSource, float par2)
     {
         Entity source = par1DamageSource.getTrueSource();
-        if (source != null && source instanceof EntityLiving)
+        if (source != null && source instanceof MobEntity)
         {
-            EntityLiving ent = (EntityLiving) source;
+            MobEntity ent = (MobEntity) source;
             ent.setAttackTarget(null);
         }
         if (source != null && source.isSneaking())

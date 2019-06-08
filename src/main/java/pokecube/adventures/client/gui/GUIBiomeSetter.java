@@ -8,7 +8,7 @@ import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import pokecube.adventures.network.PacketPokeAdv.MessageServer;
 import pokecube.core.network.PokecubePacketHandler;
 import thut.api.terrain.BiomeType;
@@ -66,9 +66,9 @@ public class GUIBiomeSetter extends GuiScreen
 
         yOffset = -20;
         String biome = "";
-        if (setter != null && setter.hasTagCompound())
+        if (setter != null && setter.hasTag())
         {
-            biome = setter.getTagCompound().getString("biome");
+            biome = setter.getTag().getString("biome");
         }
 
         textField0 = new GuiTextField(0, fontRenderer, width / 2 - 50, height / 4 + 20 + yOffset, 100, 10);
@@ -96,8 +96,8 @@ public class GUIBiomeSetter extends GuiScreen
 
     private void sendChooseToServer()
     {
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setString("biome", textField0.getText());
+        CompoundNBT tag = new CompoundNBT();
+        tag.putString("biome", textField0.getText());
         MessageServer mess = new MessageServer(MessageServer.MESSAGEBIOMESETTER, tag);
         PokecubePacketHandler.sendToServer(mess);
     }

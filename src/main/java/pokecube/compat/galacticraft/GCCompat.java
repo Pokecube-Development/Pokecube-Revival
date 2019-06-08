@@ -24,13 +24,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLCommonSetupEvent;
 import pokecube.core.database.Database;
 import pokecube.core.database.PokedexEntry;
 import pokecube.core.database.PokedexEntry.SpawnData.SpawnEntry;
@@ -60,7 +60,7 @@ public class GCCompat
     List<PokedexEntry>         moonmon         = Lists.newArrayList();
     PokedexEntry               megaray;
 
-    public static void setSpawnsFile(FMLPreInitializationEvent evt)
+    public static void setSpawnsFile(FMLCommonSetupEvent evt)
     {
         File file = evt.getSuggestedConfigurationFile();
         String seperator = System.getProperty("file.separator");
@@ -203,7 +203,7 @@ public class GCCompat
                     v = Vector3.getNextSurfacePoint2(world, vbak, Vector3.secondAxisNeg, 20);
                     if (v != null)
                     {
-                        v.offsetBy(EnumFacing.UP);
+                        v.offsetBy(Direction.UP);
                         weight = dbe.getSpawnData().getWeight(dbe.getSpawnData().getMatcher(world, v));
                     }
                     else weight = 0;
@@ -243,7 +243,7 @@ public class GCCompat
 
     @Optional.Method(modid = "galacticraft")
     @CompatClass(takesEvent = true, phase = Phase.PRE)
-    public static void Compat(FMLPreInitializationEvent evt)
+    public static void Compat(FMLCommonSetupEvent evt)
     {
         MinecraftForge.EVENT_BUS.register(new GCCompat());
         setSpawnsFile(evt);

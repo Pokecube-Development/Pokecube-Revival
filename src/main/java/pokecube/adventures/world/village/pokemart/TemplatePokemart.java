@@ -1,6 +1,6 @@
 package pokecube.adventures.world.village.pokemart;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import pokecube.core.world.gen.template.PokecubeTemplates;
 import pokecube.core.world.gen.village.buildings.TemplateStructure;
@@ -15,7 +15,7 @@ public class TemplatePokemart extends TemplateStructure
         setOffset(-2);
     }
 
-    public TemplatePokemart(BlockPos pos, EnumFacing dir)
+    public TemplatePokemart(BlockPos pos, Direction dir)
     {
         super(POKEMART, pos, dir);
     }

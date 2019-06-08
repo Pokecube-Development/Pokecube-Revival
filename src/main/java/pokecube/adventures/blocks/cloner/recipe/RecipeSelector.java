@@ -10,7 +10,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -77,21 +77,21 @@ public class RecipeSelector implements IDefaultRecipe
             return selectorDestructChance + " " + dnaDestructChance;
         }
 
-        public NBTTagCompound save()
+        public CompoundNBT save()
         {
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setFloat("S", selectorDestructChance);
-            tag.setFloat("D", dnaDestructChance);
+            CompoundNBT tag = new CompoundNBT();
+            tag.putFloat("S", selectorDestructChance);
+            tag.putFloat("D", dnaDestructChance);
             return tag;
         }
 
-        public static SelectorValue load(NBTTagCompound tag)
+        public static SelectorValue load(CompoundNBT tag)
         {
             if (!tag.hasKey("S") || !tag.hasKey("D")) return defaultSelector;
             return new SelectorValue(tag.getFloat("S"), tag.getFloat("D"));
         }
 
-        @SideOnly(Side.CLIENT)
+        @OnlyIn(Dist.CLIENT)
         public void addToTooltip(List<String> toolTip)
         {
             toolTip.add(I18n.format("container.geneselector.tooltip.a", selectorDestructChance));
@@ -154,7 +154,7 @@ public class RecipeSelector implements IDefaultRecipe
         if (value.equals(oldValue)) return false;
         output = book.copy();
         output.setCount(1);
-        output.getTagCompound().setTag(ClonerHelper.SELECTORTAG, value.save());
+        output.getTag().setTag(ClonerHelper.SELECTORTAG, value.save());
         return true;
     }
 

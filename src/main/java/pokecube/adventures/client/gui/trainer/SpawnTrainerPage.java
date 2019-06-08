@@ -95,7 +95,7 @@ public class SpawnTrainerPage extends Page
 
         if (packet != null)
         {
-            packet.data.setString("T", type.name);
+            packet.data.putString("T", type.name);
             PokecubeMod.packetPipeline.sendToServer(packet);
             parent.mc.player.closeScreen();
         }

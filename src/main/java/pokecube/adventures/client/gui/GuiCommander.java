@@ -8,7 +8,7 @@ import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import pokecube.adventures.blocks.commander.TileEntityCommander;
 import pokecube.adventures.network.packets.PacketCommander;
 import pokecube.core.interfaces.pokemob.IHasCommands.Command;
@@ -114,14 +114,14 @@ public class GuiCommander extends GuiScreen
 
     private void sendChooseToServer()
     {
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setString("biome", command.getText());
+        CompoundNBT tag = new CompoundNBT();
+        tag.putString("biome", command.getText());
         PacketCommander mess = new PacketCommander();
         mess.data.setInteger("x", tile.getPos().getX());
         mess.data.setInteger("y", tile.getPos().getY());
         mess.data.setInteger("z", tile.getPos().getZ());
-        mess.data.setString("C", command.getText());
-        mess.data.setString("A", args.getText());
+        mess.data.putString("C", command.getText());
+        mess.data.putString("A", args.getText());
         PokecubePacketHandler.sendToServer(mess);
     }
 }

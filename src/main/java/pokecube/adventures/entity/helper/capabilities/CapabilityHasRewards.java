@@ -5,14 +5,14 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -57,7 +57,7 @@ public class CapabilityHasRewards
     {
         List<Reward> getRewards();
 
-        default void giveReward(EntityPlayer player, EntityLivingBase rewarder)
+        default void giveReward(PlayerEntity player, LivingEntity rewarder)
         {
             for (Reward reward : getRewards())
             {
@@ -66,7 +66,7 @@ public class CapabilityHasRewards
                 if (new Random().nextFloat() > reward.chance) continue;
                 if (!player.inventory.addItemStackToInventory(i.copy()))
                 {
-                    EntityItem item = player.entityDropItem(i.copy(), 0.5f);
+                    ItemEntity item = player.entityDropItem(i.copy(), 0.5f);
                     if (item == null)
                     {
                         continue;
@@ -88,33 +88,33 @@ public class CapabilityHasRewards
     {
 
         @Override
-        public NBTBase writeNBT(Capability<IHasRewards> capability, IHasRewards instance, EnumFacing side)
+        public INBT writeNBT(Capability<IHasRewards> capability, IHasRewards instance, Direction side)
         {
-            NBTTagList nbttaglist = new NBTTagList();
+            ListNBT ListNBT = new ListNBT();
             for (int i = 0; i < instance.getRewards().size(); ++i)
             {
                 ItemStack stack = instance.getRewards().get(i).stack;
 
                 if (CompatWrapper.isValid(stack))
                 {
-                    NBTTagCompound nbttagcompound = new NBTTagCompound();
-                    stack.writeToNBT(nbttagcompound);
-                    nbttagcompound.setFloat("chance", instance.getRewards().get(i).chance);
-                    nbttaglist.appendTag(nbttagcompound);
+                    CompoundNBT CompoundNBT = new CompoundNBT();
+                    stack.writeToNBT(CompoundNBT);
+                    CompoundNBT.putFloat("chance", instance.getRewards().get(i).chance);
+                    ListNBT.appendTag(CompoundNBT);
                 }
             }
-            return nbttaglist;
+            return ListNBT;
         }
 
         @Override
-        public void readNBT(Capability<IHasRewards> capability, IHasRewards instance, EnumFacing side, NBTBase base)
+        public void readNBT(Capability<IHasRewards> capability, IHasRewards instance, Direction side, INBT base)
         {
-            if (!(base instanceof NBTTagList)) return;
-            NBTTagList nbttaglist = (NBTTagList) base;
+            if (!(base instanceof ListNBT)) return;
+            ListNBT ListNBT = (ListNBT) base;
             instance.getRewards().clear();
-            for (int i = 0; i < nbttaglist.tagCount(); ++i)
+            for (int i = 0; i < ListNBT.size(); ++i)
             {
-                NBTTagCompound tag = nbttaglist.getCompoundTagAt(i);
+                CompoundNBT tag = ListNBT.getCompound(i);
                 ItemStack stack = new ItemStack(tag);
                 float chance = tag.hasKey("chance") ? tag.getFloat("chance") : 1;
                 instance.getRewards().add(new Reward(stack, chance));
@@ -123,7 +123,7 @@ public class CapabilityHasRewards
 
     }
 
-    public static class DefaultRewards implements IHasRewards, ICapabilitySerializable<NBTTagList>
+    public static class DefaultRewards implements IHasRewards, ICapabilitySerializable<ListNBT>
     {
         private final List<Reward> rewards = Lists.newArrayList();
 
@@ -134,25 +134,25 @@ public class CapabilityHasRewards
         }
 
         @Override
-        public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+        public boolean hasCapability(Capability<?> capability, Direction facing)
         {
             return capability == REWARDS_CAP;
         }
 
         @Override
-        public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+        public <T> T getCapability(Capability<T> capability, Direction facing)
         {
             return hasCapability(capability, facing) ? REWARDS_CAP.cast(this) : null;
         }
 
         @Override
-        public NBTTagList serializeNBT()
+        public ListNBT serializeNBT()
         {
-            return (NBTTagList) storage.writeNBT(REWARDS_CAP, this, null);
+            return (ListNBT) storage.writeNBT(REWARDS_CAP, this, null);
         }
 
         @Override
-        public void deserializeNBT(NBTTagList nbt)
+        public void deserializeNBT(ListNBT nbt)
         {
             storage.readNBT(REWARDS_CAP, this, null, nbt);
         }

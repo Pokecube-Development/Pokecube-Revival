@@ -12,7 +12,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLCommonSetupEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -68,7 +68,7 @@ public class Compat
                 }
                 if (PokecubeAdv.tesla)
                 {
-                    ITextComponent mess = new TextComponentTranslation("pokecube.power.tesla");
+                    ITextComponent mess = new TranslationTextComponent("pokecube.power.tesla");
                     (event.player).sendMessage(mess);
                 }
             }
@@ -86,7 +86,7 @@ public class Compat
 
     private static FileWriter  fwriter;
 
-    public static void setSpawnsFile(FMLPreInitializationEvent evt)
+    public static void setSpawnsFile(FMLCommonSetupEvent evt)
     {
         File file = evt.getSuggestedConfigurationFile();
         String seperator = System.getProperty("file.separator");
@@ -221,7 +221,7 @@ public class Compat
         meta.parent = PokecubeMod.ID;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @EventHandler
     public void load(FMLInitializationEvent evt)
     {
@@ -251,7 +251,7 @@ public class Compat
     }
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent evt)
+    public void preInit(FMLCommonSetupEvent evt)
     {
         doMetastuff();
         MinecraftForge.EVENT_BUS.register(this);

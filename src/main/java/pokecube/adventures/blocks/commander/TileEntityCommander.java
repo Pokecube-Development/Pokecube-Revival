@@ -4,12 +4,12 @@ import java.lang.reflect.Constructor;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -47,11 +47,11 @@ public class TileEntityCommander extends TileEntityOwnable
     @Override
     public ITextComponent getDisplayName()
     {
-        return new TextComponentString("Pokemob Commander");
+        return new StringTextComponent("Pokemob Commander");
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public AxisAlignedBB getRenderBoundingBox()
     {
         AxisAlignedBB bb = INFINITE_EXTENT_AABB;
@@ -62,16 +62,16 @@ public class TileEntityCommander extends TileEntityOwnable
     @Override
     public SPacketUpdateTileEntity getUpdatePacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        if (getWorld().isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
-        this.writeToNBT(nbttagcompound);
-        return new SPacketUpdateTileEntity(this.getPos(), 3, nbttagcompound);
+        CompoundNBT CompoundNBT = new CompoundNBT();
+        if (getWorld().isRemote) return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
+        this.writeToNBT(CompoundNBT);
+        return new SPacketUpdateTileEntity(this.getPos(), 3, CompoundNBT);
     }
 
     @Override
-    public NBTTagCompound getUpdateTag()
+    public CompoundNBT getUpdateTag()
     {
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         return writeToNBT(nbt);
     }
 
@@ -89,13 +89,13 @@ public class TileEntityCommander extends TileEntityOwnable
     {
         if (getWorld().isRemote)
         {
-            NBTTagCompound nbt = pkt.getNbtCompound();
+            CompoundNBT nbt = pkt.getNbtCompound();
             readFromNBT(nbt);
         }
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
+    public void readFromNBT(CompoundNBT nbt)
     {
         super.readFromNBT(nbt);
         if (nbt.hasKey("pokeIDMost")) pokeID = nbt.getUniqueId("pokeID");
@@ -104,12 +104,12 @@ public class TileEntityCommander extends TileEntityOwnable
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
+    public CompoundNBT writeToNBT(CompoundNBT nbt)
     {
         super.writeToNBT(nbt);
         if (getPokeID() != null) nbt.setUniqueId("pokeID", getPokeID());
-        nbt.setString("args", args);
-        if (this.command != null) nbt.setString("cmd", this.command.name());
+        nbt.putString("args", args);
+        if (this.command != null) nbt.putString("cmd", this.command.name());
         return nbt;
     }
 

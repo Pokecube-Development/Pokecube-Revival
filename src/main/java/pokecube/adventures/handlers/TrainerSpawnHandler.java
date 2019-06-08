@@ -16,9 +16,9 @@ import com.google.common.collect.Maps;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -93,7 +93,7 @@ public class TrainerSpawnHandler
             if (chunkPosX >= coord.getX() - tolerance && chunkPosZ >= coord.getZ() - tolerance
                     && chunkPosY >= coord.getY() - tolerance && chunkPosY <= coord.getY() + tolerance
                     && chunkPosX <= coord.getX() + tolerance && chunkPosZ <= coord.getZ() + tolerance
-                    && world.provider.getDimension() == coord.dim)
+                    && world.dimension.getDimension() == coord.dim)
             {
                 ret++;
             }
@@ -126,7 +126,7 @@ public class TrainerSpawnHandler
         if (!world.isAreaLoaded(v.getPos(), 8)) return null;
 
         // Find surface
-        Vector3 temp1 = Vector3.getNextSurfacePoint2(world, vec1, vec2.set(EnumFacing.DOWN), 10);
+        Vector3 temp1 = Vector3.getNextSurfacePoint2(world, vec1, vec2.set(Direction.DOWN), 10);
 
         if (temp1 != null)
         {
@@ -159,31 +159,31 @@ public class TrainerSpawnHandler
     {
         if (event.getObject() instanceof EntityVillager || event.getObject() instanceof EntityTrainer)
         {
-            class Provider extends GuardAICapability implements ICapabilitySerializable<NBTTagCompound>
+            class Provider extends GuardAICapability implements ICapabilitySerializable<CompoundNBT>
             {
                 @Override
-                public void deserializeNBT(NBTTagCompound nbt)
+                public void deserializeNBT(CompoundNBT nbt)
                 {
                     EventsHandler.storage.readNBT(EventsHandler.GUARDAI_CAP, this, null, nbt);
                 }
 
                 @Override
-                public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+                public <T> T getCapability(Capability<T> capability, Direction facing)
                 {
                     if (hasCapability(capability, facing)) return EventsHandler.GUARDAI_CAP.cast(this);
                     return null;
                 }
 
                 @Override
-                public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+                public boolean hasCapability(Capability<?> capability, Direction facing)
                 {
                     return EventsHandler.GUARDAI_CAP != null && capability == EventsHandler.GUARDAI_CAP;
                 }
 
                 @Override
-                public NBTTagCompound serializeNBT()
+                public CompoundNBT serializeNBT()
                 {
-                    return (NBTTagCompound) EventsHandler.storage.writeNBT(EventsHandler.GUARDAI_CAP, this, null);
+                    return (CompoundNBT) EventsHandler.storage.writeNBT(EventsHandler.GUARDAI_CAP, this, null);
                 }
             }
             event.addCapability(new ResourceLocation("pokecube_adventures:guardai"), new Provider());
@@ -197,12 +197,12 @@ public class TrainerSpawnHandler
         ArrayList<Object> players = new ArrayList<Object>();
         players.addAll(w.playerEntities);
         if (players.size() < 1) return;
-        EntityPlayer p = (EntityPlayer) players.get(w.rand.nextInt(players.size()));
+        PlayerEntity p = (PlayerEntity) players.get(w.rand.nextInt(players.size()));
         Vector3 v = getRandomSpawningPointNearEntity(w, p, Config.instance.trainerBox);
         if (v == null) return;
         if (v.y < 0) v.y = v.getMaxY(w);
         Vector3 temp = Vector3.getNextSurfacePoint2(w, v, Vector3.secondAxisNeg, 20);
-        v = temp != null ? temp.offset(EnumFacing.UP) : v;
+        v = temp != null ? temp.offset(Direction.UP) : v;
 
         if (!SpawnHandler.checkNoSpawnerInArea(w, v.intX(), v.intY(), v.intZ())) return;
         int count = countTrainersInArea(w, v.intX() / 16, v.intY() / 16, v.intZ() / 16, Config.instance.trainerBox);
@@ -222,7 +222,7 @@ public class TrainerSpawnHandler
             double dt = (System.nanoTime() - time) / 1000000D;
             if (dt > 20) PokecubeMod.log(FMLCommonHandler.instance().getEffectiveSide() + " Trainer "
                     + cap.getType().name + " " + dt + "ms ");
-            v.offsetBy(EnumFacing.UP).moveEntity(t);
+            v.offsetBy(Direction.UP).moveEntity(t);
             if (t.pokemobsCap.countPokemon() > 0
                     && SpawnHandler.checkNoSpawnerInArea(w, (int) t.posX, (int) t.posY, (int) t.posZ))
             {
@@ -237,8 +237,8 @@ public class TrainerSpawnHandler
     @SubscribeEvent
     public void tickEvent(WorldTickEvent evt)
     {
-        if (Config.instance.trainerSpawn && evt.phase == Phase.END && evt.type != Type.CLIENT && evt.side != Side.CLIENT
-                && evt.world.getTotalWorldTime() % PokecubeMod.core.getConfig().spawnRate == 0)
+        if (Config.instance.trainerSpawn && evt.phase == Phase.END && evt.type != Type.CLIENT && evt.side != Dist.CLIENT
+                && evt.world.getGameTime() % PokecubeMod.core.getConfig().spawnRate == 0)
         {
             long time = System.nanoTime();
             tick(evt.world);
@@ -252,9 +252,9 @@ public class TrainerSpawnHandler
     {
         TypeTrainer ttype = null;
         Material m = v.getBlockMaterial(w);
-        if (m == Material.AIR && v.offset(EnumFacing.DOWN).getBlockMaterial(w) == Material.AIR)
+        if (m == Material.AIR && v.offset(Direction.DOWN).getBlockMaterial(w) == Material.AIR)
         {
-            v = v.getTopBlockPos(w).offsetBy(EnumFacing.UP);
+            v = v.getTopBlockPos(w).offsetBy(Direction.UP);
         }
         SpawnCheck checker = new SpawnCheck(v, w);
         List<TypeTrainer> types = Lists.newArrayList(TypeTrainer.typeMap.values());
