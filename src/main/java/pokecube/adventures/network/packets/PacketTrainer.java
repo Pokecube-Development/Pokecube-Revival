@@ -213,14 +213,14 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
             if (mob == null) return;
             IHasPokemobs cap = CapabilityHasPokemobs.getHasPokemobs(mob);
             IGuardAICapability guard = mob.getCapability(EventsHandler.GUARDAI_CAP, null);
-            
-            //Reset defeat list.
-            if(message.data.getBoolean("RDL"))
+
+            // Reset defeat list.
+            if (message.data.getBoolean("RDL"))
             {
                 cap.resetDefeatList();
                 return;
             }
-            
+
             NBTBase tag = message.data.getTag("T");
             if (tag instanceof NBTTagCompound && ((NBTTagCompound) tag).hasKey("GU") && guard != null)
             {
@@ -347,12 +347,15 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(mob);
             if (pokemob != null)
             {
-                pokemob = PokecubeManager.itemToPokemob(new ItemStack((NBTTagCompound) tag), mob.getEntityWorld());
+                IPokemob newPokemob = PokecubeManager.itemToPokemob(new ItemStack((NBTTagCompound) tag),
+                        mob.getEntityWorld());
                 if (message.data.getBoolean("D"))
                 {
                     mob.setDead();
                 }
-                else mob.readFromNBT(pokemob.getEntity().writeToNBT(new NBTTagCompound()));
+                else mob.readFromNBT(newPokemob.getEntity().writeToNBT(new NBTTagCompound()));
+                pokemob.readPokemobData(newPokemob.writePokemobData());
+                pokemob.onGenesChanged();
                 PacketHandler.sendEntityUpdate(mob);
             }
         }
