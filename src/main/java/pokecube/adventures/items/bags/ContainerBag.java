@@ -1,13 +1,13 @@
 package pokecube.adventures.items.bags;
 
 import invtweaks.api.container.ChestContainer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import pokecube.adventures.network.packets.PacketBag;
 import pokecube.core.PokecubeItems;
 import pokecube.core.interfaces.IPokemobUseable;

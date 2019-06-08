@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.ITargetWatcher;

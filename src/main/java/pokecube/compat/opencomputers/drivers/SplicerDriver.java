@@ -11,7 +11,7 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -136,7 +136,7 @@ public class SplicerDriver extends DriverBase
             newSelector.setTag(new CompoundNBT());
             ListNBT pages = new ListNBT();
             for (String s : values)
-                pages.appendTag(new NBTTagString(String.format("{\"text\":\"%s\"}", s)));
+                pages.appendTag(new StringNBT(String.format("{\"text\":\"%s\"}", s)));
             newSelector.getTag().setTag("pages", pages);
             SelectorValue value = RecipeSelector.getSelectorValue(tileEntity.getStackInSlot(1));
             newSelector.getTag().setTag(ClonerHelper.SELECTORTAG, value.save());

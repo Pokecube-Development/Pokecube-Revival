@@ -17,7 +17,7 @@ import java.util.logging.Level;
 
 import com.google.common.collect.Lists;
 
-import net.minecraftforge.fml.common.event.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.entity.trainers.TypeTrainer;
 import pokecube.core.database.Database;

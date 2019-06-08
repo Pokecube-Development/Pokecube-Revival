@@ -1,8 +1,8 @@
 package pokecube.adventures.entity.helper.capabilities;
 
-import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.IntNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -67,7 +67,7 @@ public class CapabilityNPCAIStates
         public void readNBT(Capability<IHasNPCAIStates> capability, IHasNPCAIStates instance, Direction side,
                 INBT nbt)
         {
-            if (nbt instanceof NBTTagInt) instance.setTotalState(((NBTTagInt) nbt).getInt());
+            if (nbt instanceof IntNBT) instance.setTotalState(((IntNBT) nbt).getInt());
             else if (nbt instanceof CompoundNBT)
             {
                 CompoundNBT tag = (CompoundNBT) nbt;
