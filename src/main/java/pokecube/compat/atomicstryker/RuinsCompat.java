@@ -1,8 +1,7 @@
 package pokecube.compat.atomicstryker;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import pokecube.adventures.commands.Config;
 import pokecube.core.interfaces.PokecubeMod;
 import thut.api.terrain.BiomeType;

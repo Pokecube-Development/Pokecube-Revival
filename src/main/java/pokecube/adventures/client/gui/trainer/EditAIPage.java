@@ -3,10 +3,10 @@ package pokecube.adventures.client.gui.trainer;
 import java.io.IOException;
 import java.util.function.Predicate;
 
-import org.lwjgl.input.Keyboard;
+import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 
+import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.text.ITextComponent;

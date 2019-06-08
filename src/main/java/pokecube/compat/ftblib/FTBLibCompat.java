@@ -13,7 +13,6 @@ import com.feed_the_beast.ftbl.api.IUniverse;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.Optional;
 import pokecube.core.handlers.TeamManager;
 import pokecube.core.handlers.TeamManager.ITeamProvider;
 import pokecube.core.interfaces.PokecubeMod;

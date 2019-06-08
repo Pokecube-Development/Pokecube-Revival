@@ -2,7 +2,6 @@ package pokecube.adventures.blocks.cloner.container;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pokecube.adventures.blocks.cloner.crafting.CraftMatrix;

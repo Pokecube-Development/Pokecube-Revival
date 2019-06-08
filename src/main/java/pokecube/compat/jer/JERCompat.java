@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.vecmath.Vector3f;
 
+import org.apache.maven.artifact.versioning.Restriction;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
@@ -18,20 +19,17 @@ import jeresources.api.drop.LootDrop;
 import jeresources.api.drop.PlantDrop;
 import jeresources.api.render.IMobRenderHook;
 import jeresources.api.restrictions.BiomeRestriction;
-import jeresources.api.restrictions.Restriction;
 import jeresources.compatibility.CompatBase;
 import jeresources.util.LootTableHelper;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import pokecube.core.PokecubeCore;
 import pokecube.core.PokecubeItems;
 import pokecube.core.database.Database;

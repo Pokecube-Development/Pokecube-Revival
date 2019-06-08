@@ -3,7 +3,6 @@ package pokecube.adventures.blocks.cloner.container;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
 import pokecube.adventures.blocks.cloner.crafting.CraftMatrix;
 import pokecube.adventures.blocks.cloner.recipe.IPoweredProgress;
 import thut.core.common.blocks.SmartSlot;

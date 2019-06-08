@@ -8,8 +8,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import pokecube.core.database.SpawnBiomeMatcher.SpawnCheck;
 import pokecube.core.events.SpawnCheckEvent;
 import thut.lib.CompatClass;

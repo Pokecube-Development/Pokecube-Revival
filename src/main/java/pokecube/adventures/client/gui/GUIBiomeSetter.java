@@ -3,9 +3,10 @@ package pokecube.adventures.client.gui;
 import java.io.IOException;
 import java.util.List;
 
+import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import pokecube.adventures.network.PacketPokeAdv.MessageServer;

@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.IMerchant;
+import net.minecraft.entity.merchant.IMerchant;
 import net.minecraft.util.ResourceLocation;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;

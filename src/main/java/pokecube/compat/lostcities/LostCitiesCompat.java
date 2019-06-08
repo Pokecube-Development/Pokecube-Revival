@@ -1,8 +1,7 @@
 package pokecube.compat.lostcities;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import pokecube.core.events.onload.InitDatabase;
 import pokecube.core.interfaces.PokecubeMod;
 import thut.api.terrain.TerrainSegment;

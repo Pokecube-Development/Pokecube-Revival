@@ -1,6 +1,7 @@
 package pokecube.compat.opencomputers;
 
-import li.cil.oc.api.Driver;
+import java.sql.Driver;
+
 import net.minecraftforge.fml.common.Optional.Method;
 import pokecube.compat.opencomputers.drivers.CommanderDriver;
 import pokecube.compat.opencomputers.drivers.PCDriver;

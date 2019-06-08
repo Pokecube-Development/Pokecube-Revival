@@ -7,12 +7,11 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.function.Predicate;
 
-import org.lwjgl.input.Keyboard;
-
 import com.google.common.collect.Lists;
+import com.mcf.davidee.nbteditpqb.gui.GuiTextField;
 
+import net.java.games.input.Keyboard;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;

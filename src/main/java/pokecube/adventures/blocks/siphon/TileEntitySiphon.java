@@ -6,9 +6,9 @@ import org.nfunk.jep.JEP;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;

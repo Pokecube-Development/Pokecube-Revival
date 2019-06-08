@@ -2,12 +2,10 @@ package pokecube.compat.opencomputers.drivers;
 
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
-import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.ManagedEnvironment;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
 import pokecube.adventures.blocks.afa.TileEntityAFA;
 import thut.api.network.PacketHandler;
 

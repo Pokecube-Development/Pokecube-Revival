@@ -2,7 +2,7 @@ package pokecube.compat.events;
 
 import net.minecraft.entity.Entity;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.eventbus.api.Cancelable;
 import thut.api.maths.Vector3;
 
 @Cancelable

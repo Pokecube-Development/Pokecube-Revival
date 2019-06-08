@@ -1,6 +1,5 @@
 package pokecube.adventures.blocks.cloner.crafting;
 
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;

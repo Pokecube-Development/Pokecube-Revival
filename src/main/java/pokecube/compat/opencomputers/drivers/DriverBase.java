@@ -1,7 +1,7 @@
 package pokecube.compat.opencomputers.drivers;
 
-import li.cil.oc.api.Network;
-import li.cil.oc.api.network.Visibility;
+import com.google.common.graph.Network;
+
 import li.cil.oc.api.prefab.AbstractManagedEnvironment;
 import li.cil.oc.api.prefab.DriverSidedTileEntity;
 

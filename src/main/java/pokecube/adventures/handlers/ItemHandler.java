@@ -7,14 +7,14 @@ import static pokecube.core.interfaces.PokecubeMod.creativeTabPokecube;
 import java.util.function.Predicate;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.commands.Config;
 import pokecube.adventures.handlers.loot.Loot;
