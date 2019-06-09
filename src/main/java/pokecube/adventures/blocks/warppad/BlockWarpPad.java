@@ -3,7 +3,7 @@ package pokecube.adventures.blocks.warppad;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -32,7 +32,7 @@ public class BlockWarpPad extends Block implements ITileEntityProvider
 
     /** Called when the block is placed in the world. */
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY,
+    public BlockState getStateForPlacement(World world, BlockPos pos, Direction facing, float hitX, float hitY,
             float hitZ, int meta, LivingEntity placer, Hand hand)
     {
         Vector3 loc = Vector3.getNewVector().set(pos);

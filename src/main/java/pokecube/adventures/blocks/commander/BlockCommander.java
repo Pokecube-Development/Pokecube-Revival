@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -36,7 +36,7 @@ public final class BlockCommander extends BlockBase
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn,
+    public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn,
             Hand hand, Direction side, float hitX, float hitY, float hitZ)
     {
         UUID id = PokecubeManager.getUUID(playerIn.getHeldItem(hand));
@@ -66,7 +66,7 @@ public final class BlockCommander extends BlockBase
      * when redstone power is updated, cactus blocks popping off due to a
      * neighboring solid block, etc. */
     @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
+    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
     {
         int power = worldIn.isBlockIndirectlyGettingPowered(pos);
         TileEntity tile = worldIn.getTileEntity(pos);

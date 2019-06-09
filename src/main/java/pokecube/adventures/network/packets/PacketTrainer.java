@@ -171,7 +171,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         }
         if (message.message == MESSAGEUPDATETRAINER)
         {
-            int id = message.data.getInteger("I");
+            int id = message.data.getInt("I");
             Entity mob = player.getEntityWorld().getEntityByID(id);
 
             // O for Open Gui Packet.
@@ -231,7 +231,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
             if (tag instanceof CompoundNBT && ((CompoundNBT) tag).hasKey("TR") && mob instanceof IMerchant)
             {
                 CompoundNBT nbt = ((CompoundNBT) tag);
-                int index = nbt.getInteger("I");
+                int index = nbt.getInt("I");
                 CompoundNBT tag2 = new CompoundNBT();
                 mob.writeToNBT(tag2);
                 MerchantRecipeList list = new MerchantRecipeList(tag2.getCompound("Offers"));
@@ -245,8 +245,8 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
                 {
                     if (nbt.hasKey("N"))
                     {
-                        int index1 = nbt.getInteger("I");
-                        int index2 = index1 + nbt.getInteger("N");
+                        int index1 = nbt.getInt("I");
+                        int index2 = index1 + nbt.getInt("N");
                         MerchantRecipe temp = list.get(index1);
                         list.set(index1, list.get(index2));
                         list.set(index2, temp);
@@ -343,7 +343,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         if (message.message == MESSAGEUPDATEMOB)
         {
             INBT tag = message.data.getTag("T");
-            int id = message.data.getInteger("I");
+            int id = message.data.getInt("I");
             Entity mob = player.getEntityWorld().getEntityByID(id);
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(mob);
             if (pokemob != null)
@@ -362,7 +362,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         }
         if (message.message == MESSAGESPAWNTRAINER)
         {
-            int id = message.data.getInteger("I");
+            int id = message.data.getInt("I");
             TypeTrainer type = TypeTrainer.getTrainer(message.data.getString("T"));
             if (type != null)
             {
@@ -396,14 +396,14 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         }
         if (message.message == MESSAGENOTIFYDEFEAT)
         {
-            int id = message.data.getInteger("I");
+            int id = message.data.getInt("I");
             LivingEntity mob = (LivingEntity) player.getEntityWorld().getEntityByID(id);
             if (mob instanceof EntityTrainer) ((EntityTrainer) mob).visibleTime = message.data.getLong("L");
             return;
         }
         if (message.message == MESSAGEKILLTRAINER)
         {
-            int id = message.data.getInteger("I");
+            int id = message.data.getInt("I");
             Entity trainer = player.getEntityWorld().getEntityByID(id);
             trainer.setDead();
         }

@@ -841,12 +841,12 @@ public class CapabilityHasPokemobs
             {
                 this.setOutID(UUID.fromString(nbt.getString("outPokemob")));
             }
-            this.setNextSlot(nbt.getInteger("nextSlot"));
+            this.setNextSlot(nbt.getInt("nextSlot"));
             this.setCanMegaEvolve(nbt.getBoolean("megaevolves"));
             if (nbt.hasKey("gender")) this.setGender(nbt.getByte("gender"));
             if (this.getNextSlot() >= 6) this.setNextSlot(0);
-            this.sight = nbt.hasKey("sight") ? nbt.getInteger("sight") : -1;
-            if (nbt.hasKey("battleCD")) this.battleCooldown = nbt.getInteger("battleCD");
+            this.sight = nbt.hasKey("sight") ? nbt.getInt("sight") : -1;
+            if (nbt.hasKey("battleCD")) this.battleCooldown = nbt.getInt("battleCD");
             if (this.battleCooldown < 0) this.battleCooldown = Config.instance.trainerCooldown;
 
             this.defeaters.clear();
@@ -858,7 +858,7 @@ public class CapabilityHasPokemobs
                     this.defeaters.add(DefeatEntry.createFromNBT(ListNBT.getCompound(i)));
             }
             this.notifyDefeat = nbt.getBoolean("notifyDefeat");
-            this.friendlyCooldown = nbt.getInteger("friendly");
+            this.friendlyCooldown = nbt.getInt("friendly");
             if (nbt.hasKey("levelMode")) this.setLevelMode(LevelMode.valueOf(nbt.getString("levelMode")));
         }
 

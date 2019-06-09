@@ -4,7 +4,7 @@ import java.util.Random;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.inventory.IInventory;
@@ -36,7 +36,7 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
     /** Used to determine ambient occlusion and culling when rebuilding chunks
      * for render */
     @Override
-    public boolean isOpaqueCube(IBlockState state)
+    public boolean isOpaqueCube(BlockState state)
     {
         return false;
     }
@@ -49,7 +49,7 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
 
     /** Convert the BlockState into the correct metadata value */
     @Override
-    public int getMetaFromState(IBlockState state)
+    public int getMetaFromState(BlockState state)
     {
         int meta = 0;
         int direction;
@@ -76,7 +76,7 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
 
     /** Convert the given metadata into a BlockState for this Block */
     @Override
-    public IBlockState getStateFromMeta(int meta)
+    public BlockState getStateFromMeta(int meta)
     {
         int direction = meta / 4;
         Direction dir = Direction.NORTH;
@@ -99,14 +99,14 @@ public abstract class BlockBase extends BlockRotatable implements ITileEntityPro
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
+    public void breakBlock(World world, BlockPos pos, BlockState state)
     {
         dropItems(world, pos);
         super.breakBlock(world, pos, state);
     }
 
     @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, Direction facing, float hitX, float hitY,
+    public BlockState getStateForPlacement(World worldIn, BlockPos pos, Direction facing, float hitX, float hitY,
             float hitZ, int meta, LivingEntity placer)
     {
         return this.getStateFromMeta(meta).withProperty(FACING, placer.getHorizontalFacing().getOpposite());

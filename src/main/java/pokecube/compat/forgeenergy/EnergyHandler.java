@@ -337,7 +337,7 @@ public class EnergyHandler
                 }
                 else
                 {
-                    pokeEnergy = living.getEntityData().getInteger("energyRemaining");
+                    pokeEnergy = living.getEntityData().getInt("energyRemaining");
                 }
             }
             dE = (maxEnergy);

@@ -219,8 +219,8 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
                 }
             }
         }
-        range = nbt.getInteger("distance");
-        tick = nbt.getInteger("tick");
+        range = nbt.getInt("distance");
+        tick = nbt.getInt("tick");
         multiplier = nbt.getDouble("multiplier");
     }
 
@@ -243,7 +243,7 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
         nbt.setTag("Inventory", itemList);
         nbt.setInteger("distance", range);
         nbt.setInteger("tick", tick);
-        nbt.setDouble("multiplier", multiplier);
+        nbt.putDouble("multiplier", multiplier);
         return nbt;
     }
 

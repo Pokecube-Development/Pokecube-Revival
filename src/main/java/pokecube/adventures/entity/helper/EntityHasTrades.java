@@ -180,7 +180,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     public void readEntityFromNBT(CompoundNBT nbt)
     {
         super.readEntityFromNBT(nbt);
-        if (nbt.hasKey("Offers", 10) && nbt.getInteger("version") == VERSION)
+        if (nbt.hasKey("Offers", 10) && nbt.getInt("version") == VERSION)
         {
             CompoundNBT CompoundNBT = nbt.getCompound("Offers");
             this.itemList = new MerchantRecipeList(CompoundNBT);

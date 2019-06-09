@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
@@ -66,7 +66,7 @@ public class PacketPokeAdv
                     Random rand = new Random();
                     for (int i = 0; i < 32; ++i)
                     {
-                        player.getEntityWorld().spawnParticle(EnumParticleTypes.PORTAL, v.x + 0.5,
+                        player.getEntityWorld().spawnParticle(ParticleTypes.PORTAL, v.x + 0.5,
                                 v.y + rand.nextDouble() * 2.0D, v.z + 0.5, rand.nextGaussian(), 0.0D,
                                 rand.nextGaussian());
                     }

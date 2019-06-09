@@ -65,8 +65,8 @@ public class PacketAFA implements IMessage, IMessageHandler<PacketAFA, IMessage>
         if (tile == null) return;
         if (message.data.hasKey("I"))
         {
-            int id = message.data.getInteger("I");
-            int val = message.data.getInteger("V");
+            int id = message.data.getInt("I");
+            int val = message.data.getInt("V");
             tile.setField(id, val);
         }
         PacketHandler.sendTileUpdate((TileEntity) tile);

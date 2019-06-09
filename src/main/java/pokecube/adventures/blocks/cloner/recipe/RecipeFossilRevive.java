@@ -221,8 +221,8 @@ public class RecipeFossilRevive implements IPoweredRecipe
             entity = (pokemob = pokemob.setForSpawn(exp)).getEntity();
             if (tile.getUser() != null && tame) pokemob.setPokemonOwner(tile.getUser());
             Direction dir = world.getBlockState(pos).getValue(BlockRotatable.FACING);
-            entity.setLocationAndAngles(pos.getX() + 0.5 + dir.getFrontOffsetX(), pos.getY() + 1,
-                    pos.getZ() + 0.5 + dir.getFrontOffsetZ(), world.rand.nextFloat() * 360F, 0.0F);
+            entity.setLocationAndAngles(pos.getX() + 0.5 + dir.getXOffset(), pos.getY() + 1,
+                    pos.getZ() + 0.5 + dir.getZOffset(), world.rand.nextFloat() * 360F, 0.0F);
             entity.getEntityData().putBoolean("cloned", true);
             world.spawnEntity(entity);
             IMobGenetics genes = ClonerHelper.getGenes(dnaSource);

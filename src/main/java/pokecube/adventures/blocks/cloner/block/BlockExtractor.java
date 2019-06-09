@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.block;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -24,7 +24,7 @@ public class BlockExtractor extends BlockBase
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn,
+    public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn,
             Hand hand, Direction side, float hitX, float hitY, float hitZ)
     {
         playerIn.openGui(PokecubeAdv.instance, PokecubeAdv.GUIEXTRACTOR_ID, worldIn, pos.getX(), pos.getY(),

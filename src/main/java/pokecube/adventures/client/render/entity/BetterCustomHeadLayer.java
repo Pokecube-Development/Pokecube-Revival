@@ -152,7 +152,7 @@ public class BetterCustomHeadLayer extends LayerCustomHead
                 int brightness = LivingEntityIn.getBrightnessForRender();
                 if (itemstack.hasTag() && itemstack.getTag().hasKey("dyeColour"))
                 {
-                    int damage = itemstack.getTag().getInteger("dyeColour");
+                    int damage = itemstack.getTag().getInt("dyeColour");
                     ret = EnumDyeColor.byDyeDamage(damage);
                 }
                 Color colour = new Color(ret.getColorValue() + 0xFF000000);

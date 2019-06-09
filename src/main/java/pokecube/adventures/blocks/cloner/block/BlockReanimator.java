@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.vecmath.Vector3f;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,7 +37,7 @@ public class BlockReanimator extends BlockBase
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn,
+    public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn,
             Hand hand, Direction side, float hitX, float hitY, float hitZ)
     {
         playerIn.openGui(PokecubeAdv.instance, PokecubeAdv.GUICLONER_ID, worldIn, pos.getX(), pos.getY(), pos.getZ());

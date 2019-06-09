@@ -44,7 +44,7 @@ public class RenderHandler
         }
         if (tag.hasKey("dyeColour"))
         {
-            String colour = I18n.format(EnumDyeColor.byDyeDamage(tag.getInteger("dyeColour")).getUnlocalizedName());
+            String colour = I18n.format(EnumDyeColor.byDyeDamage(tag.getInt("dyeColour")).getUnlocalizedName());
             boolean has = false;
             for (String s : evt.getToolTip())
             {

@@ -1,6 +1,6 @@
 package pokecube.adventures.blocks.cloner.tileentity;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -39,7 +39,7 @@ public class TileEntityCloner extends TileClonerBase
     @Override
     public int[] getSlotsForFace(Direction side)
     {
-        IBlockState state = getWorld().getBlockState(getPos());
+        BlockState state = getWorld().getBlockState(getPos());
         if (state.getBlock() instanceof BlockRotatable)
         {
             Direction dir = state.getValue(BlockRotatable.FACING);

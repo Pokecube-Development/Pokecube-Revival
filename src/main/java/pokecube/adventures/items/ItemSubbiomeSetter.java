@@ -155,7 +155,7 @@ public class ItemSubbiomeSetter extends Item
                         pos1.set(x, y, z);
                         if (!world.isAreaLoaded(pos1.getPos(), 0))
                         {
-                            world.getChunkFromBlockCoords(pos1.getPos());
+                            world.getChunk(pos1.getPos());
                         }
                         if (!world.isAreaLoaded(pos1.getPos(), 0))
                         {
@@ -221,7 +221,7 @@ public class ItemSubbiomeSetter extends Item
                             pos1.set(x, y, z);
                             if (!worldIn.isAreaLoaded(pos1.getPos(), 0))
                             {
-                                worldIn.getChunkFromBlockCoords(pos1.getPos());
+                                worldIn.getChunk(pos1.getPos());
                             }
                             if (!worldIn.isAreaLoaded(pos1.getPos(), 0))
                             {

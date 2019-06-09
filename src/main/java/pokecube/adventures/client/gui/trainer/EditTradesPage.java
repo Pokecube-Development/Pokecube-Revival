@@ -342,8 +342,8 @@ public class EditTradesPage extends ListPage
             CompoundNBT tag2 = new CompoundNBT();
             mob.writeToNBT(tag2);
             MerchantRecipeList list = new MerchantRecipeList(tag2.getCompound("Offers"));
-            int index1 = tag.getInteger("I");
-            int index2 = index1 + tag.getInteger("N");
+            int index1 = tag.getInt("I");
+            int index2 = index1 + tag.getInt("N");
             MerchantRecipe temp = list.get(index1);
             list.set(index1, list.get(index2));
             list.set(index2, temp);

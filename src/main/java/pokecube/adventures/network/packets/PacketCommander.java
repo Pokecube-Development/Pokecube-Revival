@@ -46,8 +46,8 @@ public class PacketCommander implements IMessage, IMessageHandler<PacketCommande
     private void processMessage(MessageContext ctx, PacketCommander message)
     {
         World world = ctx.getServerHandler().player.getEntityWorld();
-        BlockPos pos = new BlockPos(message.data.getInteger("x"), message.data.getInteger("y"),
-                message.data.getInteger("z"));
+        BlockPos pos = new BlockPos(message.data.getInt("x"), message.data.getInt("y"),
+                message.data.getInt("z"));
         TileEntity te = world.getTileEntity(pos);
         if (!(te instanceof TileEntityCommander)) return;
         TileEntityCommander tile = (TileEntityCommander) te;

@@ -460,7 +460,7 @@ public class EntityTrainer extends EntityTrainerBase
         ItemStack poke2 = recipe.getItemToSell();
         if (!(PokecubeManager.isFilled(poke1) && PokecubeManager.isFilled(poke2))) { return; }
 
-        int num = poke2.getTag().getInteger("slotnum");
+        int num = poke2.getTag().getInt("slotnum");
         LivingEntity player2 = this;
         IPokemob mon1 = PokecubeManager.itemToPokemob(poke1, getEntityWorld());
         UUID trader2 = player2.getUniqueID();

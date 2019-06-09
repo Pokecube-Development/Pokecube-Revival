@@ -71,7 +71,7 @@ public class CapabilityNPCAIStates
             else if (nbt instanceof CompoundNBT)
             {
                 CompoundNBT tag = (CompoundNBT) nbt;
-                instance.setTotalState(tag.getInteger("AI"));
+                instance.setTotalState(tag.getInt("AI"));
                 instance.setDirection(tag.getFloat("D"));
             }
         }

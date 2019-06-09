@@ -11,7 +11,7 @@ import mcjty.theoneprobe.api.IProbeInfoEntityProvider;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
 import mcjty.theoneprobe.api.ITheOneProbe;
 import mcjty.theoneprobe.api.ProbeMode;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -145,7 +145,7 @@ public class TheOneProbeCompat implements IProbeInfoProvider, IProbeInfoEntityPr
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world,
-            IBlockState blockState, IProbeHitData data)
+            BlockState blockState, IProbeHitData data)
     {
         // TODO Auto-generated method stub
         // System.out.println(mode+" "+player+" "+blockState);

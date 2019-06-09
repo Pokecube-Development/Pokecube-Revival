@@ -34,7 +34,7 @@ public class ItemBag extends Item
     {
         if (stack.hasTag() && stack.getTag().hasKey("dyeColour"))
         {
-            int damage = stack.getTag().getInteger("dyeColour");
+            int damage = stack.getTag().getInt("dyeColour");
             EnumDyeColor colour = EnumDyeColor.byDyeDamage(damage);
             String s = I18n.format(colour.getUnlocalizedName());
             list.add(s);

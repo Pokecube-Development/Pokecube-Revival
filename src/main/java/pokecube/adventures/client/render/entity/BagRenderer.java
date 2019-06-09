@@ -46,7 +46,7 @@ public class BagRenderer implements LayerRenderer<LivingEntity>
             EnumDyeColor ret = EnumDyeColor.YELLOW;
             if (bag.hasTag() && bag.getTag().hasKey("dyeColour"))
             {
-                int damage = bag.getTag().getInteger("dyeColour");
+                int damage = bag.getTag().getInt("dyeColour");
                 ret = EnumDyeColor.byDyeDamage(damage);
             }
             return ret;

@@ -26,7 +26,7 @@ import blusunrize.immersiveengineering.api.tool.BelljarHandler;
 import blusunrize.immersiveengineering.api.tool.BelljarHandler.DefaultPlantHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.item.ItemStack;
@@ -382,8 +382,8 @@ public class IECompat
         }
     }
 
-    private static HashMap<ComparableItemStack, IBlockState>   seedOutputMap = new HashMap<>();
-    private static HashMap<ComparableItemStack, IBlockState[]> seedRenderMap = new HashMap<>();
+    private static HashMap<ComparableItemStack, BlockState>   seedOutputMap = new HashMap<>();
+    private static HashMap<ComparableItemStack, BlockState[]> seedRenderMap = new HashMap<>();
 
     private static class BerryClocheHandler extends DefaultPlantHandler
     {
@@ -398,9 +398,9 @@ public class IECompat
 
         @Override
         @OnlyIn(Dist.CLIENT)
-        public IBlockState[] getRenderedPlant(ItemStack seed, ItemStack soil, float growth, TileEntity tile)
+        public BlockState[] getRenderedPlant(ItemStack seed, ItemStack soil, float growth, TileEntity tile)
         {
-            return new IBlockState[0];
+            return new BlockState[0];
         }
 
         @Override
@@ -416,13 +416,13 @@ public class IECompat
                 BlockRendererDispatcher blockRenderer)
         {
             ComparableItemStack comp = new ComparableItemStack(seed, false);
-            IBlockState[] renderStates = seedRenderMap.get(comp);
+            BlockState[] renderStates = seedRenderMap.get(comp);
             if (treeMap.get(comp))
             {
                 if (!super.isCorrectSoil(seed, soil)) return true;
                 GlStateManager.rotate(-90, 0, 1, 0);
 
-                IBlockState state = Blocks.LEAVES.getDefaultState();
+                BlockState state = Blocks.LEAVES.getDefaultState();
                 IBakedModel model = blockRenderer.getModelForState(state);
 
                 // Render leaves in top section of belljar
@@ -455,7 +455,7 @@ public class IECompat
                     float jarScale = 0.75f;
                     // Render growing stem
                     GlStateManager.rotate(-90, 0, 1, 0);
-                    IBlockState state = renderStates[0].withProperty(BlockCrops.AGE,
+                    BlockState state = renderStates[0].withProperty(BlockCrops.AGE,
                             (int) (growth >= .5 ? 7 : 2 * growth * 7));
                     IBakedModel model = blockRenderer.getModelForState(state);
                     GlStateManager.translate((1 - jarScale) / 2, 0, -(1 - jarScale) / 2);
@@ -484,8 +484,8 @@ public class IECompat
             return true;
         }
 
-        public void register(boolean tree, ItemStack seed, ItemStack[] output, IBlockState seedRender, Object soil,
-                IBlockState... cropRender)
+        public void register(boolean tree, ItemStack seed, ItemStack[] output, BlockState seedRender, Object soil,
+                BlockState... cropRender)
         {
             // Call super to register the soil.
             super.register(seed, output, soil, cropRender);

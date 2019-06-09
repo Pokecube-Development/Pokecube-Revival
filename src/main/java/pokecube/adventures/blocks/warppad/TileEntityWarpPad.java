@@ -165,7 +165,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
         link = new Vector4(tagCompound.getCompound("link"));
         noEnergy = tagCompound.getBoolean("noEnergy");
         admin = tagCompound.getBoolean("admin");
-        energy = tagCompound.getInteger("energy");
+        energy = tagCompound.getInt("energy");
     }
 
     public int receiveEnergy(Direction facing, int maxReceive, boolean simulate)
