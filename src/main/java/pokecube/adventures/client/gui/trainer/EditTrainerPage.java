@@ -235,7 +235,7 @@ public class EditTrainerPage extends ListPage
             boolean hasPrefix = parent.entity.getName().startsWith(parent.trainer.getType().name + " ");
             if (hasPrefix) name = parent.trainer.getType().name + " " + name;
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            packet.data.setInteger("I", parent.entity.getEntityId());
+            packet.data.putInt("I", parent.entity.getEntityId());
             packet.data.putString("N", name);
             PokecubeMod.packetPipeline.sendToServer(packet);
         }
@@ -245,7 +245,7 @@ public class EditTrainerPage extends ListPage
             {
                 String name = textList.get(1).getText();
                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-                packet.data.setInteger("I", parent.entity.getEntityId());
+                packet.data.putInt("I", parent.entity.getEntityId());
                 packet.data.putString("U", name);
                 PokecubeMod.packetPipeline.sendToServer(packet);
             }
@@ -253,7 +253,7 @@ public class EditTrainerPage extends ListPage
             {
                 String name = textList.get(2).getText();
                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-                packet.data.setInteger("I", parent.entity.getEntityId());
+                packet.data.putInt("I", parent.entity.getEntityId());
                 packet.data.putString("P", name);
                 PokecubeMod.packetPipeline.sendToServer(packet);
             }
@@ -304,7 +304,7 @@ public class EditTrainerPage extends ListPage
             String gender = sexe == 1 ? "\u2642" : "\u2640";
             button.displayString = gender;
             packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            packet.data.setInteger("I", parent.entity.getEntityId());
+            packet.data.putInt("I", parent.entity.getEntityId());
             packet.data.setByte("X", sexe);
             PokecubeMod.packetPipeline.sendToServer(packet);
             break;
@@ -319,13 +319,13 @@ public class EditTrainerPage extends ListPage
             boolean hasPrefix = parent.entity.getName().startsWith(parent.trainer.getType().name + " ");
             if (!hasPrefix) name = parent.trainer.getType().name + " " + name;
             packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            packet.data.setInteger("I", parent.entity.getEntityId());
+            packet.data.putInt("I", parent.entity.getEntityId());
             packet.data.putString("N", name);
             PokecubeMod.packetPipeline.sendToServer(packet);
             break;
         case KILL:
             packet = new PacketTrainer(PacketTrainer.MESSAGEKILLTRAINER);
-            packet.data.setInteger("I", parent.entity.getEntityId());
+            packet.data.putInt("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             parent.mc.player.closeScreen();
             break;
@@ -375,7 +375,7 @@ public class EditTrainerPage extends ListPage
             }
             TypeTrainer type = types.get(index);
             packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
-            packet.data.setInteger("I", parent.entity.getEntityId());
+            packet.data.putInt("I", parent.entity.getEntityId());
             packet.data.putString("K", type.name);
             PokecubeMod.packetPipeline.sendToServer(packet);
 

@@ -11,7 +11,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import pokecube.core.blocks.TileEntityOwnable;
@@ -216,11 +216,11 @@ public class TileEntityCommander extends TileEntityOwnable
     public void sendCommand() throws Exception
     {
         World w = getWorld();
-        if (!(w instanceof WorldServer)) return;
+        if (!(w instanceof ServerWorld)) return;
         if (this.command != null && handler == null) initCommand();
         if (handler == null) throw new Exception("No CommandHandler has been set");
         if (pokeID == null) throw new Exception("No Pokemob Set, please set a UUID first.");
-        WorldServer world = (WorldServer) w;
+        ServerWorld world = (ServerWorld) w;
         IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(pokeID));
         if (pokemob == null) throw new Exception("Pokemob for given ID is not found.");
         try

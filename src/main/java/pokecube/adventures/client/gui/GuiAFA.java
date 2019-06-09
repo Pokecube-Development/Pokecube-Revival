@@ -142,8 +142,8 @@ public class GuiAFA extends GuiContainer
         message = new PacketAFA();
         if (id != -1)
         {
-            message.data.setInteger("I", id);
-            message.data.setInteger("V", val);
+            message.data.putInt("I", id);
+            message.data.putInt("V", val);
         }
         PokecubePacketHandler.sendToServer(message);
     }

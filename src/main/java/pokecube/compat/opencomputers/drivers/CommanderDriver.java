@@ -9,7 +9,7 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import pokecube.adventures.blocks.commander.TileEntityCommander;
 import pokecube.core.interfaces.IMoveConstants.AIRoutine;
 import pokecube.core.interfaces.IPokemob;
@@ -82,7 +82,7 @@ public class CommanderDriver extends DriverBase
         public Object[] getMoves(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             return pokemob.getMoves();
@@ -92,7 +92,7 @@ public class CommanderDriver extends DriverBase
         public Object[] getMoveIndex(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             return new Object[] { pokemob.getMoveIndex() };
@@ -102,7 +102,7 @@ public class CommanderDriver extends DriverBase
         public Object[] setMoveIndex(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             pokemob.setMoveIndex(args.checkInteger(0));
@@ -113,7 +113,7 @@ public class CommanderDriver extends DriverBase
         public Object[] getRoutineState(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             AIRoutine routine = AIRoutine.valueOf(args.checkString(0));
@@ -124,7 +124,7 @@ public class CommanderDriver extends DriverBase
         public Object[] setRoutineState(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             AIRoutine routine = AIRoutine.valueOf(args.checkString(0));
@@ -136,7 +136,7 @@ public class CommanderDriver extends DriverBase
         public Object[] getHome(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             return new Object[] { pokemob.getHome() };
@@ -146,7 +146,7 @@ public class CommanderDriver extends DriverBase
         public Object[] setHome(Context context, Arguments args) throws Exception
         {
             if (tileEntity.pokeID == null) throw new Exception("No Pokemob set");
-            WorldServer world = (WorldServer) tileEntity.getWorld();
+            ServerWorld world = (ServerWorld) tileEntity.getWorld();
             IPokemob pokemob = CapabilityPokemob.getPokemobFor(world.getEntityFromUuid(tileEntity.pokeID));
             if (pokemob == null) throw new Exception("No Pokemob found for set ID");
             pokemob.setHome(args.checkInteger(0) + tileEntity.getPos().getX(), args.checkInteger(1) + tileEntity.getPos().getY(),

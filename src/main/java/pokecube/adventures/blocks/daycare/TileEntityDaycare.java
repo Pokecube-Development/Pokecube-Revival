@@ -241,8 +241,8 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
             }
         }
         nbt.setTag("Inventory", itemList);
-        nbt.setInteger("distance", range);
-        nbt.setInteger("tick", tick);
+        nbt.putInt("distance", range);
+        nbt.putInt("tick", tick);
         nbt.putDouble("multiplier", multiplier);
         return nbt;
     }

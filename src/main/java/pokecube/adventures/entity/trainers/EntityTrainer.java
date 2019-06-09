@@ -119,7 +119,7 @@ public class EntityTrainer extends EntityTrainerBase
                 mon.setPokemonOwner(trader1);
                 mon.setTraded(!everstone);
                 stack = PokecubeManager.pokemobToItem(mon);
-                stack.getTag().setInteger("slotnum", i);
+                stack.getTag().putInt("slotnum", i);
                 tradeList.add(new MerchantRecipe(buy, stack));
             }
         }

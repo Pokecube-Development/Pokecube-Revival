@@ -72,7 +72,7 @@ public class RecipeBag implements IDefaultRecipe
             {
                 output = bagStack.copy();
                 if (!output.hasTag()) output.setTag(new CompoundNBT());
-                output.getTag().setInteger("dyeColour", dyeStack.getItemDamage());
+                output.getTag().putInt("dyeColour", dyeStack.getItemDamage());
             }
             return CompatWrapper.isValid(output);
         }

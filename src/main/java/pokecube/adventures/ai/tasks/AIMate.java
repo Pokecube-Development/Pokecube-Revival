@@ -36,14 +36,14 @@ public class AIMate extends AITrainerBase
             if (PokecubeMod.debug) PokecubeMod.log(this.thisEntity + " is Looking for mate");
 
             foundMate = this.world.findNearestEntityWithinAABB(targetClass,
-                    this.thisEntity.getEntityBoundingBox().grow(8.0D, 3.0D, 8.0D), this.thisEntity);
+                    this.thisEntity.getBoundingBox().grow(8.0D, 3.0D, 8.0D), this.thisEntity);
             if (foundMate == null)
             {
                 thisEntity.setGrowingAge(600);
                 return;
             }
             if (this.world.getEntitiesWithinAABB(targetClass,
-                    this.thisEntity.getEntityBoundingBox().grow(16.0D, 10.0D, 16.0D)).size() > 3)
+                    this.thisEntity.getBoundingBox().grow(16.0D, 10.0D, 16.0D)).size() > 3)
             {
                 thisEntity.setGrowingAge(6000);
                 return;

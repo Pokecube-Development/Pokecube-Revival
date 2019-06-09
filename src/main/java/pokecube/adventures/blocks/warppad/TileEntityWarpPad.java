@@ -190,7 +190,7 @@ public class TileEntityWarpPad extends TileEntityOwnable
         }
         tagCompound.putBoolean("noEnergy", noEnergy);
         tagCompound.putBoolean("admin", admin);
-        tagCompound.setInteger("energy", energy);
+        tagCompound.putInt("energy", energy);
         return tagCompound;
     }
 }

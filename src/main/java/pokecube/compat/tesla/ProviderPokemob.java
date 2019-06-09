@@ -61,7 +61,7 @@ public class ProviderPokemob implements ITeslaProducer, ICapabilityProvider
         if (!simulated)
         {
             living.getEntityData().putLong("energyTime", energyTime);
-            living.getEntityData().setInteger("energyRemaining", pokeEnergy - dE);
+            living.getEntityData().putInt("energyRemaining", pokeEnergy - dE);
             int drain = 0;
             if (pokeEnergy - dE < 0)
             {

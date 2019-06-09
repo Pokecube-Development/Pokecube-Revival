@@ -52,8 +52,8 @@ public class ContainerBag extends Container
         if (FMLCommonHandler.instance().getEffectiveSide() == Dist.DEDICATED_SERVER)
         {
             PacketBag packet = new PacketBag(PacketBag.ONOPEN);
-            packet.data.setInteger("N", invBag.boxes.length);
-            packet.data.setInteger("S", InventoryBag.PAGECOUNT);
+            packet.data.putInt("N", invBag.boxes.length);
+            packet.data.putInt("S", InventoryBag.PAGECOUNT);
             packet.data.putBoolean("A", HOLDALL);
             for (int i = 0; i < invBag.boxes.length; i++)
             {
@@ -172,7 +172,7 @@ public class ContainerBag extends Container
         if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT)
         {
             PacketBag packet = new PacketBag(PacketBag.SETPAGE);
-            packet.data.setInteger("P", page);
+            packet.data.putInt("P", page);
             PokecubeMod.packetPipeline.sendToServer(packet);
             invBag.clear();
         }

@@ -345,7 +345,7 @@ public class EnergyHandler
             if (!simulate)
             {
                 living.getEntityData().putLong("energyTime", energyTime);
-                living.getEntityData().setInteger("energyRemaining", pokeEnergy - dE);
+                living.getEntityData().putInt("energyRemaining", pokeEnergy - dE);
                 int drain = 0;
                 if (pokeEnergy - dE < 0)
                 {

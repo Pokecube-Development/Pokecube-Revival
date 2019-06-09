@@ -168,7 +168,7 @@ public abstract class EntityHasTrades extends EntityAgeable implements IMerchant
     public void writeEntityToNBT(CompoundNBT nbt)
     {
         super.writeEntityToNBT(nbt);
-        nbt.setInteger("version", VERSION);
+        nbt.putInt("version", VERSION);
         if (this.itemList != null)
         {
             checkTradeIntegrity();

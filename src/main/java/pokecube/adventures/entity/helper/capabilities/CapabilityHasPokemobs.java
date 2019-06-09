@@ -640,7 +640,7 @@ public class CapabilityHasPokemobs
                 if (notifyDefeat && defeater instanceof ServerPlayerEntity)
                 {
                     PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGENOTIFYDEFEAT);
-                    packet.data.setInteger("I", user.getEntityId());
+                    packet.data.putInt("I", user.getEntityId());
                     packet.data.putLong("L", user.getEntityWorld().getGameTime() + resetTime);
                     PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) defeater);
                 }
@@ -798,14 +798,14 @@ public class CapabilityHasPokemobs
                 ListNBT.appendTag(CompoundNBT);
             }
             nbt.setTag("pokemobs", ListNBT);
-            nbt.setInteger("nextSlot", this.getNextSlot());
+            nbt.putInt("nextSlot", this.getNextSlot());
             if (this.getOutID() != null) nbt.putString("outPokemob", this.getOutID().toString());
             if (this.getType() != null) nbt.putString("type", this.getType().name);
             nbt.putLong("nextBattle", this.getCooldown());
             nbt.setByte("gender", this.getGender());
 
             if (this.battleCooldown < 0) this.battleCooldown = Config.instance.trainerCooldown;
-            nbt.setInteger("battleCD", this.battleCooldown);
+            nbt.putInt("battleCD", this.battleCooldown);
             ListNBT = new ListNBT();
             for (DefeatEntry entry : this.defeaters)
             {
@@ -816,8 +816,8 @@ public class CapabilityHasPokemobs
             nbt.setTag("DefeatList", ListNBT);
             nbt.putBoolean("notifyDefeat", this.notifyDefeat);
             nbt.putLong("resetTime", this.resetTime);
-            if (this.sight != -1) nbt.setInteger("sight", this.sight);
-            nbt.setInteger("friendly", this.friendlyCooldown);
+            if (this.sight != -1) nbt.putInt("sight", this.sight);
+            nbt.putInt("friendly", this.friendlyCooldown);
             nbt.putString("levelMode", getLevelMode().name());
             return nbt;
         }

@@ -728,7 +728,7 @@ public class EditPokemobPage extends Page
         if (tag != null)
         {
             packet.data.setTag("T", tag);
-            packet.data.setInteger("I", parent.entity.getEntityId());
+            packet.data.putInt("I", parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
         }
         this.onPageOpened();

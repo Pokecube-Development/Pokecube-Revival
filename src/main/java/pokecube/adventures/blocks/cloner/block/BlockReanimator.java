@@ -64,16 +64,16 @@ public class BlockReanimator extends BlockBase
             Vector3f diffs = new Vector3f((float) (0 - entity.motionX), (float) (0 - entity.motionY),
                     (float) (0 - entity.motionY));
 
-            double minX = entity.getEntityBoundingBox().minX;
-            double minY = entity.getEntityBoundingBox().minY;
-            double minZ = entity.getEntityBoundingBox().minZ;
-            double maxX = entity.getEntityBoundingBox().maxX;
-            double maxY = entity.getEntityBoundingBox().maxY;
-            double maxZ = entity.getEntityBoundingBox().maxZ;
+            double minX = entity.getBoundingBox().minX;
+            double minY = entity.getBoundingBox().minY;
+            double minZ = entity.getBoundingBox().minZ;
+            double maxX = entity.getBoundingBox().maxX;
+            double maxY = entity.getBoundingBox().maxY;
+            double maxZ = entity.getBoundingBox().maxZ;
             double factor = 0.75d;
             double dx = max(maxX - minX, 0.5) / factor + (entity.motionX - 0),
                     dz = max(maxZ - minZ, 0.5) / factor + (entity.motionZ - 0), r;
-            AxisAlignedBB boundingBox = entity.getEntityBoundingBox();
+            AxisAlignedBB boundingBox = entity.getBoundingBox();
             double yTop = Math.min(entity.stepHeight + entity.posY + 0, maxY);
             boolean floor = false;
             boolean ceiling = false;

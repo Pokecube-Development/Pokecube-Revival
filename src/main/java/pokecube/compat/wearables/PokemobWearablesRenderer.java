@@ -303,7 +303,7 @@ public class PokemobWearablesRenderer
     public static void applyWearables(LivingEntity wearer, IModelRenderer<?> renderer, IModel imodel)
     {
         // No Render invisible.
-        if (wearer.getActivePotionEffect(MobEffects.INVISIBILITY) != null) return;
+        if (wearer.getActiveEffectInstance(MobEffects.INVISIBILITY) != null) return;
         WornOffsets offsets = null;
 
         for (ItemStack stack : wearer.getArmorInventoryList())

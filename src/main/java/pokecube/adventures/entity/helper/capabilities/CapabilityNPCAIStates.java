@@ -58,7 +58,7 @@ public class CapabilityNPCAIStates
         public INBT writeNBT(Capability<IHasNPCAIStates> capability, IHasNPCAIStates instance, Direction side)
         {
             CompoundNBT tag = new CompoundNBT();
-            tag.setInteger("AI", instance.getTotalState());
+            tag.putInt("AI", instance.getTotalState());
             tag.putFloat("D", instance.getDirection());
             return tag;
         }

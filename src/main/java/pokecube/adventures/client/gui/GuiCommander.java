@@ -117,9 +117,9 @@ public class GuiCommander extends GuiScreen
         CompoundNBT tag = new CompoundNBT();
         tag.putString("biome", command.getText());
         PacketCommander mess = new PacketCommander();
-        mess.data.setInteger("x", tile.getPos().getX());
-        mess.data.setInteger("y", tile.getPos().getY());
-        mess.data.setInteger("z", tile.getPos().getZ());
+        mess.data.putInt("x", tile.getPos().getX());
+        mess.data.putInt("y", tile.getPos().getY());
+        mess.data.putInt("z", tile.getPos().getZ());
         mess.data.putString("C", command.getText());
         mess.data.putString("A", args.getText());
         PokecubePacketHandler.sendToServer(mess);

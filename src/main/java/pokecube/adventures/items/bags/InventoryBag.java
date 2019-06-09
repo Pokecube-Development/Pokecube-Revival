@@ -196,12 +196,12 @@ public class InventoryBag implements IInventory
         CompoundNBT items = new CompoundNBT();
         CompoundNBT boxes = new CompoundNBT();
         boxes.putString("UUID", player.toString());
-        boxes.setInteger("page", map.get(player).page);
+        boxes.putInt("page", map.get(player).page);
         for (int i = 0; i < PAGECOUNT; i++)
         {
             boxes.putString("name" + i, map.get(player).boxes[i]);
         }
-        items.setInteger("page", map.get(player).getPage());
+        items.putInt("page", map.get(player).getPage());
         for (int i = 0; i < map.get(player).getSizeInventory(); i++)
         {
             ItemStack itemstack = map.get(player).getStackInSlot(i);
@@ -410,7 +410,7 @@ public class InventoryBag implements IInventory
     public CompoundNBT serializeBox(int box)
     {
         CompoundNBT items = new CompoundNBT();
-        items.setInteger("box", box);
+        items.putInt("box", box);
         int start = box * 54;
         for (int i = start; i < start + 54; i++)
         {

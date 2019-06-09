@@ -12,7 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
@@ -71,7 +71,7 @@ public class ItemLinker extends Item
     }
 
     @Override
-    public EnumActionResult onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand,
+    public ActionResultType onItemUse(PlayerEntity playerIn, World worldIn, BlockPos pos, Hand hand,
             Direction side, float hitX, float hitY, float hitZ)
     {
         ItemStack stack = playerIn.getHeldItem(hand);
@@ -85,7 +85,7 @@ public class ItemLinker extends Item
                 pad.link = new Vector4(stack.getTag().getCompound("link"));
                 playerIn.sendMessage(new StringTextComponent("linked pad to " + pad.link));
             }
-            return EnumActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
         }
         else
         {
@@ -106,6 +106,6 @@ public class ItemLinker extends Item
                 playerIn.sendMessage(new StringTextComponent("Copied to clipboard"));
             }
         }
-        return EnumActionResult.FAIL;
+        return ActionResultType.FAIL;
     }
 }

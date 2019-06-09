@@ -313,9 +313,9 @@ public class EditTradesPage extends ListPage
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
             CompoundNBT tag = new CompoundNBT();
             tag.putBoolean("TR", true);
-            tag.setInteger("I", index);
+            tag.putInt("I", index);
             packet.data.setTag("T", tag);
-            packet.data.setInteger("I", parent.parent.entity.getEntityId());
+            packet.data.putInt("I", parent.parent.entity.getEntityId());
             Entity mob = parent.parent.entity;
             CompoundNBT tag2 = new CompoundNBT();
             mob.writeToNBT(tag2);
@@ -334,10 +334,10 @@ public class EditTradesPage extends ListPage
             PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
             CompoundNBT tag = new CompoundNBT();
             tag.putBoolean("TR", true);
-            tag.setInteger("I", index);
-            tag.setInteger("N", dir);
+            tag.putInt("I", index);
+            tag.putInt("N", dir);
             packet.data.setTag("T", tag);
-            packet.data.setInteger("I", parent.parent.entity.getEntityId());
+            packet.data.putInt("I", parent.parent.entity.getEntityId());
             Entity mob = parent.parent.entity;
             CompoundNBT tag2 = new CompoundNBT();
             mob.writeToNBT(tag2);
@@ -361,7 +361,7 @@ public class EditTradesPage extends ListPage
 
             CompoundNBT tag = new CompoundNBT();
             tag.putBoolean("TR", true);
-            tag.setInteger("I", index);
+            tag.putInt("I", index);
             // Delete in this case.
             if (buy1.getText().isEmpty())
             {
@@ -382,7 +382,7 @@ public class EditTradesPage extends ListPage
             if (tag.hasKey("R"))
             {
                 packet.data.setTag("T", tag);
-                packet.data.setInteger("I", parent.parent.entity.getEntityId());
+                packet.data.putInt("I", parent.parent.entity.getEntityId());
                 Entity mob = parent.parent.entity;
                 CompoundNBT tag2 = new CompoundNBT();
                 mob.writeToNBT(tag2);

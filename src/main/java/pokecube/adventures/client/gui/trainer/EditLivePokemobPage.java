@@ -700,7 +700,7 @@ public class EditLivePokemobPage extends Page
         if (tag != null)
         {
             packet.data.setTag("T", tag);
-            packet.data.setInteger("I", pokemob.getEntity().getEntityId());
+            packet.data.putInt("I", pokemob.getEntity().getEntityId());
             if (pokemob.getEntity().isDead) packet.data.putBoolean("D", true);
             PokecubeMod.packetPipeline.sendToServer(packet);
         }

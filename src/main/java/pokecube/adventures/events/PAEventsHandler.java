@@ -416,7 +416,7 @@ public class PAEventsHandler
             if (pokemobs.notifyDefeat)
             {
                 PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGENOTIFYDEFEAT);
-                packet.data.setInteger("I", trainer.getEntityId());
+                packet.data.putInt("I", trainer.getEntityId());
                 packet.data.putBoolean("V", pokemobs.hasDefeated(event.getPlayerEntity()));
                 PokecubeMod.packetPipeline.sendTo(packet, (ServerPlayerEntity) event.getPlayerEntity());
             }

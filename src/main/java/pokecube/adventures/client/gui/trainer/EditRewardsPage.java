@@ -162,7 +162,7 @@ public class EditRewardsPage extends ListPage
                                     parent.parent.rewards, null);
                             packet.data.setTag("T", tag);
                             packet.data.setByte("V", (byte) 1);
-                            packet.data.setInteger("I", parent.parent.entity.getEntityId());
+                            packet.data.putInt("I", parent.parent.entity.getEntityId());
                             PokecubeMod.packetPipeline.sendToServer(packet);
                             parent.onPageOpened();
                         }
@@ -189,7 +189,7 @@ public class EditRewardsPage extends ListPage
                                         parent.parent.rewards, null);
                                 packet.data.setTag("T", tag);
                                 packet.data.setByte("V", (byte) 1);
-                                packet.data.setInteger("I", parent.parent.entity.getEntityId());
+                                packet.data.putInt("I", parent.parent.entity.getEntityId());
                                 PokecubeMod.packetPipeline.sendToServer(packet);
                                 parent.onPageOpened();
                             }
@@ -204,7 +204,7 @@ public class EditRewardsPage extends ListPage
                                         parent.parent.rewards, null);
                                 packet.data.setTag("T", tag);
                                 packet.data.setByte("V", (byte) 1);
-                                packet.data.setInteger("I", parent.parent.entity.getEntityId());
+                                packet.data.putInt("I", parent.parent.entity.getEntityId());
                                 PokecubeMod.packetPipeline.sendToServer(packet);
                                 parent.onPageOpened();
                             }

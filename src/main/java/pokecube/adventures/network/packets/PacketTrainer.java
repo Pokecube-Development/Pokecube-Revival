@@ -94,7 +94,7 @@ public class PacketTrainer implements IMessage, IMessageHandler<PacketTrainer, I
         }
         PacketTrainer packet = new PacketTrainer(PacketTrainer.MESSAGEUPDATETRAINER);
         packet.data.putBoolean("O", true);
-        packet.data.setInteger("I", target == null ? -1 : target.getEntityId());
+        packet.data.putInt("I", target == null ? -1 : target.getEntityId());
 
         if (target != null)
         {

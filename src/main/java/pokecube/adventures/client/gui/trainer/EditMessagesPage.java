@@ -116,7 +116,7 @@ public class EditMessagesPage extends ListPage
                     parent.parent.messages, null);
             packet.data.setTag("T", tag);
             packet.data.setByte("V", (byte) 2);
-            packet.data.setInteger("I", parent.parent.entity.getEntityId());
+            packet.data.putInt("I", parent.parent.entity.getEntityId());
             PokecubeMod.packetPipeline.sendToServer(packet);
             parent.onPageOpened();
         }

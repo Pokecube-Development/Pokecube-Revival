@@ -474,14 +474,14 @@ public class TileEntityAFA extends TileEntityOwnable implements IInventory, ITic
             }
         }
         nbt.putIntArray("shift", shift);
-        nbt.setInteger("scale", scale);
+        nbt.putInt("scale", scale);
         nbt.setTag("Inventory", itemList);
-        nbt.setInteger("distance", distance);
+        nbt.putInt("distance", distance);
         nbt.putBoolean("noEnergy", noEnergy);
         nbt.putFloat("angle", angle);
         nbt.putBoolean("rotates", rotates);
-        nbt.setInteger("transparency", transparency);
-        nbt.setInteger("energy", energy);
+        nbt.putInt("transparency", transparency);
+        nbt.putInt("energy", energy);
         nbt.putBoolean("frozen", frozen);
         nbt.putFloat("animTime", animationTime);
         nbt.putString("animation", animation);
