@@ -22,6 +22,7 @@ import net.minecraft.world.storage.loot.conditions.LootCondition;
 import net.minecraft.world.storage.loot.functions.LootFunction;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
+import pokecube.adventures.blocks.cloner.ClonerHelper.EditType;
 import pokecube.core.interfaces.PokecubeMod;
 import thut.api.entity.genetics.Alleles;
 import thut.api.entity.genetics.Gene;
@@ -93,7 +94,7 @@ public class MakeDnaBottle extends LootFunction
             PokecubeMod.log(Level.SEVERE, "no dna here? " + arg);
             return stack;
         }
-        ClonerHelper.setGenes(stack, genes);
+        ClonerHelper.setGenes(stack, genes, EditType.OTHER);
         return stack;
     }
 

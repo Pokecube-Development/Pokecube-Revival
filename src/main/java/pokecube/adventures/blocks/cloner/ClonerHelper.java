@@ -16,9 +16,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.MinecraftForge;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.SelectorValue;
 import pokecube.adventures.blocks.cloner.tileentity.TileClonerBase;
+import pokecube.adventures.events.GeneEditEvent;
 import pokecube.core.database.PokedexEntry;
 import pokecube.core.entity.pokemobs.genetics.GeneticsManager;
 import pokecube.core.entity.pokemobs.genetics.genes.SpeciesGene.SpeciesInfo;
@@ -45,6 +47,11 @@ public class ClonerHelper
             this.alleles = alleles;
             this.chance = chance;
         }
+    }
+
+    public static enum EditType
+    {
+        SPLICE, EXTRACT, OTHER;
     }
 
     public static Map<ItemStack, DNAPack> DNAITEMS = Maps.newHashMap();
@@ -88,9 +95,10 @@ public class ClonerHelper
         return eggs;
     }
 
-    public static void setGenes(ItemStack stack, IMobGenetics genes)
+    public static void setGenes(ItemStack stack, IMobGenetics genes, EditType reason)
     {
         if (!CompatWrapper.isValid(stack) || !stack.hasTagCompound()) return;
+        MinecraftForge.EVENT_BUS.post(new GeneEditEvent(genes, reason));
         NBTTagCompound nbt = stack.getTagCompound();
         NBTBase geneTag = IMobGenetics.GENETICS_CAP.getStorage().writeNBT(IMobGenetics.GENETICS_CAP, genes, null);
         if (PokecubeManager.isFilled(stack))
@@ -227,7 +235,7 @@ public class ClonerHelper
                 eggs.getAlleles().put(loc, eggsAllele);
             }
         }
-        setGenes(destination, eggs);
+        setGenes(destination, eggs, EditType.EXTRACT);
     }
 
     public static void spliceGenes(IMobGenetics genesIn, ItemStack destination, IGeneSelector selector)
@@ -245,6 +253,6 @@ public class ClonerHelper
             alleles = selector.merge(alleles, eggsAllele);
             if (alleles != null) eggs.getAlleles().put(loc, alleles);
         }
-        setGenes(destination, eggs);
+        setGenes(destination, eggs, EditType.SPLICE);
     }
 }
