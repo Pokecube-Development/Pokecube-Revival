@@ -1,34 +1,62 @@
 package pokecube.adventures.ai.tasks;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.World;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.IHasPokemobs;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages.IHasMessages;
-import pokecube.core.ai.thread.aiRunnables.AIBase;
+import net.minecraft.world.ServerWorld;
+import pokecube.adventures.capabilities.CapabilityHasPokemobs;
+import pokecube.adventures.capabilities.CapabilityHasPokemobs.IHasPokemobs;
+import pokecube.adventures.capabilities.CapabilityNPCAIStates;
+import pokecube.adventures.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
+import pokecube.adventures.capabilities.CapabilityNPCMessages;
+import pokecube.adventures.capabilities.CapabilityNPCMessages.IHasMessages;
+import pokecube.core.ai.tasks.AIBase.IRunnable;
+import thut.api.entity.ai.IAIRunnable;
 
-public class AITrainerBase extends AIBase
+public class AITrainerBase implements IAIRunnable
 {
-    World                  world;
+    ServerWorld world;
     // The trainer Entity
-    final LivingEntity entity;
-    final IHasPokemobs     trainer;
-    final IHasNPCAIStates  aiTracker;
-    final IHasMessages     messages;
-    final boolean          valid;
-    int                    noSeeTicks = 0;
+    final LivingEntity        entity;
+    final IHasPokemobs        trainer;
+    final IHasNPCAIStates     aiTracker;
+    final IHasMessages        messages;
+    final boolean             valid;
+    int                       noSeeTicks = 0;
+    protected List<IRunnable> toRun      = Lists.newArrayList();
 
-    public AITrainerBase(LivingEntity trainer)
+    int priority = 0;
+    int mutex    = 0;
+
+    public AITrainerBase(final LivingEntity trainer)
     {
         this.entity = trainer;
-        this.world = trainer.getEntityWorld();
+        this.world = (ServerWorld) trainer.getEntityWorld();
         this.aiTracker = CapabilityNPCAIStates.getNPCAIStates(trainer);
         this.trainer = CapabilityHasPokemobs.getHasPokemobs(trainer);
         this.messages = CapabilityNPCMessages.getMessages(trainer);
-        valid = trainer != null && aiTracker != null && messages != null;
+        this.valid = trainer != null && this.aiTracker != null && this.messages != null;
+    }
+
+    @Override
+    public void finish()
+    {
+        this.toRun.forEach(w -> w.run(this.world));
+        this.toRun.clear();
+    }
+
+    @Override
+    public int getMutex()
+    {
+        return this.mutex;
+    }
+
+    @Override
+    public int getPriority()
+    {
+        return this.priority;
     }
 
     @Override
@@ -39,6 +67,20 @@ public class AITrainerBase extends AIBase
     @Override
     public void run()
     {
+    }
+
+    @Override
+    public IAIRunnable setMutex(final int mutex)
+    {
+        this.mutex = mutex;
+        return this;
+    }
+
+    @Override
+    public IAIRunnable setPriority(final int prior)
+    {
+        this.priority = prior;
+        return this;
     }
 
     @Override

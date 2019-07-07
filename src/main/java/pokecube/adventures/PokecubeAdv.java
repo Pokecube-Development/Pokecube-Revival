@@ -1,238 +1,141 @@
 package pokecube.adventures;
 
-import java.io.File;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.world.gen.structure.MapGenStructureIO;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.registry.VillagerRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import pokecube.adventures.advancements.Triggers;
-import pokecube.adventures.commands.BattleCommand;
-import pokecube.adventures.commands.Config;
-import pokecube.adventures.commands.CountCommand;
-import pokecube.adventures.commands.KillCommand;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.DefaultPokemobs;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasPokemobs.IHasPokemobs;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards.DefaultRewards;
-import pokecube.adventures.entity.helper.capabilities.CapabilityHasRewards.IHasRewards;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.DefaultAIStates;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages.DefaultMessager;
-import pokecube.adventures.entity.helper.capabilities.CapabilityNPCMessages.IHasMessages;
-import pokecube.adventures.entity.trainers.EntityLeader;
-import pokecube.adventures.entity.trainers.EntityPokemartSeller;
-import pokecube.adventures.entity.trainers.EntityTrainer;
-import pokecube.adventures.entity.trainers.TypeTrainer;
-import pokecube.adventures.events.PAEventsHandler;
-import pokecube.adventures.handlers.BlockHandler;
-import pokecube.adventures.handlers.ItemHandler;
-import pokecube.adventures.handlers.RecipeHandler;
-import pokecube.adventures.handlers.TrainerSpawnHandler;
-import pokecube.adventures.items.EntityTarget;
-import pokecube.adventures.items.bags.InventoryBag;
-import pokecube.adventures.network.PacketPokeAdv;
-import pokecube.adventures.network.PacketPokeAdv.MessageClient;
-import pokecube.adventures.network.PacketPokeAdv.MessageClient.MessageHandlerClient;
-import pokecube.adventures.network.PacketPokeAdv.MessageServer;
-import pokecube.adventures.network.PacketPokeAdv.MessageServer.MessageHandlerServer;
-import pokecube.adventures.network.packets.PacketTrainer;
-import pokecube.adventures.utils.DBLoader;
-import pokecube.adventures.world.WorldGenInits;
-import pokecube.adventures.world.village.gym.GymCreationHandler;
-import pokecube.adventures.world.village.gym.TemplateGym;
-import pokecube.adventures.world.village.pokemart.PokeMartCreationHandler;
-import pokecube.adventures.world.village.pokemart.TemplatePokemart;
-import pokecube.core.PokecubeCore;
-import pokecube.core.events.PostPostInit;
-import pokecube.core.interfaces.PokecubeMod;
-import thut.core.common.commands.CommandConfig;
-import thut.lib.CompatWrapper;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import pokecube.adventures.blocks.afa.AfaBlock;
+import pokecube.adventures.client.ClientProxy;
+import pokecube.adventures.entity.trainer.EntityTrainer;
+import pokecube.core.PokecubeItems;
 
-@Mod( // @formatter:off
-        modid = PokecubeAdv.ID, name = "Pokecube Adventures", version = PokecubeAdv.version, dependencies = PokecubeAdv.DEPSTRING, acceptableRemoteVersions = PokecubeAdv.MINVERSION, guiFactory = "pokecube.adventures.client.gui.config.ModGuiFactory", updateJSON = PokecubeAdv.UPDATEURL, acceptedMinecraftVersions = PokecubeAdv.MCVERSIONS) // @formatter:on
+@Mod(value = PokecubeAdv.ID)
 public class PokecubeAdv
 {
-    public static final String ID                 = "pokecube_adventures";
-    public static final String version            = "@VERSION";
-    public final static String MCVERSIONS         = "@MCVERSION";
-    public final static String MINVERSION         = "@MINVERSION";
-    // Add things here as compat modules are made for them, the only
-    // "required-after" should be pokecube.
-    public final static String DEPSTRING          = "required-after:pokecube;" + "after:thut_wearables;"
-            + "after:thutessentials;" + "after:waila;" + "after:advancedrocketry;" + "after:thut_bling;"
-            + "after:theoneprobe;" + "after:tesla;" + "after:lostcities;" + "after:ruins;" + "after:ftbl;"
-            + "after:journeymap;" + "after:reccomplex;" + "after:minefactoryreloaded;" + "after:immersiveengineering";
-
-    public static final String UPDATEURL  = "https://raw.githubusercontent.com/Pokecube-Development/Pokecube-Revival/master/versions.json";
-    public static final String TRAINERTEXTUREPATH = ID + ":textures/trainer/";
-
-    public static String       CUSTOMTRAINERFILE;
-
-    public static int          GUITRAINER_ID      = 2;
-    public static int          GUIBAG_ID          = 3;
-    public static int          GUICLONER_ID       = 4;
-    public static int          GUIBIOMESETTER_ID  = 5;
-    public static int          GUIAFA_ID          = 6;
-    public static int          GUISPLICER_ID      = 7;
-    public static int          GUIEXTRACTOR_ID    = 8;
-    public static int          GUICOMMANDER_ID    = 9;
-
-    public static boolean      tesla              = false;
-
-    @SidedProxy(clientSide = "pokecube.adventures.client.ClientProxy", serverSide = "pokecube.adventures.CommonProxy")
-    public static CommonProxy  proxy;
-
-    @Instance(ID)
-    public static PokecubeAdv  instance;
-
-    public static Config       conf;
-
-    public static void setTrainerConfig(FMLCommonSetupEvent evt)
+    // You can use EventBusSubscriber to automatically subscribe events on
+    // the
+    // contained class (this is subscribing to the MOD
+    // Event bus for receiving Registry Events)
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class RegistryEvents
     {
-        File file = evt.getSuggestedConfigurationFile();
-        String seperator = System.getProperty("file.separator");
+        @SubscribeEvent
+        public static void registerBlocks(final RegistryEvent.Register<Block> event)
+        {
+            if (!ModLoadingContext.get().getActiveContainer().getModId().equals(PokecubeAdv.ID)) return;
+            // register blocks
+            event.getRegistry().register(PokecubeAdv.AFA);
+            event.getRegistry().register(PokecubeAdv.COMMANDER);
+            event.getRegistry().register(PokecubeAdv.DAYCARE);
+            event.getRegistry().register(PokecubeAdv.CLONER);
+            event.getRegistry().register(PokecubeAdv.EXTRACTOR);
+            event.getRegistry().register(PokecubeAdv.SPLICER);
+            event.getRegistry().register(PokecubeAdv.SIPHON);
+            event.getRegistry().register(PokecubeAdv.WARPPAD);
+        }
 
-        String folder = file.getAbsolutePath();
-        String name = file.getName();
-        folder = folder.replace(name, "pokecube" + seperator + "trainers" + seperator + "trainers.xml");
+        @SubscribeEvent
+        public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event)
+        {
+            if (!ModLoadingContext.get().getActiveContainer().getModId().equals(PokecubeAdv.ID)) return;
+            // register a new mob here
+            event.getRegistry().register(EntityTrainer.TYPE.setRegistryName(PokecubeAdv.ID, "trainer"));
+        }
 
-        CUSTOMTRAINERFILE = folder;
+        @SubscribeEvent
+        public static void registerItems(final RegistryEvent.Register<Item> event)
+        {
+            if (!ModLoadingContext.get().getActiveContainer().getModId().equals(PokecubeAdv.ID)) return;
+            // register items
 
-        return;
+            // Register the item blocks.
+            event.getRegistry().register(new BlockItem(PokecubeAdv.AFA, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.AFA.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.COMMANDER, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.COMMANDER.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.DAYCARE, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.DAYCARE.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.CLONER, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.CLONER.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.EXTRACTOR, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.EXTRACTOR.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.SPLICER, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.SPLICER.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.SIPHON, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.SIPHON.getRegistryName()));
+            event.getRegistry().register(new BlockItem(PokecubeAdv.WARPPAD, new Item.Properties().group(
+                    PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.WARPPAD.getRegistryName()));
+
+            // Register the badges
+            for (final Item item : PokecubeAdv.BADGES)
+                event.getRegistry().register(item);
+        }
+
+        @SubscribeEvent
+        public static void registerTiles(final RegistryEvent.Register<TileEntityType<?>> event)
+        {
+            if (!ModLoadingContext.get().getActiveContainer().getModId().equals(PokecubeAdv.ID)) return;
+            // register tile entities
+        }
     }
+
+    public static final String ID = "pokecube_adventures";
+
+    public static final Block AFA;
+    public static final Block COMMANDER;
+    public static final Block DAYCARE;
+    public static final Block CLONER;
+    public static final Block EXTRACTOR;
+    public static final Block SPLICER;
+    public static final Block SIPHON;
+    public static final Block WARPPAD;
+
+    public static final List<Item> BADGES = Lists.newArrayList();
+
+    static
+    {
+        AFA = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "afa");
+        COMMANDER = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "commander");
+        DAYCARE = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "daycare");
+        CLONER = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "cloner");
+        EXTRACTOR = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "extractor");
+        SPLICER = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "splicer");
+        SIPHON = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "siphon");
+        WARPPAD = new AfaBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "warppad");
+    }
+
+    public static final String TRAINERTEXTUREPATH = PokecubeAdv.ID + ":textures/trainer/";
+
+    public final static CommonProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(),
+            () -> () -> new CommonProxy());
+
+    public static final Config config = Config.instance;
 
     public PokecubeAdv()
     {
+
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(PokecubeAdv.proxy::setup);
+        // Register the doClientStuff method for modloading
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(PokecubeAdv.proxy::setupClient);
+        // Register the loaded method for modloading
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(PokecubeAdv.proxy::loaded);
+
         MinecraftForge.EVENT_BUS.register(this);
-        Triggers.init();
-        WorldGenInits.FILENAMES.add(TemplatePokemart.POKEMART);
-        WorldGenInits.FILENAMES.add(TemplateGym.GYM_GENERAL);
+
+        // Register Config stuff
+        thut.core.common.config.Config.setupConfigs(PokecubeAdv.config, PokecubeAdv.ID, PokecubeAdv.ID);
     }
-
-    @EventHandler
-    public void load(FMLInitializationEvent evt)
-    {
-        proxy.initClient();
-        WorldGenInits.init();
-        PacketPokeAdv.init();
-        PokecubeMod.packetPipeline.registerMessage(MessageHandlerClient.class, MessageClient.class,
-                PokecubeCore.getMessageID(), Dist.CLIENT);
-        PokecubeMod.packetPipeline.registerMessage(MessageHandlerServer.class, MessageServer.class,
-                PokecubeCore.getMessageID(), Dist.DEDICATED_SERVER);
-
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
-
-        if (conf.villagePokemarts)
-        {
-            VillagerRegistry.instance().registerVillageCreationHandler(new PokeMartCreationHandler());
-            MapGenStructureIO.registerStructureComponent(TemplatePokemart.class, ID + ":pokemart");
-        }
-        if (conf.villageGyms)
-        {
-            VillagerRegistry.instance().registerVillageCreationHandler(new GymCreationHandler());
-            MapGenStructureIO.registerStructureComponent(TemplateGym.class, ID + ":gym_general");
-        }
-        CompatWrapper.registerModEntity(EntityTarget.class, "targetParticles", 0, this, 16, 3, true);
-        CompatWrapper.registerModEntity(EntityTrainer.class, "trainer", 1, this, 80, 3, true);
-        CompatWrapper.registerModEntity(EntityLeader.class, "leader", 2, this, 80, 3, true);
-        CompatWrapper.registerModEntity(EntityPokemartSeller.class, "trainermerchant", 4, this, 80, 3, true);
-        PAEventsHandler events = new PAEventsHandler();
-        MinecraftForge.EVENT_BUS.register(events);
-        new TrainerSpawnHandler();
-        ItemHandler.handleLoot();
-        RecipeHandler.register(evt);
-    }
-
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent e)
-    {
-        PacketTrainer.register();
-        proxy.postinit();
-    }
-
-    @SubscribeEvent
-    public void postPostInit(PostPostInit e)
-    {
-        conf.postInit();
-        RecipeHandler.addClonerRecipes();
-        DBLoader.load();
-    }
-
-    @EventHandler
-    public void preInit(FMLCommonSetupEvent e)
-    {
-        conf = new Config(PokecubeMod.core.getPokecubeConfig(e).getConfigFile());
-        tesla = Loader.isModLoaded("tesla");
-        DBLoader.preInit(e);
-        setTrainerConfig(e);
-        MinecraftForge.EVENT_BUS.register(new ItemHandler());
-        proxy.preinit();
-        RecipeHandler.preInit();
-
-        CapabilityManager.INSTANCE.register(IHasPokemobs.class,
-                CapabilityHasPokemobs.storage = new CapabilityHasPokemobs.Storage(), DefaultPokemobs::new);
-        CapabilityManager.INSTANCE.register(IHasNPCAIStates.class,
-                CapabilityNPCAIStates.storage = new CapabilityNPCAIStates.Storage(), DefaultAIStates::new);
-        CapabilityManager.INSTANCE.register(IHasMessages.class,
-                CapabilityNPCMessages.storage = new CapabilityNPCMessages.Storage(), DefaultMessager::new);
-        CapabilityManager.INSTANCE.register(IHasRewards.class,
-                CapabilityHasRewards.storage = new CapabilityHasRewards.Storage(), DefaultRewards::new);
-    }
-
-    @SubscribeEvent
-    public void registerItems(RegistryEvent.Register<Item> evt)
-    {
-        ItemHandler.registerItems(evt.getRegistry());
-        proxy.initItemModels();
-    }
-
-    @SubscribeEvent
-    public void registerBlocks(RegistryEvent.Register<Block> evt)
-    {
-        BlockHandler.registerBlocks(evt.getRegistry());
-        proxy.initBlockModels();
-    }
-
-    @SubscribeEvent
-    public void registerTiles(RegistryEvent.Register<Block> evt)
-    {
-        BlockHandler.registerTiles(evt.getRegistry());
-    }
-
-    @EventHandler
-    public void serverStarting(FMLServerStartingEvent event)
-    {
-        event.registerServerCommand(new KillCommand());
-        event.registerServerCommand(new CountCommand());
-        event.registerServerCommand(new BattleCommand());
-        event.registerServerCommand(new CommandConfig("pokeadvsettings", Config.instance));
-        TypeTrainer.initSpawns();
-    }
-
-    @EventHandler
-    public void serverEnding(FMLServerStoppedEvent evt)
-    {
-        TrainerSpawnHandler.trainerMap.clear();
-        InventoryBag.clearInventory();
-    }
-
 }

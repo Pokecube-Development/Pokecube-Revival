@@ -1,96 +1,78 @@
 package pokecube.adventures.utils;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import net.minecraft.item.ItemStack;
-import pokecube.adventures.entity.trainers.TypeTrainer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.LogicalSidedProvider;
+import pokecube.adventures.capabilities.utils.TypeTrainer;
+import pokecube.core.PokecubeCore;
 import pokecube.core.database.Database;
 import pokecube.core.database.PokedexEntry;
+import pokecube.core.database.PokedexEntryLoader;
 import pokecube.core.database.PokedexEntryLoader.SpawnRule;
 import pokecube.core.database.SpawnBiomeMatcher;
-import pokecube.core.interfaces.PokecubeMod;
 import pokecube.core.utils.PokeType;
 import pokecube.core.utils.Tools;
 
 public class TrainerEntryLoader
 {
-    static XMLDatabase database;
-
-    @XmlRootElement(name = "TYPETRAINERSET")
-    public static class XMLDatabase
+    public static class Bag
     {
-        @XmlElement(name = "TYPETRAINER")
-        private List<TrainerEntry> trainers = Lists.newArrayList();
+        Map<QName, String> values;
+        String             tag;
     }
 
-    @XmlRootElement(name = "TYPETRAINER")
+    public static class Held
+    {
+        Map<QName, String> values;
+        String             tag;
+    }
+
     public static class TrainerEntry
     {
-        @XmlAttribute
         String          tradeTemplate = "default";
-        @XmlElement(name = "TYPE")
         String          type;
-        @XmlElement(name = "POKEMON")
         String          pokemon;
-        @XmlElement(name = "Spawn")
         List<SpawnRule> spawns        = Lists.newArrayList();
-        @XmlElement(name = "GENDER")
         String          gender;
-        @XmlElement(name = "BAG")
         Bag             bag;
-        @XmlElement(name = "BELT")
         boolean         belt          = true;
-        @XmlElement(name = "HELD")
         Held            held;
-        @XmlElement(name = "REWARD")
         Held            reward;
 
         @Override
         public String toString()
         {
-            return type + " " + spawns;
+            return this.type + " " + this.spawns;
         }
     }
 
-    @XmlRootElement(name = "BAG")
-    public static class Bag
+    public static class XMLDatabase
     {
-        @XmlAnyAttribute
-        Map<QName, String> values;
-        @XmlElement(name = "tag")
-        String             tag;
+        private final List<TrainerEntry> trainers = Lists.newArrayList();
     }
 
-    @XmlRootElement(name = "HELD")
-    public static class Held
-    {
-        @XmlAnyAttribute
-        Map<QName, String> values;
-        @XmlElement(name = "tag")
-        String             tag;
-    }
+    static XMLDatabase database;
 
-    private static XMLDatabase loadDatabase(File file) throws Exception
+    private static XMLDatabase loadDatabase(final ResourceLocation file) throws Exception
     {
-        JAXBContext jaxbContext = JAXBContext.newInstance(XMLDatabase.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        FileReader reader = new FileReader(file);
-        XMLDatabase database = (XMLDatabase) unmarshaller.unmarshal(reader);
-        for (TrainerEntry entry : database.trainers)
+        final MinecraftServer server = LogicalSidedProvider.INSTANCE.get(LogicalSide.SERVER);
+        final InputStream res = server.getResourceManager().getResource(file).getInputStream();
+        final Reader reader = new InputStreamReader(res);
+        final XMLDatabase database = PokedexEntryLoader.gson.fromJson(reader, XMLDatabase.class);
+        for (final TrainerEntry entry : database.trainers)
         {
             if (entry.type != null) entry.type = entry.type.trim();
             if (entry.pokemon != null) entry.pokemon = entry.pokemon.trim();
@@ -100,133 +82,107 @@ public class TrainerEntryLoader
         return database;
     }
 
-    public static void makeEntries(File file)
+    public static void makeEntries(final ResourceLocation file)
     {
-        if (database == null)
+        if (TrainerEntryLoader.database == null) try
         {
-            try
-            {
-                database = loadDatabase(file);
-            }
-            catch (Exception e)
-            {
-                PokecubeMod.log(Level.WARNING, file + "", e);
-                throw new RuntimeException();
-            }
+            TrainerEntryLoader.database = TrainerEntryLoader.loadDatabase(file);
         }
-        else
+        catch (final Exception e)
         {
-            try
+            PokecubeCore.LOGGER.warn(file + "", e);
+            throw new RuntimeException();
+        }
+        else try
+        {
+            PokecubeCore.LOGGER.debug("Loading Database: " + file);
+            final XMLDatabase newDatabase = TrainerEntryLoader.loadDatabase(file);
+            for (final TrainerEntry entry : newDatabase.trainers)
             {
-                XMLDatabase newDatabase = loadDatabase(file);
-                for (TrainerEntry entry : newDatabase.trainers)
-                {
-                    for (TrainerEntry old : database.trainers)
+                for (final TrainerEntry old : TrainerEntryLoader.database.trainers)
+                    if (old.type.equals(entry.type))
                     {
-                        if (old.type.equals(entry.type))
-                        {
-                            database.trainers.remove(old);
-                            break;
-                        }
+                        TrainerEntryLoader.database.trainers.remove(old);
+                        break;
                     }
-                    database.trainers.add(entry);
-                }
-            }
-            catch (Exception e)
-            {
-                PokecubeMod.log(Level.WARNING, file + "", e);
-                throw new RuntimeException();
+                TrainerEntryLoader.database.trainers.add(entry);
             }
         }
-        for (TrainerEntry entry : database.trainers)
+        catch (final Exception e)
         {
-            String name = entry.type;
+            PokecubeCore.LOGGER.warn(file + "", e);
+            throw new RuntimeException();
+        }
+        for (final TrainerEntry entry : TrainerEntryLoader.database.trainers)
+        {
+            final String name = entry.type;
+            PokecubeCore.LOGGER.debug("Loaded Type: " + name);
             TypeTrainer type = TypeTrainer.typeMap.get(name);
             if (type == null) type = new TypeTrainer(name);
             type.matchers.clear();
             type.pokemon.clear();
-            byte male = 1;
-            byte female = 2;
+            final byte male = 1;
+            final byte female = 2;
             type.tradeTemplate = entry.tradeTemplate;
             type.hasBag = entry.bag != null;
             if (type.hasBag)
             {
+                if (entry.bag.values == null) entry.bag.values = Maps.newHashMap();
                 if (entry.bag.tag != null) entry.bag.values.put(new QName("tag"), entry.bag.tag);
-                ItemStack bag = Tools.getStack(entry.bag.values);
+                final ItemStack bag = Tools.getStack(entry.bag.values);
                 type.bag = bag;
             }
-            if (entry.spawns != null) for (SpawnRule rule : entry.spawns)
+            if (entry.spawns != null) for (final SpawnRule rule : entry.spawns)
             {
                 Float weight;
                 try
                 {
                     weight = Float.parseFloat(rule.values.get(new QName("rate")));
                 }
-                catch (Exception e)
+                catch (final Exception e)
                 {
-                    PokecubeMod.log(Level.WARNING,
-                            "Error with weight for " + type.name + " " + rule.values + " " + entry.spawns, e);
+                    PokecubeCore.LOGGER.warn("Error with weight for " + type.name + " " + rule.values + " "
+                            + entry.spawns, e);
                     continue;
                 }
-                SpawnBiomeMatcher matcher = new SpawnBiomeMatcher(rule);
+                final SpawnBiomeMatcher matcher = new SpawnBiomeMatcher(rule);
                 type.matchers.put(matcher, weight);
             }
 
             type.hasBelt = entry.belt;
-            if (entry.gender != null) type.genders = (byte) (entry.gender.equalsIgnoreCase("male") ? male
-                    : entry.gender.equalsIgnoreCase("female") ? female : male + female);
-            String[] pokeList = entry.pokemon == null ? new String[] {} : entry.pokemon.split(",");
+            if (entry.gender != null) type.genders = entry.gender.equalsIgnoreCase("male") ? male
+                    : entry.gender.equalsIgnoreCase("female") ? female : male + female;
+            final String[] pokeList = entry.pokemon == null ? new String[] {} : entry.pokemon.split(",");
             if (entry.held != null)
             {
+                if (entry.held.values == null) entry.held.values = Maps.newHashMap();
                 if (entry.held.tag != null) entry.held.values.put(new QName("tag"), entry.held.tag);
-                ItemStack held = Tools.getStack(entry.held.values);
+                final ItemStack held = Tools.getStack(entry.held.values);
                 type.held = held;
             }
             if (pokeList.length == 0) continue;
-            if (!pokeList[0].startsWith("-"))
+            if (!pokeList[0].startsWith("-")) for (final String s : pokeList)
             {
-                for (String s : pokeList)
+                final PokedexEntry e = Database.getEntry(s);
+                if (e != null && !type.pokemon.contains(e)) type.pokemon.add(e);
+                else if (e == null)
                 {
-                    PokedexEntry e = Database.getEntry(s);
-                    if (e != null && !type.pokemon.contains(e))
-                    {
-                        type.pokemon.add(e);
-                    }
-                    else if (e == null)
-                    {
-                        // System.err.println("Error in reading of "+s);
-                    }
+                    // System.err.println("Error in reading of "+s);
                 }
             }
             else
             {
-                String[] types = pokeList[0].replace("-", "").split(":");
+                final String[] types = pokeList[0].replace("-", "").split(":");
                 if (types[0].equalsIgnoreCase("all"))
                 {
-                    for (PokedexEntry s : Database.spawnables)
-                    {
-                        if (!s.legendary && s.getPokedexNb() != 151)
-                        {
-                            type.pokemon.add(s);
-                        }
-                    }
+                    for (final PokedexEntry s : Database.spawnables)
+                        if (!s.legendary && s.getPokedexNb() != 151) type.pokemon.add(s);
                 }
-                else
+                else for (final String type2 : types)
                 {
-                    for (int i = 0; i < types.length; i++)
-                    {
-                        PokeType pokeType = PokeType.getType(types[i]);
-                        if (pokeType != PokeType.unknown)
-                        {
-                            for (PokedexEntry s : Database.spawnables)
-                            {
-                                if (s.isType(pokeType) && !s.legendary && s.getPokedexNb() != 151)
-                                {
-                                    type.pokemon.add(s);
-                                }
-                            }
-                        }
-                    }
+                    final PokeType pokeType = PokeType.getType(type2);
+                    if (pokeType != PokeType.unknown) for (final PokedexEntry s : Database.spawnables)
+                        if (s.isType(pokeType) && !s.legendary && s.getPokedexNb() != 151) type.pokemon.add(s);
                 }
             }
         }

@@ -1,7 +1,8 @@
 package pokecube.adventures.utils;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,9 +19,13 @@ import javax.xml.namespace.QName;
 import com.google.common.collect.Lists;
 
 import net.minecraft.item.ItemStack;
-import pokecube.adventures.entity.trainers.TypeTrainer;
-import pokecube.adventures.entity.trainers.TypeTrainer.TrainerTrade;
-import pokecube.adventures.entity.trainers.TypeTrainer.TrainerTrades;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.LogicalSidedProvider;
+import pokecube.adventures.capabilities.utils.TypeTrainer;
+import pokecube.adventures.capabilities.utils.TypeTrainer.TrainerTrade;
+import pokecube.adventures.capabilities.utils.TypeTrainer.TrainerTrades;
 import pokecube.core.PokecubeItems;
 import pokecube.core.handlers.ItemGenerator;
 import pokecube.core.items.ItemTM;
@@ -28,43 +33,22 @@ import pokecube.core.items.vitamins.ItemVitamin;
 import pokecube.core.moves.MovesUtils;
 import pokecube.core.utils.PokeType;
 import pokecube.core.utils.Tools;
-import thut.lib.CompatWrapper;
 
 public class TradeEntryLoader
 {
-    static final QName MIN    = new QName("min");
-    static final QName MAX    = new QName("max");
-    static final QName CHANCE = new QName("chance");
-
-    static XMLDatabase database;
-
-    @XmlRootElement(name = "AllTrades")
-    public static class XMLDatabase
+    @XmlRootElement(name = "Buy")
+    public static class Buy
     {
-        @XmlElement(name = "Trades")
-        private List<TradeEntry> trades = Lists.newArrayList();
-    }
-
-    @XmlRootElement(name = "Trades")
-    public static class TradeEntry
-    {
-        @XmlAttribute
-        String              template = "default";
-        @XmlElement(name = "Trade")
-        private List<Trade> trades   = Lists.newArrayList();
-    }
-
-    @XmlRootElement(name = "Trade")
-    public static class Trade
-    {
-        @XmlAttribute
-        String             custom;
-        @XmlElement(name = "Sell")
-        Sell               sell;
-        @XmlElement(name = "Buy")
-        private List<Buy>  buys = Lists.newArrayList();
         @XmlAnyAttribute
         Map<QName, String> values;
+        @XmlElement(name = "tag")
+        String             tag;
+
+        @Override
+        public String toString()
+        {
+            return this.values + " " + this.tag;
+        }
     }
 
     @XmlRootElement(name = "Sell")
@@ -78,50 +62,247 @@ public class TradeEntryLoader
         @Override
         public String toString()
         {
-            return values + " " + tag;
+            return this.values + " " + this.tag;
         }
     }
 
-    @XmlRootElement(name = "Buy")
-    public static class Buy
+    @XmlRootElement(name = "Trade")
+    public static class Trade
     {
+        @XmlAttribute
+        String                  custom;
+        @XmlElement(name = "Sell")
+        Sell                    sell;
+        @XmlElement(name = "Buy")
+        private final List<Buy> buys = Lists.newArrayList();
         @XmlAnyAttribute
-        Map<QName, String> values;
-        @XmlElement(name = "tag")
-        String             tag;
-
-        @Override
-        public String toString()
-        {
-            return values + " " + tag;
-        }
+        Map<QName, String>      values;
     }
 
-    public static XMLDatabase loadDatabase(File file) throws Exception
+    @XmlRootElement(name = "Trades")
+    public static class TradeEntry
     {
-        JAXBContext jaxbContext = JAXBContext.newInstance(XMLDatabase.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        FileReader reader = new FileReader(file);
-        XMLDatabase database = (XMLDatabase) unmarshaller.unmarshal(reader);
+        @XmlAttribute
+        String                    template = "default";
+        @XmlElement(name = "Trade")
+        private final List<Trade> trades   = Lists.newArrayList();
+    }
+
+    @XmlRootElement(name = "AllTrades")
+    public static class XMLDatabase
+    {
+        @XmlElement(name = "Trades")
+        private final List<TradeEntry> trades = Lists.newArrayList();
+    }
+
+    static final QName MIN = new QName("min");
+
+    static final QName MAX = new QName("max");
+
+    static final QName CHANCE = new QName("chance");
+
+    static XMLDatabase database;
+
+    private static void addTemplatedTrades(final Trade trade, final TrainerTrades trades)
+    {
+        final String custom = trade.custom;
+        if (custom.equals("allMegas"))
+        {
+            for (final String s : ItemGenerator.variants)
+                if (s.contains("mega") && !s.equals("megastone") || s.contains("orb"))
+                {
+                    final ItemStack sell = PokecubeItems.getStack(s);
+                    Map<QName, String> values;
+                    TrainerTrade recipe;
+                    ItemStack buy1 = ItemStack.EMPTY;
+                    ItemStack buy2 = ItemStack.EMPTY;
+                    values = trade.buys.get(0).values;
+                    if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
+                    buy1 = Tools.getStack(values);
+                    if (trade.buys.size() > 1)
+                    {
+                        values = trade.buys.get(1).values;
+                        if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
+                        buy2 = Tools.getStack(values);
+                    }
+                    recipe = new TrainerTrade(buy1, buy2, sell);
+                    values = trade.values;
+                    if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                            TradeEntryLoader.CHANCE));
+                    if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                            TradeEntryLoader.MIN));
+                    if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                            TradeEntryLoader.MAX));
+                    trades.tradesList.add(recipe);
+                }
+        }
+        else if (custom.equals("allVitamins")) for (final String s : ItemVitamin.vitamins)
+        {
+            final ItemStack sell = PokecubeItems.getStack(s);
+            Map<QName, String> values;
+            TrainerTrade recipe;
+            ItemStack buy1 = ItemStack.EMPTY;
+            ItemStack buy2 = ItemStack.EMPTY;
+            values = trade.buys.get(0).values;
+            if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
+            buy1 = Tools.getStack(values);
+            if (trade.buys.size() > 1)
+            {
+                values = trade.buys.get(1).values;
+                if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
+                buy2 = Tools.getStack(values);
+            }
+            recipe = new TrainerTrade(buy1, buy2, sell);
+            values = trade.values;
+            if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                    TradeEntryLoader.CHANCE));
+            if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                    TradeEntryLoader.MIN));
+            if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                    TradeEntryLoader.MAX));
+            trades.tradesList.add(recipe);
+        }
+        else if (custom.equals("allGenericHeld")) for (final String s : ItemGenerator.variants)
+        {
+            if (s.contains("mega") && !s.equals("megastone") || s.contains("orb") || s.equals("shiny_charm")) continue;
+
+            final ItemStack sell = PokecubeItems.getStack(s);
+            Map<QName, String> values;
+            TrainerTrade recipe;
+            ItemStack buy1 = ItemStack.EMPTY;
+            ItemStack buy2 = ItemStack.EMPTY;
+            values = trade.buys.get(0).values;
+            if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
+            buy1 = Tools.getStack(values);
+            if (trade.buys.size() > 1)
+            {
+                values = trade.buys.get(1).values;
+                if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
+                buy2 = Tools.getStack(values);
+            }
+            recipe = new TrainerTrade(buy1, buy2, sell);
+            values = trade.values;
+            if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                    TradeEntryLoader.CHANCE));
+            if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                    TradeEntryLoader.MIN));
+            if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                    TradeEntryLoader.MAX));
+            trades.tradesList.add(recipe);
+        }
+        else if (custom.equals("allTMs"))
+        {
+            final ArrayList<String> moves = Lists.newArrayList(MovesUtils.moves.keySet());
+            Collections.sort(moves);
+            for (int i = 0; i < moves.size(); i++)
+            {
+                final int index = i;
+                final String name = moves.get(index);
+                final ItemStack sell = ItemTM.getTM(name);
+                Map<QName, String> values;
+                TrainerTrade recipe;
+                ItemStack buy1 = ItemStack.EMPTY;
+                ItemStack buy2 = ItemStack.EMPTY;
+                values = trade.buys.get(0).values;
+                if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
+                buy1 = Tools.getStack(values);
+                if (trade.buys.size() > 1)
+                {
+                    values = trade.buys.get(1).values;
+                    if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
+                    buy2 = Tools.getStack(values);
+                }
+                recipe = new TrainerTrade(buy1, buy2, sell);
+                values = trade.values;
+                if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                        TradeEntryLoader.CHANCE));
+                if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                        TradeEntryLoader.MIN));
+                if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                        TradeEntryLoader.MAX));
+                trades.tradesList.add(recipe);
+            }
+        }
+        else if (custom.equals("sellRandomBadge"))
+        {
+            for (final PokeType type : PokeType.values())
+                if (type != PokeType.unknown)
+                {
+                    final ItemStack badge = PokecubeItems.getStack("badge_" + type);
+                    if (!badge.isEmpty())
+                    {
+                        Map<QName, String> values;
+                        TrainerTrade recipe;
+                        ItemStack buy1 = ItemStack.EMPTY;
+                        ItemStack buy2 = ItemStack.EMPTY;
+                        values = trade.buys.get(0).values;
+                        if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
+                        buy1 = Tools.getStack(values);
+                        if (trade.buys.size() > 1)
+                        {
+                            values = trade.buys.get(1).values;
+                            if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
+                            buy2 = Tools.getStack(values);
+                        }
+                        recipe = new TrainerTrade(buy1, buy2, badge);
+                        values = trade.values;
+                        if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                                TradeEntryLoader.CHANCE));
+                        if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                                TradeEntryLoader.MIN));
+                        if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                                TradeEntryLoader.MAX));
+                        trades.tradesList.add(recipe);
+                    }
+                }
+        }
+        else if (custom.equals("buyRandomBadge")) for (final PokeType type : PokeType.values())
+            if (type != PokeType.unknown)
+            {
+                final ItemStack badge = PokecubeItems.getStack("badge_" + type);
+                if (!badge.isEmpty())
+                {
+                    Map<QName, String> values = trade.sell.values;
+                    TrainerTrade recipe;
+                    if (trade.sell.tag != null) values.put(new QName("tag"), trade.sell.tag);
+                    final ItemStack sell = Tools.getStack(values);
+                    recipe = new TrainerTrade(badge, ItemStack.EMPTY, sell);
+                    values = trade.values;
+                    if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                            TradeEntryLoader.CHANCE));
+                    if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                            TradeEntryLoader.MIN));
+                    if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                            TradeEntryLoader.MAX));
+                    trades.tradesList.add(recipe);
+                }
+            }
+    }
+
+    public static XMLDatabase loadDatabase(final ResourceLocation file) throws Exception
+    {
+        final MinecraftServer server = LogicalSidedProvider.INSTANCE.get(LogicalSide.SERVER);
+        final InputStream res = server.getResourceManager().getResource(file).getInputStream();
+        final JAXBContext jaxbContext = JAXBContext.newInstance(XMLDatabase.class);
+        final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        final Reader reader = new InputStreamReader(res);
+        final XMLDatabase database = (XMLDatabase) unmarshaller.unmarshal(reader);
         reader.close();
         return database;
     }
 
-    public static void makeEntries(File file) throws Exception
+    public static void makeEntries(final ResourceLocation file) throws Exception
     {
-        if (database == null)
+        if (TradeEntryLoader.database == null) TradeEntryLoader.database = TradeEntryLoader.loadDatabase(file);
+        for (final TradeEntry entry : TradeEntryLoader.database.trades)
         {
-            database = loadDatabase(file);
-        }
-        for (TradeEntry entry : database.trades)
-        {
-            TrainerTrades trades = new TrainerTrades();
+            final TrainerTrades trades = new TrainerTrades();
             inner:
-            for (Trade trade : entry.trades)
+            for (final Trade trade : entry.trades)
             {
                 if (trade.custom != null)
                 {
-                    addTemplatedTrades(trade, trades);
+                    TradeEntryLoader.addTemplatedTrades(trade, trades);
                     continue inner;
                 }
                 Map<QName, String> values = trade.sell.values;
@@ -140,7 +321,7 @@ public class TradeEntryLoader
                     if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
                     buy2 = Tools.getStack(values);
                 }
-                if (!CompatWrapper.isValid(sell))
+                if (sell.isEmpty())
                 {
                     System.err.println("No Sell:" + trade.sell + " " + trade.buys);
                     continue;
@@ -148,187 +329,15 @@ public class TradeEntryLoader
 
                 recipe = new TrainerTrade(buy1, buy2, sell);
                 values = trade.values;
-                if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
+                if (values.containsKey(TradeEntryLoader.CHANCE)) recipe.chance = Float.parseFloat(values.get(
+                        TradeEntryLoader.CHANCE));
+                if (values.containsKey(TradeEntryLoader.MIN)) recipe.min = Integer.parseInt(values.get(
+                        TradeEntryLoader.MIN));
+                if (values.containsKey(TradeEntryLoader.MAX)) recipe.max = Integer.parseInt(values.get(
+                        TradeEntryLoader.MAX));
                 trades.tradesList.add(recipe);
             }
             TypeTrainer.tradesMap.put(entry.template, trades);
-        }
-    }
-
-    private static void addTemplatedTrades(Trade trade, TrainerTrades trades)
-    {
-        String custom = trade.custom;
-        if (custom.equals("allMegas"))
-        {
-            for (String s : ItemGenerator.variants)
-            {
-                if ((s.contains("mega") && !s.equals("megastone")) || s.contains("orb"))
-                {
-                    ItemStack sell = PokecubeItems.getStack(s);
-                    sell.setItemDamage(0);
-                    Map<QName, String> values;
-                    TrainerTrade recipe;
-                    ItemStack buy1 = ItemStack.EMPTY;
-                    ItemStack buy2 = ItemStack.EMPTY;
-                    values = trade.buys.get(0).values;
-                    if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
-                    buy1 = Tools.getStack(values);
-                    if (trade.buys.size() > 1)
-                    {
-                        values = trade.buys.get(1).values;
-                        if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
-                        buy2 = Tools.getStack(values);
-                    }
-                    recipe = new TrainerTrade(buy1, buy2, sell);
-                    values = trade.values;
-                    if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                    if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                    if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
-                    trades.tradesList.add(recipe);
-                }
-            }
-        }
-        else if (custom.equals("allVitamins"))
-        {
-            for (String s : ItemVitamin.vitamins)
-            {
-                ItemStack sell = PokecubeItems.getStack(s);
-                sell.setItemDamage(0);
-                Map<QName, String> values;
-                TrainerTrade recipe;
-                ItemStack buy1 = ItemStack.EMPTY;
-                ItemStack buy2 = ItemStack.EMPTY;
-                values = trade.buys.get(0).values;
-                if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
-                buy1 = Tools.getStack(values);
-                if (trade.buys.size() > 1)
-                {
-                    values = trade.buys.get(1).values;
-                    if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
-                    buy2 = Tools.getStack(values);
-                }
-                recipe = new TrainerTrade(buy1, buy2, sell);
-                values = trade.values;
-                if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
-                trades.tradesList.add(recipe);
-            }
-        }
-        else if (custom.equals("allGenericHeld"))
-        {
-            for (String s : ItemGenerator.variants)
-            {
-                if ((s.contains("mega") && !s.equals("megastone")) || s.contains("orb") || s.equals("shiny_charm"))
-                    continue;
-
-                ItemStack sell = PokecubeItems.getStack(s);
-                sell.setItemDamage(0);
-                Map<QName, String> values;
-                TrainerTrade recipe;
-                ItemStack buy1 = ItemStack.EMPTY;
-                ItemStack buy2 = ItemStack.EMPTY;
-                values = trade.buys.get(0).values;
-                if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
-                buy1 = Tools.getStack(values);
-                if (trade.buys.size() > 1)
-                {
-                    values = trade.buys.get(1).values;
-                    if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
-                    buy2 = Tools.getStack(values);
-                }
-                recipe = new TrainerTrade(buy1, buy2, sell);
-                values = trade.values;
-                if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
-                trades.tradesList.add(recipe);
-            }
-        }
-        else if (custom.equals("allTMs"))
-        {
-            ArrayList<String> moves = Lists.newArrayList(MovesUtils.moves.keySet());
-            Collections.sort(moves);
-            for (int i = 0; i < moves.size(); i++)
-            {
-                int index = i;
-                String name = moves.get(index);
-                ItemStack sell = ItemTM.getTM(name);
-                Map<QName, String> values;
-                TrainerTrade recipe;
-                ItemStack buy1 = ItemStack.EMPTY;
-                ItemStack buy2 = ItemStack.EMPTY;
-                values = trade.buys.get(0).values;
-                if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
-                buy1 = Tools.getStack(values);
-                if (trade.buys.size() > 1)
-                {
-                    values = trade.buys.get(1).values;
-                    if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
-                    buy2 = Tools.getStack(values);
-                }
-                recipe = new TrainerTrade(buy1, buy2, sell);
-                values = trade.values;
-                if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
-                trades.tradesList.add(recipe);
-            }
-        }
-        else if (custom.equals("sellRandomBadge"))
-        {
-            for (PokeType type : PokeType.values())
-                if (type != PokeType.unknown)
-                {
-                    ItemStack badge = PokecubeItems.getStack("badge_" + type);
-                    if (CompatWrapper.isValid(badge))
-                    {
-                        badge.setItemDamage(0);
-                        Map<QName, String> values;
-                        TrainerTrade recipe;
-                        ItemStack buy1 = ItemStack.EMPTY;
-                        ItemStack buy2 = ItemStack.EMPTY;
-                        values = trade.buys.get(0).values;
-                        if (trade.buys.get(0).tag != null) values.put(new QName("tag"), trade.buys.get(0).tag);
-                        buy1 = Tools.getStack(values);
-                        if (trade.buys.size() > 1)
-                        {
-                            values = trade.buys.get(1).values;
-                            if (trade.buys.get(1).tag != null) values.put(new QName("tag"), trade.buys.get(1).tag);
-                            buy2 = Tools.getStack(values);
-                        }
-                        recipe = new TrainerTrade(buy1, buy2, badge);
-                        values = trade.values;
-                        if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                        if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                        if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
-                        trades.tradesList.add(recipe);
-                    }
-                }
-        }
-        else if (custom.equals("buyRandomBadge"))
-        {
-            for (PokeType type : PokeType.values())
-                if (type != PokeType.unknown)
-                {
-                    ItemStack badge = PokecubeItems.getStack("badge_" + type);
-                    if (CompatWrapper.isValid(badge))
-                    {
-                        badge.setItemDamage(0);
-                        Map<QName, String> values = trade.sell.values;
-                        TrainerTrade recipe;
-                        if (trade.sell.tag != null) values.put(new QName("tag"), trade.sell.tag);
-                        ItemStack sell = Tools.getStack(values);
-                        recipe = new TrainerTrade(badge, ItemStack.EMPTY, sell);
-                        values = trade.values;
-                        if (values.containsKey(CHANCE)) recipe.chance = Float.parseFloat(values.get(CHANCE));
-                        if (values.containsKey(MIN)) recipe.min = Integer.parseInt(values.get(MIN));
-                        if (values.containsKey(MAX)) recipe.max = Integer.parseInt(values.get(MAX));
-                        trades.tradesList.add(recipe);
-                    }
-                }
         }
     }
 

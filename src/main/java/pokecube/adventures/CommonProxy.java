@@ -1,139 +1,42 @@
 package pokecube.adventures;
 
-import java.util.Map;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import pokecube.adventures.capabilities.CapabilityHasPokemobs;
+import pokecube.adventures.capabilities.CapabilityHasPokemobs.DefaultPokemobs;
+import pokecube.adventures.capabilities.CapabilityHasPokemobs.IHasPokemobs;
+import pokecube.adventures.capabilities.CapabilityHasRewards;
+import pokecube.adventures.capabilities.CapabilityHasRewards.DefaultRewards;
+import pokecube.adventures.capabilities.CapabilityHasRewards.IHasRewards;
+import pokecube.adventures.capabilities.CapabilityNPCAIStates;
+import pokecube.adventures.capabilities.CapabilityNPCAIStates.DefaultAIStates;
+import pokecube.adventures.capabilities.CapabilityNPCAIStates.IHasNPCAIStates;
+import pokecube.adventures.capabilities.CapabilityNPCMessages;
+import pokecube.adventures.capabilities.CapabilityNPCMessages.DefaultMessager;
+import pokecube.adventures.capabilities.CapabilityNPCMessages.IHasMessages;
+import pokecube.adventures.capabilities.utils.TypeTrainer;
+import thut.core.common.Proxy;
 
-import com.google.common.collect.Maps;
-
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.IGuiHandler;
-import pokecube.adventures.blocks.afa.ContainerAFA;
-import pokecube.adventures.blocks.afa.TileEntityAFA;
-import pokecube.adventures.blocks.cloner.container.ContainerCloner;
-import pokecube.adventures.blocks.cloner.container.ContainerGeneExtractor;
-import pokecube.adventures.blocks.cloner.container.ContainerSplicer;
-import pokecube.adventures.blocks.cloner.tileentity.TileEntityCloner;
-import pokecube.adventures.blocks.daycare.ContainerDaycare;
-import pokecube.adventures.blocks.daycare.TileEntityDaycare;
-import pokecube.adventures.items.bags.ContainerBag;
-
-public class CommonProxy implements IGuiHandler
+public class CommonProxy implements Proxy
 {
-    public static Map<Integer, IGuiHandler> custom_server_handlers = Maps.newHashMap();
-    public static Map<Integer, IGuiHandler> custom_client_handlers = Maps.newHashMap();
-
-    @Override
-    public Object getClientGuiElement(int guiID, PlayerEntity player, World world, int x, int y, int z)
+    public ResourceLocation getTrainerSkin(final LivingEntity mob, final TypeTrainer type, final byte gender)
     {
-        return null;
-    }
-
-    public PlayerEntity getPlayer()
-    {
-        return null;
-    }
-
-    public PlayerEntity getPlayer(String playerName)
-    {
-        if (playerName != null) { return getWorld().getPlayerEntityByName(playerName); }
         return null;
     }
 
     @Override
-    public Object getServerGuiElement(int guiID, PlayerEntity player, World world, int x, int y, int z)
+    public void setup(final FMLCommonSetupEvent event)
     {
-        if (guiID == PokecubeAdv.GUIBAG_ID)
-        {
-            ContainerBag cont = new ContainerBag(player.inventory);
-            cont.gotoInventoryPage(x);
-            return cont;
-        }
-        if (guiID == PokecubeAdv.GUICLONER_ID)
-        {
-            BlockPos pos = new BlockPos(x, y, z);
-            TileEntityCloner tile = (TileEntityCloner) world.getTileEntity(pos);
-            ContainerCloner cont = new ContainerCloner(player.inventory, tile);
-            return cont;
-        }
-        if (guiID == PokecubeAdv.GUISPLICER_ID)
-        {
-            BlockPos pos = new BlockPos(x, y, z);
-            IInventory tile = (IInventory) world.getTileEntity(pos);
-            ContainerSplicer cont = new ContainerSplicer(player.inventory, tile);
-            return cont;
-        }
-        if (guiID == PokecubeAdv.GUIEXTRACTOR_ID)
-        {
-            BlockPos pos = new BlockPos(x, y, z);
-            IInventory tile = (IInventory) world.getTileEntity(pos);
-            ContainerGeneExtractor cont = new ContainerGeneExtractor(player.inventory, tile);
-            return cont;
-        }
-        if (guiID == PokecubeAdv.GUIAFA_ID)
-        {
-            BlockPos pos = new BlockPos(x, y, z);
-            Container cont = null;
-            TileEntity tileEntity = world.getTileEntity(pos);
-            if (tileEntity instanceof TileEntityAFA)
-            {
-                TileEntityAFA tile = (TileEntityAFA) tileEntity;
-                cont = new ContainerAFA(tile, player.inventory);
-            }
-            else if (tileEntity instanceof TileEntityDaycare)
-            {
-                TileEntityDaycare tile = (TileEntityDaycare) tileEntity;
-                cont = new ContainerDaycare(tile, player.inventory);
-            }
-            return cont;
-        }
-        if (custom_server_handlers.containsKey(guiID))
-        {
-            IGuiHandler handler = custom_server_handlers.get(guiID);
-            return handler.getServerGuiElement(guiID, player, world, x, y, z);
-        }
-        return null;
-    }
-
-    public World getWorld()
-    {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0];
-    }
-
-    public World getWorld(int dim)
-    {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(dim);
-    }
-
-    public void initClient()
-    {
-    }
-
-    public boolean isOnClientSide()
-    {
-        return false;
-    }
-
-    public void initItemModels()
-    {
-    }
-
-    public void initBlockModels()
-    {
-    }
-
-    public void preinit()
-    {
-    }
-
-    public void postinit()
-    {
-    }
-
-    public void registerEntities()
-    {
+        Proxy.super.setup(event);
+        CapabilityManager.INSTANCE.register(IHasPokemobs.class,
+                CapabilityHasPokemobs.storage = new CapabilityHasPokemobs.Storage(), DefaultPokemobs::new);
+        CapabilityManager.INSTANCE.register(IHasNPCAIStates.class,
+                CapabilityNPCAIStates.storage = new CapabilityNPCAIStates.Storage(), DefaultAIStates::new);
+        CapabilityManager.INSTANCE.register(IHasMessages.class,
+                CapabilityNPCMessages.storage = new CapabilityNPCMessages.Storage(), DefaultMessager::new);
+        CapabilityManager.INSTANCE.register(IHasRewards.class,
+                CapabilityHasRewards.storage = new CapabilityHasRewards.Storage(), DefaultRewards::new);
     }
 }

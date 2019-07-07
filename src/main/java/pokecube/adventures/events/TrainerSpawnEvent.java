@@ -4,7 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.Cancelable;
-import pokecube.adventures.entity.trainers.TypeTrainer;
+import net.minecraftforge.eventbus.api.Event;
+import pokecube.adventures.capabilities.utils.TypeTrainer;
 
 @Cancelable
 public class TrainerSpawnEvent extends Event
@@ -14,7 +15,7 @@ public class TrainerSpawnEvent extends Event
     private final BlockPos    location;
     private final World       world;
 
-    public TrainerSpawnEvent(TypeTrainer type, Entity trainer, BlockPos location, World world)
+    public TrainerSpawnEvent(final TypeTrainer type, final Entity trainer, final BlockPos location, final World world)
     {
         this.type = type;
         this.location = location;
@@ -22,24 +23,24 @@ public class TrainerSpawnEvent extends Event
         this.trainer = trainer;
     }
 
-    public TypeTrainer getType()
-    {
-        return type;
-    }
-
     public BlockPos getLocation()
     {
-        return location;
-    }
-
-    public World getWorld()
-    {
-        return world;
+        return this.location;
     }
 
     public Entity getTrainer()
     {
-        return trainer;
+        return this.trainer;
+    }
+
+    public TypeTrainer getType()
+    {
+        return this.type;
+    }
+
+    public World getWorld()
+    {
+        return this.world;
     }
 
 }
