@@ -29,6 +29,14 @@ public class PoweredProcess
         return null;
     }
 
+    public static void init()
+    {
+        RecipeSelector.SERIALIZER.toString();
+        RecipeExtract.SERIALIZER.toString();
+        RecipeSplice.SERIALIZER.toString();
+        RecipeFossilRevive.SERIALIZER.toString();
+    }
+
     public static PoweredProcess load(final CompoundNBT tag, final BaseGeneticsTile tile)
     {
         // TODO load what is saved in save()

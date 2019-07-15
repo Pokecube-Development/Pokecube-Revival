@@ -4,12 +4,19 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import pokecube.adventures.CommonProxy;
+import pokecube.adventures.blocks.genetics.cloner.ClonerContainer;
+import pokecube.adventures.blocks.genetics.extractor.ExtractorContainer;
+import pokecube.adventures.blocks.genetics.splicer.SplicerContainer;
 import pokecube.adventures.capabilities.utils.TypeTrainer;
+import pokecube.adventures.client.gui.blocks.Cloner;
+import pokecube.adventures.client.gui.blocks.Extractor;
+import pokecube.adventures.client.gui.blocks.Splicer;
 import pokecube.adventures.entity.trainer.EntityTrainer;
 import pokecube.core.client.render.RenderNPC;
 
@@ -39,5 +46,10 @@ public class ClientProxy extends CommonProxy
     public void setupClient(final FMLClientSetupEvent event)
     {
         RenderingRegistry.registerEntityRenderingHandler(EntityTrainer.class, (manager) -> new RenderNPC<>(manager));
+
+        // Register container guis.
+        ScreenManager.registerFactory(ClonerContainer.TYPE, Cloner::new);
+        ScreenManager.registerFactory(SplicerContainer.TYPE, Splicer::new);
+        ScreenManager.registerFactory(ExtractorContainer.TYPE, Extractor::new);
     }
 }

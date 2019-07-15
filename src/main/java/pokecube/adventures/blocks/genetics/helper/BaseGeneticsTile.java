@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -26,6 +27,22 @@ import pokecube.core.inventory.InvHelper;
 public abstract class BaseGeneticsTile extends InteractableTile implements IPoweredProgress, ITickableTileEntity,
         ISidedInventory
 {
+    public static class IntHolder extends IntReferenceHolder
+    {
+        private int value;
+
+        @Override
+        public int get()
+        {
+            return this.value;
+        }
+
+        @Override
+        public void set(final int arg0)
+        {
+            this.value = arg0;
+        }
+    }
 
     public static JEP parser;
 
@@ -49,8 +66,8 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
 
     final int                                            outputSlot;
     private boolean                                      check          = true;
-    public int                                           progress       = 0;
-    public int                                           total          = 0;
+    public IntReferenceHolder                            progress       = new IntHolder();
+    public IntReferenceHolder                            total          = new IntHolder();
     private PoweredProcess                               currentProcess = null;
     protected PoweredCraftingInventory                   craftMatrix;
     private PlayerEntity                                 user;
@@ -115,22 +132,36 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
             boolean done = true;
             if (valid)
             {
-                this.total = this.getProcess().recipe.getEnergyCost();
+                this.total.set(this.getProcess().recipe.getEnergyCost());
                 done = !this.getProcess().tick();
             }
             if (!valid || done)
             {
                 this.setProcess(null);
-                this.progress = 0;
+                this.progress.set(0);
                 this.markDirty();
             }
         }
     }
 
     @Override
+    public void clear()
+    {
+        this.inventory.clear();
+    }
+
+    @Override
     public void closeInventory(final PlayerEntity player)
     {
         if (this.user == player) this.user = null;
+    }
+
+    @Override
+    public ItemStack decrStackSize(final int arg0, final int arg1)
+    {
+        final ItemStack stack = this.getStackInSlot(arg0);
+        // TODO is this how it is supposed to happen?
+        return stack.split(arg1);
     }
 
     @Override
@@ -166,6 +197,12 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
     }
 
     @Override
+    public int getSizeInventory()
+    {
+        return this.getInventory().size();
+    }
+
+    @Override
     public int[] getSlotsForFace(final Direction side)
     {
         if (this.slots == null)
@@ -178,9 +215,21 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
     }
 
     @Override
+    public ItemStack getStackInSlot(final int arg0)
+    {
+        return this.inventory.get(arg0);
+    }
+
+    @Override
     public PlayerEntity getUser()
     {
         return this.user;
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return this.inventory.isEmpty();
     }
 
     @Override
@@ -204,7 +253,7 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
         {
             final CompoundNBT tag = nbt.getCompound("progress");
             this.setProcess(PoweredProcess.load(tag, this));
-            if (this.getProcess() != null) this.total = this.getProcess().recipe.getEnergyCost();
+            if (this.getProcess() != null) this.total.set(this.getProcess().recipe.getEnergyCost());
         }
     }
 
@@ -217,6 +266,12 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
         super.remove();
         for (final LazyOptional<? extends IItemHandler> wrapper : this.wrappers)
             wrapper.invalidate();
+    }
+
+    @Override
+    public ItemStack removeStackFromSlot(final int arg0)
+    {
+        return this.inventory.remove(arg0);
     }
 
     @Override
@@ -242,7 +297,7 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
     @Override
     public void setProgress(final int progress)
     {
-        this.progress = progress;
+        this.progress.set(progress);
     }
 
     @Override
