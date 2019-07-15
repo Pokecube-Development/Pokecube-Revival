@@ -29,4 +29,13 @@ public class Extractor extends ContainerScreen<ExtractorContainer>
         this.blit(x, y, 0, 0, this.xSize, this.ySize);
         GL11.glPopMatrix();
     }
+
+    @Override
+    /** Draws the screen and all the components in it. */
+    public void render(final int mouseX, final int mouseY, final float partialTicks)
+    {
+        this.renderBackground();
+        super.render(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
+    }
 }

@@ -14,9 +14,9 @@ import pokecube.core.inventory.BaseContainer;
 public class SplicerContainer extends BaseContainer
 {
     public static final ContainerType<SplicerContainer> TYPE = new ContainerType<>(SplicerContainer::new);
-    private IInventory                                    inv;
-    private final IWorldPosCallable                       pos;
-    public SplicerTile                                    tile;
+    private IInventory                                  inv;
+    private final IWorldPosCallable                     pos;
+    public SplicerTile                                  tile;
 
     public SplicerContainer(final int id, final PlayerInventory invIn)
     {
@@ -62,7 +62,7 @@ public class SplicerContainer extends BaseContainer
             @Override
             public String getSlotTexture()
             {
-                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_bottle");
+                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_dna");
                 return super.getSlotTexture();
             }
 
