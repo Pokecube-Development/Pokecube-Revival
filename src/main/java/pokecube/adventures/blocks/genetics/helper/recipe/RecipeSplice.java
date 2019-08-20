@@ -34,6 +34,12 @@ public class RecipeSplice extends PoweredRecipe
     }
 
     @Override
+    public boolean canFit(final int width, final int height)
+    {
+        return width * height > 2;
+    }
+
+    @Override
     public boolean complete(final IPoweredProgress tile)
     {
         final List<ItemStack> remaining = Lists.newArrayList(this.getRemainingItems(tile.getCraftMatrix()));

@@ -35,9 +35,15 @@ public class RecipeExtract extends PoweredRecipe
 
     public boolean fixed = false;
 
-    public RecipeExtract(final ResourceLocation p_i48169_1_)
+    public RecipeExtract(final ResourceLocation location)
     {
-        super(p_i48169_1_);
+        super(location);
+    }
+
+    @Override
+    public boolean canFit(final int width, final int height)
+    {
+        return width * height > 2;
     }
 
     @Override
@@ -91,11 +97,11 @@ public class RecipeExtract extends PoweredRecipe
         }
         final ItemStack output = destination.copy();
         output.setCount(1);
-        if (source.isEmpty() || genes == null) return output;
+        if (source.isEmpty() || genes == null) return ItemStack.EMPTY;
         if (output.getTag() == null) output.setTag(new CompoundNBT());
         ClonerHelper.mergeGenes(genes, output, new ItemBasedSelector(this.selector));
         output.setCount(1);
-        return ItemStack.EMPTY;
+        return output;
     }
 
     @Override

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -18,7 +20,9 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import pokecube.adventures.blocks.genetics.cloner.ClonerTile;
 import pokecube.adventures.blocks.genetics.helper.ClonerHelper;
+import pokecube.adventures.events.CloneEvent;
 import pokecube.core.PokecubeCore;
 import pokecube.core.database.Database;
 import pokecube.core.database.PokedexEntry;
@@ -40,7 +44,7 @@ public class RecipeFossilRevive extends PoweredRecipe
         {
             final World world = ((TileEntity) tile).getWorld();
             final BlockPos pos = ((TileEntity) tile).getPos();
-            final PokedexEntry entry = this.getEntry(tile.getCraftMatrix());
+            final PokedexEntry entry = RecipeFossilRevive.getEntry(this, tile);
             if (entry == Database.missingno) return false;
             final boolean tame = !entry.legendary;
             MobEntity entity = PokecubeCore.createPokemob(entry, world);
@@ -60,6 +64,11 @@ public class RecipeFossilRevive extends PoweredRecipe
                 entity.setLocationAndAngles(pos.getX() + 0.5 + dir.getXOffset(), pos.getY() + 1, pos.getZ() + 0.5 + dir
                         .getZOffset(), world.rand.nextFloat() * 360F, 0.0F);
                 entity.getEntityData().putBoolean("cloned", true);
+
+                final CloneEvent.Spawn event = new CloneEvent.Spawn((ClonerTile) tile, pokemob);
+                if (PokecubeCore.POKEMOB_BUS.post(event)) return false;
+                pokemob = event.getPokemob();
+                entity = pokemob.getEntity();
                 world.addEntity(entity);
                 final IMobGenetics genes = ClonerHelper.getGenes(dnaSource);
                 if (genes != null) GeneticsManager.initFromGenes(genes, pokemob);
@@ -84,6 +93,13 @@ public class RecipeFossilRevive extends PoweredRecipe
     {
         boolean complete(final IPoweredProgress tile);
 
+        @Nonnull
+        /**
+         * This method should return Database.missingno if not valid!
+         *
+         * @param inventory
+         * @return
+         */
         PokedexEntry getEntry(CraftingInventory inventory);
 
         default PokedexEntry getEntry(final CraftingInventory inventory, final World world)
@@ -106,8 +122,19 @@ public class RecipeFossilRevive extends PoweredRecipe
 
     private static HashMap<PokedexEntry, RecipeFossilRevive> entryMap = Maps.newHashMap();
 
-    public static ReviveMatcher             ANYMATCHER;
-    public static final List<ReviveMatcher> MATCHERS = Lists.newArrayList();
+    public static ReviveMatcher             ANYMATCHER = new AnyMatcher();
+    public static final List<ReviveMatcher> MATCHERS   = Lists.newArrayList();
+
+    public static PokedexEntry getEntry(final ReviveMatcher matcher, final IPoweredProgress tile)
+    {
+        if (!(tile instanceof ClonerTile)) return Database.missingno;
+        final ClonerTile cloner = (ClonerTile) tile;
+        PokedexEntry entry = matcher.getEntry(tile.getCraftMatrix(), cloner.getWorld());
+        final CloneEvent.Pick pick = new CloneEvent.Pick(cloner, entry);
+        if (PokecubeCore.POKEMOB_BUS.post(pick)) entry = Database.missingno;
+        entry = pick.getEntry();
+        return entry;
+    }
 
     public static RecipeFossilRevive getRecipe(final PokedexEntry entry)
     {
@@ -125,9 +152,17 @@ public class RecipeFossilRevive extends PoweredRecipe
     }
 
     @Override
+    public boolean canFit(final int width, final int height)
+    {
+        return width * height > 2;
+    }
+
+    @Override
     public boolean complete(final IPoweredProgress tile)
     {
-        return true;
+        for (final ReviveMatcher matcher : RecipeFossilRevive.MATCHERS)
+            if (matcher.complete(tile)) return true;
+        return RecipeFossilRevive.ANYMATCHER.complete(tile);
     }
 
     @Override
@@ -152,8 +187,8 @@ public class RecipeFossilRevive extends PoweredRecipe
     {
         PokedexEntry entry = Database.missingno;
         for (final ReviveMatcher matcher : RecipeFossilRevive.MATCHERS)
-            if ((entry = matcher.getEntry(tile.getCraftMatrix())) != null) return entry;
-        return RecipeFossilRevive.ANYMATCHER.getEntry(tile.getCraftMatrix());
+            if ((entry = RecipeFossilRevive.getEntry(matcher, tile)) != Database.missingno) return entry;
+        return RecipeFossilRevive.getEntry(RecipeFossilRevive.ANYMATCHER, tile);
     }
 
     @Override
@@ -167,7 +202,7 @@ public class RecipeFossilRevive extends PoweredRecipe
     public boolean matches(final CraftingInventory inv, final World worldIn)
     {
         for (final ReviveMatcher matcher : RecipeFossilRevive.MATCHERS)
-            if (matcher.getEntry(inv, worldIn) != null) return true;
-        return RecipeFossilRevive.ANYMATCHER.getEntry(inv, worldIn) != null;
+            if (matcher.getEntry(inv, worldIn) != Database.missingno) return true;
+        return RecipeFossilRevive.ANYMATCHER.getEntry(inv, worldIn) != Database.missingno;
     }
 }

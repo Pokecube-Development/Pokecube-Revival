@@ -22,10 +22,10 @@ public class PoweredProcess
         if (!tile.getStackInSlot(tile.getOutputSlot()).isEmpty()) return null;
         if (tile.isValid(RecipeFossilRevive.class) && PoweredProcess.REVIVE.matches(tile.getCraftMatrix(), world))
             return PoweredProcess.REVIVE;
-        if (tile.isValid(RecipeExtract.class) && PoweredProcess.EXTRACT.matches(tile.getCraftMatrix(), world))
-            return PoweredProcess.EXTRACT;
-        if (tile.isValid(RecipeSplice.class) && PoweredProcess.SPLICE.matches(tile.getCraftMatrix(), world))
-            return PoweredProcess.SPLICE;
+        if (tile.isValid(RecipeExtract.class) && !PoweredProcess.EXTRACT.getCraftingResult(tile.getCraftMatrix())
+                .isEmpty()) return PoweredProcess.EXTRACT;
+        if (tile.isValid(RecipeSplice.class) && !PoweredProcess.SPLICE.getCraftingResult(tile.getCraftMatrix())
+                .isEmpty()) return PoweredProcess.SPLICE;
         return null;
     }
 
@@ -118,6 +118,8 @@ public class PoweredProcess
     public boolean valid()
     {
         if (this.world == null || this.recipe == null) return false;
-        return this.recipe.matches(this.tile.getCraftMatrix(), this.world);
+        final boolean valid = this.recipe.matches(this.tile.getCraftMatrix(), this.world);
+        // check this, as the "matches" sometimes checks the energy value.
+        return valid || !this.recipe.getCraftingResult(this.tile.getCraftMatrix()).isEmpty();
     }
 }

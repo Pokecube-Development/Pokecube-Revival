@@ -10,10 +10,12 @@ import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.TranslationTextComponent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.blocks.genetics.helper.BaseGeneticsTile;
 import pokecube.adventures.blocks.genetics.helper.ClonerHelper;
 import pokecube.adventures.blocks.genetics.helper.recipe.PoweredRecipe;
+import pokecube.adventures.blocks.genetics.helper.recipe.RecipeFossilRevive;
 import pokecube.core.PokecubeItems;
 
 public class ClonerTile extends BaseGeneticsTile
@@ -49,15 +51,16 @@ public class ClonerTile extends BaseGeneticsTile
     @Override
     public boolean isValid(final Class<? extends PoweredRecipe> recipe)
     {
-        return false;
+        return recipe == RecipeFossilRevive.class;
     }
 
     @Override
     public boolean onInteract(final BlockPos pos, final PlayerEntity player, final Hand hand,
             final BlockRayTraceResult hit)
     {
+        final TranslationTextComponent name = new TranslationTextComponent("block.pokecube_adventures.cloner");
         player.openContainer(new SimpleNamedContainerProvider((id, playerInventory, playerIn) -> new ClonerContainer(id,
-                playerInventory, IWorldPosCallable.of(this.getWorld(), pos)), player.getDisplayName()));
+                playerInventory, IWorldPosCallable.of(this.getWorld(), pos)), name));
         return true;
     }
 }

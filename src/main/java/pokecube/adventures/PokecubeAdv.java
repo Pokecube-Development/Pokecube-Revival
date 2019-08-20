@@ -44,9 +44,13 @@ import pokecube.adventures.blocks.warppad.WarppadBlock;
 import pokecube.adventures.blocks.warppad.WarppadTile;
 import pokecube.adventures.client.ClientProxy;
 import pokecube.adventures.entity.trainer.EntityTrainer;
+import pokecube.adventures.items.Linker;
+import pokecube.adventures.items.bag.BagContainer;
+import pokecube.adventures.items.bag.BagItem;
 import pokecube.core.PokecubeCore;
 import pokecube.core.PokecubeItems;
 import pokecube.core.utils.PokeType;
+import thut.core.common.network.PacketHandler;
 
 @Mod(value = PokecubeAdv.ID)
 public class PokecubeAdv
@@ -79,6 +83,7 @@ public class PokecubeAdv
             event.getRegistry().register(ClonerContainer.TYPE.setRegistryName(PokecubeAdv.ID, "cloner"));
             event.getRegistry().register(ExtractorContainer.TYPE.setRegistryName(PokecubeAdv.ID, "extractor"));
             event.getRegistry().register(SplicerContainer.TYPE.setRegistryName(PokecubeAdv.ID, "splicer"));
+            event.getRegistry().register(BagContainer.TYPE.setRegistryName(PokecubeAdv.ID, "bag"));
         }
 
         @SubscribeEvent
@@ -110,6 +115,11 @@ public class PokecubeAdv
                     PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.SIPHON.getRegistryName()));
             event.getRegistry().register(new BlockItem(PokecubeAdv.WARPPAD, new Item.Properties().group(
                     PokecubeItems.POKECUBEBLOCKS)).setRegistryName(PokecubeAdv.WARPPAD.getRegistryName()));
+
+            // Register some items
+            event.getRegistry().register(PokecubeAdv.EXPSHARE);
+            event.getRegistry().register(PokecubeAdv.LINKER);
+            event.getRegistry().register(PokecubeAdv.BAG);
 
             // Register the badges
             for (final PokeType type : PokeType.values())
@@ -165,6 +175,10 @@ public class PokecubeAdv
     public static final Block SIPHON;
     public static final Block WARPPAD;
 
+    public static final Item EXPSHARE;
+    public static final Item LINKER;
+    public static final Item BAG;
+
     public static final Map<PokeType, Item> BADGES = Maps.newHashMap();
 
     static
@@ -179,12 +193,24 @@ public class PokecubeAdv
         SPLICER = new SplicerBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "splicer");
         SIPHON = new SiphonBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "siphon");
         WARPPAD = new WarppadBlock(Block.Properties.create(Material.IRON)).setRegistryName(PokecubeAdv.ID, "warppad");
+
+        EXPSHARE = new Item(new Item.Properties().group(PokecubeItems.POKECUBEITEMS)).setRegistryName(PokecubeAdv.ID,
+                "exp_share");
+        LINKER = new Linker(new Item.Properties().group(PokecubeItems.POKECUBEITEMS)).setRegistryName(PokecubeAdv.ID,
+                "linker");
+        BAG = new BagItem(new Item.Properties().group(PokecubeItems.POKECUBEITEMS)).setRegistryName(PokecubeAdv.ID,
+                "bag");
     }
 
     public static final String TRAINERTEXTUREPATH = PokecubeAdv.ID + ":textures/trainer/";
 
     public final static CommonProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(),
             () -> () -> new CommonProxy());
+
+    private static final String NETVERSION = "1.0.0";
+    // Handler for network stuff.
+    public static final PacketHandler packets = new PacketHandler(new ResourceLocation(PokecubeAdv.ID, "comms"),
+            PokecubeAdv.NETVERSION);
 
     public static final Config config = Config.instance;
 
@@ -201,6 +227,6 @@ public class PokecubeAdv
         PokecubeCore.POKEMOB_BUS.register(this);
 
         // Register Config stuff
-        thut.core.common.config.Config.setupConfigs(PokecubeAdv.config, PokecubeAdv.ID, PokecubeAdv.ID);
+        thut.core.common.config.Config.setupConfigs(PokecubeAdv.config, PokecubeCore.MODID, PokecubeAdv.ID);
     }
 }

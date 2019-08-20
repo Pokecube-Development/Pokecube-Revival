@@ -17,6 +17,7 @@ import pokecube.adventures.capabilities.CapabilityNPCMessages;
 import pokecube.adventures.capabilities.CapabilityNPCMessages.DefaultMessager;
 import pokecube.adventures.capabilities.CapabilityNPCMessages.IHasMessages;
 import pokecube.adventures.capabilities.utils.TypeTrainer;
+import pokecube.adventures.network.PacketBag;
 import thut.core.common.Proxy;
 
 public class CommonProxy implements Proxy
@@ -30,6 +31,8 @@ public class CommonProxy implements Proxy
     public void setup(final FMLCommonSetupEvent event)
     {
         Proxy.super.setup(event);
+
+        // Register capabilities
         CapabilityManager.INSTANCE.register(IHasPokemobs.class,
                 CapabilityHasPokemobs.storage = new CapabilityHasPokemobs.Storage(), DefaultPokemobs::new);
         CapabilityManager.INSTANCE.register(IHasNPCAIStates.class,
@@ -38,5 +41,8 @@ public class CommonProxy implements Proxy
                 CapabilityNPCMessages.storage = new CapabilityNPCMessages.Storage(), DefaultMessager::new);
         CapabilityManager.INSTANCE.register(IHasRewards.class,
                 CapabilityHasRewards.storage = new CapabilityHasRewards.Storage(), DefaultRewards::new);
+
+        // Register packets
+        PokecubeAdv.packets.registerMessage(PacketBag.class, PacketBag::new);
     }
 }

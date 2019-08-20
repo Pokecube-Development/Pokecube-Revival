@@ -133,6 +133,8 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
             if (valid)
             {
                 this.total.set(this.getProcess().recipe.getEnergyCost());
+                // TODO remove this when needed.
+                this.getProcess().needed -= 230;
                 done = !this.getProcess().tick();
             }
             if (!valid || done)
@@ -175,11 +177,17 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
     @Override
     public PoweredCraftingInventory getCraftMatrix()
     {
-        if (this.craftMatrix == null) this.craftMatrix = new PoweredCraftingInventory(null, 3, 3);
+        if (this.craftMatrix == null) this.craftMatrix = new PoweredCraftingInventory(null, this, 3, 3);
         return this.craftMatrix;
     }
 
     public List<ItemStack> getInventory()
+    {
+        return this.inventory;
+    }
+
+    @Override
+    public List<ItemStack> getList()
     {
         return this.inventory;
     }
@@ -292,6 +300,7 @@ public abstract class BaseGeneticsTile extends InteractableTile implements IPowe
     public void setProcess(final PoweredProcess process)
     {
         this.currentProcess = process;
+        if (process == null) this.setProgress(0);
     }
 
     @Override

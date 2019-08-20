@@ -9,10 +9,12 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.TranslationTextComponent;
 import pokecube.adventures.PokecubeAdv;
 import pokecube.adventures.blocks.genetics.helper.BaseGeneticsTile;
 import pokecube.adventures.blocks.genetics.helper.ClonerHelper;
 import pokecube.adventures.blocks.genetics.helper.recipe.PoweredRecipe;
+import pokecube.adventures.blocks.genetics.helper.recipe.RecipeExtract;
 import pokecube.adventures.blocks.genetics.helper.recipe.RecipeSelector;
 import pokecube.core.utils.Tools;
 import thut.api.entity.genetics.IMobGenetics;
@@ -56,15 +58,16 @@ public class ExtractorTile extends BaseGeneticsTile
     @Override
     public boolean isValid(final Class<? extends PoweredRecipe> recipe)
     {
-        return false;
+        return recipe == RecipeExtract.class;
     }
 
     @Override
     public boolean onInteract(final BlockPos pos, final PlayerEntity player, final Hand hand,
             final BlockRayTraceResult hit)
     {
+        final TranslationTextComponent name = new TranslationTextComponent("block.pokecube_adventures.extractor");
         player.openContainer(new SimpleNamedContainerProvider((id, playerInventory, playerIn) -> new ExtractorContainer(
-                id, playerInventory, IWorldPosCallable.of(this.getWorld(), pos)), player.getDisplayName()));
+                id, playerInventory, IWorldPosCallable.of(this.getWorld(), pos)), name));
         return true;
     }
 

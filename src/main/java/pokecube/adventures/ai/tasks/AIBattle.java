@@ -144,8 +144,7 @@ public class AIBattle extends AITrainerBase
                     if (next != null)
                     {
                         this.messages.sendMessage(MessageState.ABOUTSEND, this.trainer.getTarget(), this.entity
-                                .getDisplayName(), next.getDisplayName(), this.trainer.getTarget()
-                                        .getDisplayName());
+                                .getDisplayName(), next.getDisplayName(), this.trainer.getTarget().getDisplayName());
                         this.messages.doAction(MessageState.ABOUTSEND, this.trainer.getTarget());
                     }
                 }
@@ -235,7 +234,7 @@ public class AIBattle extends AITrainerBase
         {
             if (this.battleLoc == null) this.battleLoc = this.entity.getPosition();
             ((MobEntity) this.entity).getNavigator().setPath(((MobEntity) this.entity).getNavigator().getPathToPos(
-                    this.battleLoc), 0.75);
+                    this.battleLoc, 0), 0.75);
         }
 
         // If target is no longer visbile, forget about it and reset.

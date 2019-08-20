@@ -1,22 +1,17 @@
 package pokecube.adventures.blocks.genetics.cloner;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IWorldPosCallable;
+import pokecube.adventures.blocks.genetics.helper.PoweredContainer;
 import pokecube.adventures.blocks.genetics.helper.crafting.PoweredCraftingInventory;
-import pokecube.core.inventory.BaseContainer;
+import pokecube.core.inventory.TexturedSlot;
 
-public class ClonerContainer extends BaseContainer
+public class ClonerContainer extends PoweredContainer<ClonerTile>
 {
     public static final ContainerType<ClonerContainer> TYPE = new ContainerType<>(ClonerContainer::new);
-    private IInventory                                 inv;
-    private final IWorldPosCallable                    pos;
-    public ClonerTile                                  tile;
 
     public ClonerContainer(final int id, final PlayerInventory invIn)
     {
@@ -25,29 +20,20 @@ public class ClonerContainer extends BaseContainer
 
     public ClonerContainer(final int id, final PlayerInventory invIn, final IWorldPosCallable pos)
     {
-        super(ClonerContainer.TYPE, id);
-        this.pos = pos;
-        this.pos.consume((w, p) ->
+        super(ClonerContainer.TYPE, id, (c) ->
         {
-            final TileEntity tile = w.getTileEntity(p);
-            // Server side
-            if (tile instanceof ClonerTile)
+            pos.consume((w, p) ->
             {
-                this.tile = (ClonerTile) tile;
-                this.inv = this.tile;
-            }
+                final TileEntity temp = w.getTileEntity(p);
+                // Server side
+                if (temp instanceof ClonerTile) c.tile = (ClonerTile) temp;
+            });
+            // Client side
+            if (c.tile == null) c.tile = new ClonerTile();
+            return c.tile;
         });
-        // Client side
-        if (this.inv == null)
-        {
-            this.tile = new ClonerTile();
-            this.inv = this.tile;
-        }
 
-        this.tile.setCraftMatrix(new PoweredCraftingInventory(this, 3, 3));
-
-        this.trackInt(this.tile.progress);
-        this.trackInt(this.tile.total);
+        this.tile.setCraftMatrix(new PoweredCraftingInventory(this, this.tile, 3, 3));
 
         this.addSlot(new Slot(this.tile, this.tile.getOutputSlot(), 124, 35));
 
@@ -57,37 +43,11 @@ public class ClonerContainer extends BaseContainer
 
         int i = 0;
         int j = 0;
-        this.addSlot(new Slot(this.inv, 0, dj - 21 + j * 18, di + i * 18)
-        {
-            @Override
-            public String getSlotTexture()
-            {
-                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_bottle");
-                return super.getSlotTexture();
-            }
-
-            @Override
-            public boolean isItemValid(final ItemStack stack)
-            {
-                return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
-            }
-        });
+        this.addSlot(new TexturedSlot(this.inv, 0, dj - 21 + j * 18, di + i * 18,
+                "pokecube_adventures:items/slot_bottle"));
         i = 2;
-        this.addSlot(new Slot(this.inv, 1, dj - 21 + j * 18, di + i * 18)
-        {
-            @Override
-            public String getSlotTexture()
-            {
-                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_dna");
-                return super.getSlotTexture();
-            }
-
-            @Override
-            public boolean isItemValid(final ItemStack stack)
-            {
-                return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
-            }
-        });
+        this.addSlot(new TexturedSlot(this.inv, 1, dj - 21 + j * 18, di + i * 18,
+                "pokecube_adventures:items/slot_dna"));
 
         i = 0;
         this.addSlot(new Slot(this.inv, 2, dj + j * 18, di + di2 + i * 18));
@@ -110,23 +70,4 @@ public class ClonerContainer extends BaseContainer
 
         this.bindPlayerInventory(invIn, -19);
     }
-
-    @Override
-    public boolean canInteractWith(final PlayerEntity playerIn)
-    {
-        return true;
-    }
-
-    @Override
-    public IInventory getInv()
-    {
-        return this.inv;
-    }
-
-    @Override
-    public int getInventorySlotCount()
-    {
-        return this.tile.getSizeInventory();
-    }
-
 }

@@ -26,7 +26,22 @@ public class Cloner extends ContainerScreen<ClonerContainer>
         final int x = (this.width - this.xSize) / 2;
         final int y = (this.height - this.ySize) / 2;
         this.blit(x, y, 0, 0, this.xSize, this.ySize);
+
+        // Draw the progress bar.
+        this.blit(x, y, 0, 0, this.xSize, this.ySize);
+        final int i = this.container.tile.progress.get();
+        final int j = this.container.tile.total.get();
+        final int l1 = j != 0 && i != 0 ? i * 24 / j : 0;
+        this.blit(x + 89, y + 34, 176, 0, l1 + 1, 16);
+
         GL11.glPopMatrix();
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(final int mouseX, final int mouseY)
+    {
+        this.font.drawString(this.getTitle().getFormattedText(), 8, 6, 4210752);
+        this.font.drawString(this.playerInventory.getName().getFormattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     @Override

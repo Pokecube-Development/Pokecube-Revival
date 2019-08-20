@@ -1,22 +1,17 @@
 package pokecube.adventures.blocks.genetics.extractor;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IWorldPosCallable;
+import pokecube.adventures.blocks.genetics.helper.PoweredContainer;
 import pokecube.adventures.blocks.genetics.helper.crafting.PoweredCraftingInventory;
-import pokecube.core.inventory.BaseContainer;
+import pokecube.core.inventory.TexturedSlot;
 
-public class ExtractorContainer extends BaseContainer
+public class ExtractorContainer extends PoweredContainer<ExtractorTile>
 {
     public static final ContainerType<ExtractorContainer> TYPE = new ContainerType<>(ExtractorContainer::new);
-    private IInventory                                 inv;
-    private final IWorldPosCallable                    pos;
-    public ExtractorTile                               tile;
 
     public ExtractorContainer(final int id, final PlayerInventory invIn)
     {
@@ -25,29 +20,20 @@ public class ExtractorContainer extends BaseContainer
 
     public ExtractorContainer(final int id, final PlayerInventory invIn, final IWorldPosCallable pos)
     {
-        super(ExtractorContainer.TYPE, id);
-        this.pos = pos;
-        this.pos.consume((w, p) ->
+        super(ExtractorContainer.TYPE, id, (c) ->
         {
-            final TileEntity tile = w.getTileEntity(p);
-            // Server side
-            if (tile instanceof ExtractorTile)
+            pos.consume((w, p) ->
             {
-                this.tile = (ExtractorTile) tile;
-                this.inv = this.tile;
-            }
+                final TileEntity temp = w.getTileEntity(p);
+                // Server side
+                if (temp instanceof ExtractorTile) c.tile = (ExtractorTile) temp;
+            });
+            // Client side
+            if (c.tile == null) c.tile = new ExtractorTile();
+            return c.tile;
         });
-        // Client side
-        if (this.inv == null)
-        {
-            this.tile = new ExtractorTile();
-            this.inv = this.tile;
-        }
 
-        this.tile.setCraftMatrix(new PoweredCraftingInventory(this, 1, 3));
-
-        this.trackInt(this.tile.progress);
-        this.trackInt(this.tile.total);
+        this.tile.setCraftMatrix(new PoweredCraftingInventory(this, this.tile, 1, 3));
 
         this.addSlot(new Slot(this.tile, this.tile.getOutputSlot(), 114, 35));
 
@@ -57,73 +43,13 @@ public class ExtractorContainer extends BaseContainer
         final int dj = 32;
 
         // DNA Container
-        this.addSlot(new Slot(this.tile, 0, dj + dj2, di)
-        {
-            @Override
-            public String getSlotTexture()
-            {
-                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_bottle");
-                return super.getSlotTexture();
-            }
-
-            @Override
-            public boolean isItemValid(final ItemStack stack)
-            {
-                return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
-            }
-        });
+        this.addSlot(new TexturedSlot(this.tile, 0, dj + dj2, di, "pokecube_adventures:items/slot_bottle"));
         // Stabiliser
-        this.addSlot(new Slot(this.tile, 1, dj + dj2, di + 35)
-        {
-            @Override
-            public String getSlotTexture()
-            {
-                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_selector");
-                return super.getSlotTexture();
-            }
-
-            @Override
-            public boolean isItemValid(final ItemStack stack)
-            {
-                return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
-            }
-        });
+        this.addSlot(new TexturedSlot(this.tile, 1, dj + dj2, di + 35, "pokecube_adventures:items/slot_selector"));
         // DNA Source
-        this.addSlot(new Slot(this.tile, 2, 47, di + di2)
-        {
-            @Override
-            public String getSlotTexture()
-            {
-                if (super.getSlotTexture() == null) super.setBackgroundName("pokecube_adventures:items/slot_dna");
-                return super.getSlotTexture();
-            }
-
-            @Override
-            public boolean isItemValid(final ItemStack stack)
-            {
-                return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
-            }
-        });
+        this.addSlot(new TexturedSlot(this.tile, 2, 47, di + di2, "pokecube_adventures:items/slot_dna"));
 
         this.bindPlayerInventory(invIn, -19);
-    }
-
-    @Override
-    public boolean canInteractWith(final PlayerEntity playerIn)
-    {
-        return true;
-    }
-
-    @Override
-    public IInventory getInv()
-    {
-        return this.inv;
-    }
-
-    @Override
-    public int getInventorySlotCount()
-    {
-        return this.tile.getSizeInventory();
     }
 
 }

@@ -6,7 +6,6 @@ import java.util.Set;
 
 import com.google.common.collect.Maps;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -14,6 +13,8 @@ import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -80,10 +81,10 @@ public class RecipeSelector extends SpecialRecipe
         }
 
         @OnlyIn(Dist.CLIENT)
-        public void addToTooltip(final List<String> toolTip)
+        public void addToTooltip(final List<ITextComponent> toolTip)
         {
-            toolTip.add(I18n.format("container.geneselector.tooltip.a", this.selectorDestructChance));
-            toolTip.add(I18n.format("container.geneselector.tooltip.b", this.dnaDestructChance));
+            toolTip.add(new TranslationTextComponent("container.geneselector.tooltip.a", this.selectorDestructChance));
+            toolTip.add(new TranslationTextComponent("container.geneselector.tooltip.b", this.dnaDestructChance));
         }
 
         @Override
@@ -145,6 +146,12 @@ public class RecipeSelector extends SpecialRecipe
     public RecipeSelector(final ResourceLocation location)
     {
         super(location);
+    }
+
+    @Override
+    public boolean canFit(final int width, final int height)
+    {
+        return width * height > 1;
     }
 
     @Override
