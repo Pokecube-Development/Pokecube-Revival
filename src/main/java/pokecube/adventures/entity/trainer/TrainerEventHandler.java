@@ -197,10 +197,10 @@ public class TrainerEventHandler
     {
         if (evt.getWorld().isRemote) return;
         final String ID = "LastSuccessInteractEvent";
-        final long time = evt.getTarget().getEntityData().getLong(ID);
+        final long time = evt.getTarget().getPersistentData().getLong(ID);
         if (time == evt.getTarget().getEntityWorld().getGameTime()) return;
         TrainerEventHandler.processInteract(evt, evt.getTarget());
-        evt.getTarget().getEntityData().putLong(ID, evt.getTarget().getEntityWorld().getGameTime());
+        evt.getTarget().getPersistentData().putLong(ID, evt.getTarget().getEntityWorld().getGameTime());
     }
 
     @SubscribeEvent
@@ -213,10 +213,10 @@ public class TrainerEventHandler
     {
         if (evt.getWorld().isRemote) return;
         final String ID = "LastSuccessInteractEvent";
-        final long time = evt.getTarget().getEntityData().getLong(ID);
+        final long time = evt.getTarget().getPersistentData().getLong(ID);
         if (time == evt.getTarget().getEntityWorld().getGameTime()) return;
         TrainerEventHandler.processInteract(evt, evt.getTarget());
-        evt.getTarget().getEntityData().putLong(ID, evt.getTarget().getEntityWorld().getGameTime());
+        evt.getTarget().getPersistentData().putLong(ID, evt.getTarget().getEntityWorld().getGameTime());
     }
 
     /**
@@ -381,7 +381,7 @@ public class TrainerEventHandler
     {
         final IHasPokemobs mobs = CapabilityHasPokemobs.getHasPokemobs(event.getEntity());
         if (mobs == null) return;
-        boolean randomize = event.getEntity().getEntityData().getBoolean("randomizeTeam");
+        boolean randomize = event.getEntity().getPersistentData().getBoolean("randomizeTeam");
         if (event.getEntity() instanceof EntityTrainer) randomize = ((EntityTrainer) event.getEntity())
                 .getShouldRandomize();
         if (randomize) TrainerSpawnHandler.randomizeTrainerTeam(event.getEntity(), mobs);

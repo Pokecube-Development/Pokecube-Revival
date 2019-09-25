@@ -63,7 +63,7 @@ public class RecipeFossilRevive extends PoweredRecipe
                 final Direction dir = world.getBlockState(pos).get(HorizontalBlock.HORIZONTAL_FACING);
                 entity.setLocationAndAngles(pos.getX() + 0.5 + dir.getXOffset(), pos.getY() + 1, pos.getZ() + 0.5 + dir
                         .getZOffset(), world.rand.nextFloat() * 360F, 0.0F);
-                entity.getEntityData().putBoolean("cloned", true);
+                entity.getPersistentData().putBoolean("cloned", true);
 
                 final CloneEvent.Spawn event = new CloneEvent.Spawn((ClonerTile) tile, pokemob);
                 if (PokecubeCore.POKEMOB_BUS.post(event)) return false;
