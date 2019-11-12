@@ -329,8 +329,8 @@ public class TileEntityDaycare extends TileEntityOwnable implements IInventory, 
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
         if (index == 0) return Tools.isStack(stack, "emerald_shard");
-        if (index == 1) return Tools.isSameStack(stack, new ItemStack(Items.EMERALD));
-        if (index == 2) return Tools.isSameStack(stack, new ItemStack(Blocks.EMERALD_BLOCK));
+        if (index == 1) return Tools.isSameStack(stack, new ItemStack(Items.EMERALD), true);
+        if (index == 2) return Tools.isSameStack(stack, new ItemStack(Blocks.EMERALD_BLOCK), true);
         return false;
     }
 

@@ -15,7 +15,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import pokecube.adventures.blocks.cloner.ClonerHelper;
 import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.ItemBasedSelector;
-import pokecube.adventures.blocks.cloner.recipe.RecipeSelector.SelectorValue;
 import pokecube.core.database.PokedexEntry;
 import thut.lib.CompatWrapper;
 
@@ -101,15 +100,9 @@ public class RecipeSplice implements IPoweredRecipe
     @Override
     public ItemStack toKeep(int slot, ItemStack stackIn, InventoryCrafting inv)
     {
-        boolean keepDNA = false;
-        boolean keepSelector = false;
-        SelectorValue value = ClonerHelper.getSelectorValue(selector);
-        if (value.dnaDestructChance < Math.random()) keepDNA = true;
-        if (value.selectorDestructChance < Math.random()) keepSelector = true;
-        if (slot == 0 && keepDNA) return stackIn;
-        if (slot == 1 && keepSelector) return stackIn;
         if (slot == 0 && CompatWrapper.isValid(stackIn) && stackIn.getItem() == Items.POTIONITEM)
             return new ItemStack(Items.GLASS_BOTTLE);
+        if (slot == 1) return stackIn;
         return IPoweredRecipe.super.toKeep(slot, stackIn, inv);
     }
 

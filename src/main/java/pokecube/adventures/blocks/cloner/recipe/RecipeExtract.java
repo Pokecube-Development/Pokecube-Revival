@@ -60,7 +60,7 @@ public class RecipeExtract implements IPoweredRecipe
             Collections.shuffle(stacks);
             if (!source.isEmpty()) for (ItemStack stack : stacks)
             {
-                if (Tools.isSameStack(stack, source))
+                if (Tools.isSameStack(stack, source, true))
                 {
                     DNAPack pack = ClonerHelper.DNAITEMS.get(stack);
                     if (Math.random() > pack.chance) continue;

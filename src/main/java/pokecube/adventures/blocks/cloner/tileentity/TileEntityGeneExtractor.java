@@ -50,7 +50,7 @@ public class TileEntityGeneExtractor extends TileClonerBase
             IMobGenetics genes = ClonerHelper.getGenes(stack);
             if (genes == null && CompatWrapper.isValid(stack)) for (ItemStack stack1 : ClonerHelper.DNAITEMS.keySet())
             {
-                if (Tools.isSameStack(stack1, stack)) { return true; }
+                if (Tools.isSameStack(stack1, stack, true)) { return true; }
             }
             return genes != null;
         }

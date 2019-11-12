@@ -50,7 +50,7 @@ public class TileEntitySplicer extends TileClonerBase
             boolean selector = hasGenes || RecipeSelector.getSelectorValue(stack) != RecipeSelector.defaultSelector;
             return hasGenes || selector;
         case 2:// DNA Destination
-            return ItemPokemobEgg.getEntry(stack) != null;
+            return ItemPokemobEgg.getEntry(stack) != null || ClonerHelper.getGenes(stack) != null;
         }
         return false;
     }

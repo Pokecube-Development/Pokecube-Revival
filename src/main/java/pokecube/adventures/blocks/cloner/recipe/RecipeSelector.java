@@ -114,7 +114,7 @@ public class RecipeSelector implements IDefaultRecipe
         SelectorValue value = defaultSelector;
         if (CompatWrapper.isValid(stack)) for (ItemStack stack1 : selectorValues.keySet())
         {
-            if (Tools.isSameStack(stack1, stack))
+            if (Tools.isSameStack(stack1, stack, true))
             {
                 value = selectorValues.get(stack1);
                 break;
@@ -128,7 +128,7 @@ public class RecipeSelector implements IDefaultRecipe
         if (!ClonerHelper.getGeneSelectors(stack).isEmpty()) return true;
         if (CompatWrapper.isValid(stack)) for (ItemStack stack1 : selectorValues.keySet())
         {
-            if (Tools.isSameStack(stack1, stack)) { return true; }
+            if (Tools.isSameStack(stack1, stack, true)) { return true; }
         }
         return false;
     }
